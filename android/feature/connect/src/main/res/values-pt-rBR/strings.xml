@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Conectar ao OpenCode</string>
+    <string name="connect_subtitle">Pareie este celular com um servidor OpenCode no seu computador para acompanhar e controlar suas sessões de programação.</string>
+    <string name="connect_add_title">Adicionar servidor</string>
+    <string name="connect_scan">Ler código QR</string>
+    <string name="connect_paste">Colar link</string>
+    <string name="connect_manual">Ou conectar manualmente</string>
+    <string name="connect_url_label">URL do servidor</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Código de pareamento</string>
+    <string name="connect_method_password">Senha</string>
+    <string name="connect_code_label">Código de pareamento</string>
+    <string name="connect_password_label">Senha do servidor</string>
+    <string name="connect_test">Testar conexão</string>
+    <string name="connect_submit">Conectar</string>
+    <string name="connect_probe_ok">Acessível · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Servidor acessível. O código de pareamento autenticará este dispositivo.</string>
+    <string name="connect_hint_title">Obter um QR de pareamento</string>
+    <string name="connect_hint_body">No computador que executa o OpenCode, execute %1$s e leia o código QR exibido. Os códigos expiram em poucos minutos.</string>
+    <string name="connect_saved_servers">Servidores salvos</string>
+    <string name="connect_discovered_title">Encontrados nesta rede</string>
+    <string name="connect_discovering">Buscando servidores OpenCode nesta rede…</string>
+    <string name="connect_discovered_hint">Toque e insira um código de pareamento ou a senha</string>
+    <string name="connect_discover_again">Buscar na rede novamente</string>
+    <string name="connect_active">Ativo</string>
+    <string name="connect_error_url_required">Insira a URL do servidor</string>
+    <string name="connect_error_url_invalid">Esta URL de servidor é inválida</string>
+    <string name="connect_error_code_required">Insira o código de pareamento</string>
+    <string name="connect_error_password_required">Insira a senha do servidor</string>
+    <string name="connect_error_no_reachable_url">Nenhum endereço do QR responde neste celular. Confira se ele está na mesma rede ou VPN, ou execute opencode pair --url com um endereço acessível.</string>
+    <string name="connect_paste_invalid">A área de transferência não contém um link do OpenCode</string>
+    <string name="connect_scan_invalid">Este QR não é um link de pareamento do OpenCode</string>
+    <string name="connect_scanner_title">Ler QR de pareamento</string>
+    <string name="connect_scanner_hint">Aponte a câmera para o QR exibido por opencode pair</string>
+    <string name="connect_camera_rationale_title">Acesso à câmera necessário</string>
+    <string name="connect_camera_rationale">O OpenCode usa a câmera apenas para ler o QR de pareamento. Nada é gravado ou salvo.</string>
+    <string name="connect_camera_grant">Permitir câmera</string>
+    <string name="connect_camera_denied">O acesso à câmera foi negado. Ative nas configurações do sistema ou cole o link.</string>
+    <string name="connect_open_settings">Abrir configurações</string>
+    <string name="connect_camera_unavailable">A câmera não está disponível neste dispositivo.</string>
+    <string name="connect_warning_public_http">Este endereço parece público e usa HTTP sem criptografia: a senha trafegaria sem proteção pela internet. Prefira sua rede local, uma VPN ou HTTPS.</string>
+</resources>

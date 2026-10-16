@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Повторить</string>
+    <string name="oc_cancel">Отмена</string>
+    <string name="oc_clear">Очистить</string>
+    <string name="oc_close">Закрыть</string>
+    <string name="oc_back">Назад</string>
+    <string name="oc_copy">Копировать</string>
+    <string name="oc_copied">Скопировано в буфер обмена</string>
+    <string name="oc_show_password">Показать пароль</string>
+    <string name="oc_hide_password">Скрыть пароль</string>
+    <string name="oc_just_now">только что</string>
+    <string name="oc_error_unauthorized">Ошибка аутентификации. Проверьте пароль или выполните сопряжение заново.</string>
+    <string name="oc_error_unreachable">Сервер недоступен. Проверьте URL и убедитесь, что сервер запущен.</string>
+    <string name="oc_error_pairing">Код сопряжения недействителен или истёк. Создайте новый.</string>
+    <string name="oc_error_not_found">Не найдено на сервере.</string>
+    <string name="oc_error_server">Ошибка сервера (%1$d): %2$s</string>
+    <string name="oc_error_generic">Произошла ошибка: %1$s</string>
+    <string name="oc_models_title">Выбрать модель</string>
+    <string name="oc_models_search">Поиск моделей</string>
+    <string name="oc_models_recent">Недавно использованные</string>
+    <string name="oc_models_variant">Рассуждение</string>
+    <string name="oc_models_variant_default">По умолчанию</string>
+    <string name="oc_models_empty">Нет моделей по вашему запросу</string>
+</resources>

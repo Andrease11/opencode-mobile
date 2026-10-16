@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">再試行</string>
+    <string name="oc_cancel">キャンセル</string>
+    <string name="oc_clear">クリア</string>
+    <string name="oc_close">閉じる</string>
+    <string name="oc_back">戻る</string>
+    <string name="oc_copy">コピー</string>
+    <string name="oc_copied">クリップボードにコピーしました</string>
+    <string name="oc_show_password">パスワードを表示</string>
+    <string name="oc_hide_password">パスワードを隠す</string>
+    <string name="oc_just_now">たった今</string>
+    <string name="oc_error_unauthorized">認証に失敗しました。パスワードを確認するか、再度ペアリングしてください。</string>
+    <string name="oc_error_unreachable">サーバーに接続できません。URL とサーバーの起動状態を確認してください。</string>
+    <string name="oc_error_pairing">ペアリングコードが無効か、有効期限が切れています。新しいコードを生成してください。</string>
+    <string name="oc_error_not_found">サーバー上に見つかりません。</string>
+    <string name="oc_error_server">サーバーエラー（%1$d）：%2$s</string>
+    <string name="oc_error_generic">エラーが発生しました：%1$s</string>
+    <string name="oc_models_title">モデルを選択</string>
+    <string name="oc_models_search">モデルを検索</string>
+    <string name="oc_models_recent">最近使用したモデル</string>
+    <string name="oc_models_variant">推論</string>
+    <string name="oc_models_variant_default">デフォルト</string>
+    <string name="oc_models_empty">検索条件に一致するモデルがありません</string>
+</resources>

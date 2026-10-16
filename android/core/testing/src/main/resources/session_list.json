@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "id": "ses_ec9cb5c70ffe3M22jWcPWdSAIF",
+      "projectID": "eaa803d9c060c666e115eedc65b06139bfb8a340",
+      "agent": "build",
+      "model": {
+        "id": "claude-haiku-5-5",
+        "providerID": "anthropic",
+        "variant": "default"
+      },
+      "cost": 0.002645305,
+      "tokens": {
+        "input": 6,
+        "output": 354,
+        "reasoning": 0,
+        "cache": {
+          "read": 14233,
+          "write": 18603
+        }
+      },
+      "outcome": "succeeded",
+      "time": {
+        "created": 1791910781843,
+        "updated": 1791910789784,
+        "idle": 1791910789786
+      },
+      "title": "event probe",
+      "location": {
+        "directory": "/home/user/project"
+      }
+    }
+  ],
+  "cursor": {
+    "previous": "eyJhbmNob3IiOnsiaWQiOiJzZXNfZWNiNjI5OTYxZmZlVk4xcXk2YUsyOWJabXEiLCJ0aW1lIjoxNzkxOTE0MzMzNDI3LCJkaXJlY3Rpb24iOiJwcmV2aW91cyJ9fQ",
+    "next": "eyJhbmNob3IiOnsiaWQiOiJzZXNfZWYzYTY2M2YxZmZlQXg0b2pyWHdvbTIxb2oiLCJ0aW1lIjoxNzkxMjA4NjE0NTMxLCJkaXJlY3Rpb24iOiJuZXh0In19"
+  }
+}

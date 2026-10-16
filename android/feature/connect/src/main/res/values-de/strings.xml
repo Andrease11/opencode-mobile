@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Mit OpenCode verbinden</string>
+    <string name="connect_subtitle">Kopple dieses Telefon mit einem OpenCode-Server auf deinem Computer, um deine Programmiersitzungen zu verfolgen und zu steuern.</string>
+    <string name="connect_add_title">Server hinzufügen</string>
+    <string name="connect_scan">QR-Code scannen</string>
+    <string name="connect_paste">Link einfügen</string>
+    <string name="connect_manual">Oder manuell verbinden</string>
+    <string name="connect_url_label">Server-URL</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Kopplungscode</string>
+    <string name="connect_method_password">Passwort</string>
+    <string name="connect_code_label">Kopplungscode</string>
+    <string name="connect_password_label">Serverpasswort</string>
+    <string name="connect_test">Verbindung testen</string>
+    <string name="connect_submit">Verbinden</string>
+    <string name="connect_probe_ok">Erreichbar · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Server erreichbar. Der Kopplungscode authentifiziert dieses Gerät.</string>
+    <string name="connect_hint_title">Kopplungs-QR-Code erstellen</string>
+    <string name="connect_hint_body">Führe auf dem Computer mit OpenCode %1$s aus und scanne den angezeigten QR-Code. Codes laufen nach wenigen Minuten ab.</string>
+    <string name="connect_saved_servers">Gespeicherte Server</string>
+    <string name="connect_discovered_title">In diesem Netzwerk gefunden</string>
+    <string name="connect_discovering">OpenCode-Server in diesem Netzwerk werden gesucht…</string>
+    <string name="connect_discovered_hint">Für Code oder Passwort antippen</string>
+    <string name="connect_discover_again">Netzwerk erneut durchsuchen</string>
+    <string name="connect_active">Aktiv</string>
+    <string name="connect_error_url_required">Server-URL eingeben</string>
+    <string name="connect_error_url_invalid">Ungültige Server-URL</string>
+    <string name="connect_error_code_required">Kopplungscode eingeben</string>
+    <string name="connect_error_password_required">Serverpasswort eingeben</string>
+    <string name="connect_error_no_reachable_url">Keine Adresse im QR-Code antwortet von diesem Telefon aus. Prüfe das Netzwerk oder VPN, oder führe opencode pair --url mit einer erreichbaren Adresse aus.</string>
+    <string name="connect_paste_invalid">Die Zwischenablage enthält keinen OpenCode-Link</string>
+    <string name="connect_scan_invalid">Dieser QR-Code enthält keinen OpenCode-Kopplungslink</string>
+    <string name="connect_scanner_title">Kopplungs-QR-Code scannen</string>
+    <string name="connect_scanner_hint">Richte die Kamera auf den von opencode pair angezeigten QR-Code</string>
+    <string name="connect_camera_rationale_title">Kamerazugriff erforderlich</string>
+    <string name="connect_camera_rationale">OpenCode verwendet die Kamera nur zum Lesen des Kopplungs-QR-Codes. Es wird nichts aufgezeichnet oder gespeichert.</string>
+    <string name="connect_camera_grant">Kamera erlauben</string>
+    <string name="connect_camera_denied">Kamerazugriff verweigert. Erlaube ihn in den Systemeinstellungen oder füge den Link ein.</string>
+    <string name="connect_open_settings">Einstellungen öffnen</string>
+    <string name="connect_camera_unavailable">Die Kamera ist auf diesem Gerät nicht verfügbar.</string>
+    <string name="connect_warning_public_http">Diese Adresse scheint öffentlich zu sein und nutzt unverschlüsseltes HTTP: Das Passwort würde unverschlüsselt über das Internet gesendet. Nutze besser dein lokales Netz, ein VPN oder HTTPS.</string>
+</resources>

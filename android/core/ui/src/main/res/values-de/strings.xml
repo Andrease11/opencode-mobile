@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Erneut versuchen</string>
+    <string name="oc_cancel">Abbrechen</string>
+    <string name="oc_clear">Leeren</string>
+    <string name="oc_close">Schließen</string>
+    <string name="oc_back">Zurück</string>
+    <string name="oc_copy">Kopieren</string>
+    <string name="oc_copied">In die Zwischenablage kopiert</string>
+    <string name="oc_show_password">Passwort anzeigen</string>
+    <string name="oc_hide_password">Passwort ausblenden</string>
+    <string name="oc_just_now">gerade eben</string>
+    <string name="oc_error_unauthorized">Authentifizierung fehlgeschlagen. Prüfe das Passwort oder kopple das Gerät erneut.</string>
+    <string name="oc_error_unreachable">Server nicht erreichbar. Prüfe die URL und ob der Server läuft.</string>
+    <string name="oc_error_pairing">Der Kopplungscode ist ungültig oder abgelaufen. Erstelle einen neuen.</string>
+    <string name="oc_error_not_found">Auf dem Server nicht gefunden.</string>
+    <string name="oc_error_server">Serverfehler (%1$d): %2$s</string>
+    <string name="oc_error_generic">Ein Fehler ist aufgetreten: %1$s</string>
+    <string name="oc_models_title">Modell auswählen</string>
+    <string name="oc_models_search">Modelle suchen</string>
+    <string name="oc_models_recent">Zuletzt verwendet</string>
+    <string name="oc_models_variant">Denkmodus</string>
+    <string name="oc_models_variant_default">Standard</string>
+    <string name="oc_models_empty">Keine Modelle für diese Suche gefunden</string>
+</resources>

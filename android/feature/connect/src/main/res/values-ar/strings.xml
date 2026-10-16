@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">الاتصال بـ OpenCode</string>
+    <string name="connect_subtitle">أقرن هذا الهاتف بخادم OpenCode يعمل على حاسوبك لمتابعة جلسات البرمجة والتحكم بها.</string>
+    <string name="connect_add_title">إضافة خادم</string>
+    <string name="connect_scan">مسح رمز QR</string>
+    <string name="connect_paste">لصق رابط</string>
+    <string name="connect_manual">أو الاتصال يدويًا</string>
+    <string name="connect_url_label">رابط الخادم</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">رمز الاقتران</string>
+    <string name="connect_method_password">كلمة المرور</string>
+    <string name="connect_code_label">رمز الاقتران</string>
+    <string name="connect_password_label">كلمة مرور الخادم</string>
+    <string name="connect_test">اختبار الاتصال</string>
+    <string name="connect_submit">اتصال</string>
+    <string name="connect_probe_ok">متاح · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">الخادم متاح. سيصادق رمز الاقتران على هذا الجهاز.</string>
+    <string name="connect_hint_title">الحصول على رمز QR للاقتران</string>
+    <string name="connect_hint_body">على الحاسوب الذي يشغّل OpenCode، نفّذ %1$s وامسح رمز QR الظاهر. تنتهي صلاحية الرموز بعد بضع دقائق.</string>
+    <string name="connect_saved_servers">الخوادم المحفوظة</string>
+    <string name="connect_discovered_title">تم العثور عليها في هذه الشبكة</string>
+    <string name="connect_discovering">جارٍ البحث عن خوادم OpenCode في هذه الشبكة…</string>
+    <string name="connect_discovered_hint">اضغط ثم أدخل رمز الاقتران أو كلمة المرور</string>
+    <string name="connect_discover_again">البحث في الشبكة مجددًا</string>
+    <string name="connect_active">نشط</string>
+    <string name="connect_error_url_required">أدخل رابط الخادم</string>
+    <string name="connect_error_url_invalid">رابط الخادم غير صالح</string>
+    <string name="connect_error_code_required">أدخل رمز الاقتران</string>
+    <string name="connect_error_password_required">أدخل كلمة مرور الخادم</string>
+    <string name="connect_error_no_reachable_url">لا يستجيب أي عنوان في رمز QR من هذا الهاتف. تحقق من الاتصال بالشبكة نفسها أو VPN، أو نفّذ opencode pair --url بعنوان متاح.</string>
+    <string name="connect_paste_invalid">لا تحتوي الحافظة على رابط OpenCode</string>
+    <string name="connect_scan_invalid">رمز QR هذا ليس رابط اقتران OpenCode</string>
+    <string name="connect_scanner_title">مسح QR الاقتران</string>
+    <string name="connect_scanner_hint">وجّه الكاميرا إلى رمز QR الذي يعرضه opencode pair</string>
+    <string name="connect_camera_rationale_title">يلزم الوصول إلى الكاميرا</string>
+    <string name="connect_camera_rationale">يستخدم OpenCode الكاميرا لقراءة رمز QR للاقتران فقط. لا يتم تسجيل أو حفظ أي شيء.</string>
+    <string name="connect_camera_grant">السماح بالكاميرا</string>
+    <string name="connect_camera_denied">تم رفض إذن الكاميرا. فعّله في إعدادات النظام أو الصق الرابط.</string>
+    <string name="connect_open_settings">فتح الإعدادات</string>
+    <string name="connect_camera_unavailable">الكاميرا غير متاحة على هذا الجهاز.</string>
+    <string name="connect_warning_public_http">يبدو أن هذا العنوان عام ويستخدم HTTP دون تشفير: ستنتقل كلمة المرور عبر الإنترنت دون حماية. يُفضَّل استخدام شبكتك المحلية أو VPN أو HTTPS.</string>
+</resources>

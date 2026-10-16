@@ -1,0 +1,45 @@
+# Pairs a fresh install with the local server through the manual URL + pairing code form.
+# Requires adb reverse tcp:4096 and a single-use code passed with -e OC_PAIR_CODE=...
+# (see .maestro/AGENTS.md). Clears app data, so saved servers are removed.
+appId: io.github.beppe2880.opencodemobile.debug
+name: Connect - manual pairing code
+env:
+  OC_SERVER_URL: http://localhost:4096
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: connect_url_field
+    timeout: 15000
+- tapOn:
+    id: connect_url_field
+- inputText: ${OC_SERVER_URL}
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: connect_method_code
+    direction: DOWN
+- tapOn:
+    id: connect_method_code
+- scrollUntilVisible:
+    element:
+      id: connect_code_field
+    direction: DOWN
+- tapOn:
+    id: connect_code_field
+- inputText: ${OC_PAIR_CODE}
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: connect_submit_button
+    direction: DOWN
+- tapOn:
+    id: connect_submit_button
+- extendedWaitUntil:
+    visible:
+      id: sessions_list
+    timeout: 20000
+- assertVisible:
+    id: sessions_connection_indicator
+- takeScreenshot: .maestro/output/connect-paired

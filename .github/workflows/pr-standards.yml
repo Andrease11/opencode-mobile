@@ -1,0 +1,89 @@
+name: PR Standards
+
+# Labels pull requests that miss the title format or the template, explains how to fix them
+# in a single comment, and clears the labels once fixed. compliance-close.yml closes the ones
+# still not fixed after 72 hours.
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  check:
+    name: Check PR standards
+    runs-on: ubuntu-latest
+    # pull_request_target runs with write permissions: never check out PR code here.
+    if: ${{ !github.event.repository.fork }}
+    timeout-minutes: 2
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const exempt = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association)
+              || pr.user.type === 'Bot';
+            if (exempt) {
+              core.info(`Skipping: ${pr.user.login} (${pr.author_association})`);
+              return;
+            }
+
+            const repo = { owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number };
+            const titleOk = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: [A-Z].+/.test(pr.title);
+
+            // The template's free-text answers, without HTML comments and placeholders.
+            const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '');
+            const section = (heading) => {
+              const match = body.match(new RegExp(`###\\s*${heading}[^\\n]*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i'));
+              return match ? match[1].trim() : null;
+            };
+            const what = section('What does this PR do');
+            const how = section('How did you verify');
+            const templateOk = what !== null && how !== null && what.length >= 20 && how.length >= 10;
+
+            const problems = [];
+            if (!titleOk) problems.push(
+              '- **Title**: use [Conventional Commits](https://www.conventionalcommits.org) with a capitalized subject, ' +
+              'for example `feat(chat): Group thinking and tool rows` or `fix: Keep the draft after a failed send`.'
+            );
+            if (!templateOk) problems.push(
+              '- **Description**: fill in the pull request template, at least ' +
+              '"What does this PR do?" and "How did you verify your code works?".'
+            );
+
+            async function setLabel(name, on) {
+              if (on) {
+                await github.rest.issues.addLabels({ ...repo, labels: [name] });
+              } else {
+                await github.rest.issues.removeLabel({ ...repo, name }).catch(() => {});
+              }
+            }
+            await setLabel('needs:title', !titleOk);
+            await setLabel('needs:template', !templateOk);
+            await setLabel('needs:compliance', problems.length > 0);
+
+            const marker = '<!-- compliance -->';
+            const comments = await github.paginate(github.rest.issues.listComments, repo);
+            const existing = comments.find((c) => c.body.includes(marker));
+            if (problems.length === 0) {
+              if (existing) await github.rest.issues.deleteComment({ ...repo, comment_id: existing.id });
+              return;
+            }
+            const message = [
+              marker,
+              'Thanks for the pull request! A couple of things to fix before review:',
+              '',
+              ...problems,
+              '',
+              'Pull requests that still miss these after 72 hours are closed automatically. ' +
+              'See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md).',
+            ].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: existing.id, body: message });
+            } else {
+              await github.rest.issues.createComment({ ...repo, body: message });
+            }

@@ -1,0 +1,26 @@
+# Built artifacts
+*.iml
+.gradle
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Local config
+local.properties
+
+# IDE
+.idea/
+.DS_Store
+*.ipr
+*.iws
+*.ipl
+.kotlin/
+
+# Signing
+*.jks
+*.keystore
+keystore.properties
+# The shared debug keystore is committed so every machine signs debug APKs
+# with the same key. It is a standard debug key and protects nothing.
+!debug.keystore

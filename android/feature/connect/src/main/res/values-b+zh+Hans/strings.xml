@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">连接 OpenCode</string>
+    <string name="connect_subtitle">将此手机与电脑上运行的 OpenCode 服务器配对，即可跟进和管理编程会话。</string>
+    <string name="connect_add_title">添加服务器</string>
+    <string name="connect_scan">扫描二维码</string>
+    <string name="connect_paste">粘贴链接</string>
+    <string name="connect_manual">或手动连接</string>
+    <string name="connect_url_label">服务器 URL</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">配对码</string>
+    <string name="connect_method_password">密码</string>
+    <string name="connect_code_label">配对码</string>
+    <string name="connect_password_label">服务器密码</string>
+    <string name="connect_test">测试连接</string>
+    <string name="connect_submit">连接</string>
+    <string name="connect_probe_ok">可连接 · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">服务器可连接。配对码将用于验证此设备。</string>
+    <string name="connect_hint_title">获取配对二维码</string>
+    <string name="connect_hint_body">在运行 OpenCode 的电脑上执行 %1$s，然后扫描显示的二维码。配对码将在几分钟后过期。</string>
+    <string name="connect_saved_servers">已保存的服务器</string>
+    <string name="connect_discovered_title">在此网络中找到</string>
+    <string name="connect_discovering">正在此网络中搜索 OpenCode 服务器…</string>
+    <string name="connect_discovered_hint">点击后输入配对码或密码</string>
+    <string name="connect_discover_again">重新搜索网络</string>
+    <string name="connect_active">当前使用</string>
+    <string name="connect_error_url_required">请输入服务器 URL</string>
+    <string name="connect_error_url_invalid">服务器 URL 无效</string>
+    <string name="connect_error_code_required">请输入配对码</string>
+    <string name="connect_error_password_required">请输入服务器密码</string>
+    <string name="connect_error_no_reachable_url">手机无法访问二维码中的任何地址。请确认手机连接到同一网络或 VPN，或运行 opencode pair --url 并指定可访问的地址。</string>
+    <string name="connect_paste_invalid">剪贴板中没有 OpenCode 链接</string>
+    <string name="connect_scan_invalid">此二维码不是 OpenCode 配对链接</string>
+    <string name="connect_scanner_title">扫描配对二维码</string>
+    <string name="connect_scanner_hint">将相机对准 opencode pair 显示的二维码</string>
+    <string name="connect_camera_rationale_title">需要相机权限</string>
+    <string name="connect_camera_rationale">OpenCode 仅使用相机扫描配对二维码，不会录制或保存任何内容。</string>
+    <string name="connect_camera_grant">允许使用相机</string>
+    <string name="connect_camera_denied">相机权限被拒绝。请在系统设置中开启权限，或粘贴链接。</string>
+    <string name="connect_open_settings">打开设置</string>
+    <string name="connect_camera_unavailable">此设备的相机不可用。</string>
+    <string name="connect_warning_public_http">此地址看起来是公网地址，且使用未加密的 HTTP：密码会以明文经过互联网传输。建议使用局域网、VPN 或 HTTPS。</string>
+</resources>

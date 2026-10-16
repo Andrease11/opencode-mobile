@@ -1,0 +1,63 @@
+name: Bug report
+description: Something in the app does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Before sending, make sure screenshots and logs do not show
+        **server addresses, passwords, pairing codes or private sessions**.
+        Please write the report yourself: long AI-generated descriptions may be closed.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a session with ...
+        2. Tap ...
+        3. See ...
+    validations:
+      required: false
+
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Settings → About → App version
+      placeholder: e.g. 1.2.0
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: OpenCode server version
+      description: Settings → About, or `opencode --version` on the computer
+      placeholder: e.g. 2.0.27
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: e.g. Pixel 8, Android 16
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or screen recording
+      description: Drag and drop here. Hide anything private first.
+    validations:
+      required: false

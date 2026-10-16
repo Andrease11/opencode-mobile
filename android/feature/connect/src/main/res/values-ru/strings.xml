@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Подключиться к OpenCode</string>
+    <string name="connect_subtitle">Подключите телефон к серверу OpenCode на компьютере, чтобы следить за сессиями программирования и управлять ими.</string>
+    <string name="connect_add_title">Добавить сервер</string>
+    <string name="connect_scan">Сканировать QR-код</string>
+    <string name="connect_paste">Вставить ссылку</string>
+    <string name="connect_manual">Или подключитесь вручную</string>
+    <string name="connect_url_label">URL сервера</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Код сопряжения</string>
+    <string name="connect_method_password">Пароль</string>
+    <string name="connect_code_label">Код сопряжения</string>
+    <string name="connect_password_label">Пароль сервера</string>
+    <string name="connect_test">Проверить соединение</string>
+    <string name="connect_submit">Подключиться</string>
+    <string name="connect_probe_ok">Доступен · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Сервер доступен. Код сопряжения подтвердит доступ этого устройства.</string>
+    <string name="connect_hint_title">Получить QR-код сопряжения</string>
+    <string name="connect_hint_body">На компьютере с OpenCode выполните %1$s и отсканируйте появившийся QR-код. Коды действуют несколько минут.</string>
+    <string name="connect_saved_servers">Сохранённые серверы</string>
+    <string name="connect_discovered_title">Найдены в этой сети</string>
+    <string name="connect_discovering">Поиск серверов OpenCode в этой сети…</string>
+    <string name="connect_discovered_hint">Нажмите и введите код сопряжения или пароль</string>
+    <string name="connect_discover_again">Повторить поиск в сети</string>
+    <string name="connect_active">Активен</string>
+    <string name="connect_error_url_required">Введите URL сервера</string>
+    <string name="connect_error_url_invalid">Недопустимый URL сервера</string>
+    <string name="connect_error_code_required">Введите код сопряжения</string>
+    <string name="connect_error_password_required">Введите пароль сервера</string>
+    <string name="connect_error_no_reachable_url">Ни один адрес из QR-кода не отвечает с этого телефона. Проверьте сеть или VPN либо выполните opencode pair --url с доступным адресом.</string>
+    <string name="connect_paste_invalid">В буфере обмена нет ссылки OpenCode</string>
+    <string name="connect_scan_invalid">Этот QR-код не содержит ссылку сопряжения OpenCode</string>
+    <string name="connect_scanner_title">Сканировать QR-код сопряжения</string>
+    <string name="connect_scanner_hint">Наведите камеру на QR-код, показанный командой opencode pair</string>
+    <string name="connect_camera_rationale_title">Нужен доступ к камере</string>
+    <string name="connect_camera_rationale">OpenCode использует камеру только для чтения QR-кода сопряжения. Ничего не записывается и не сохраняется.</string>
+    <string name="connect_camera_grant">Разрешить камеру</string>
+    <string name="connect_camera_denied">Доступ к камере запрещён. Разрешите его в настройках системы или вставьте ссылку.</string>
+    <string name="connect_open_settings">Открыть настройки</string>
+    <string name="connect_camera_unavailable">Камера недоступна на этом устройстве.</string>
+    <string name="connect_warning_public_http">Этот адрес похож на публичный и использует HTTP без шифрования: пароль будет передаваться через интернет в открытом виде. Лучше используйте локальную сеть, VPN или HTTPS.</string>
+</resources>

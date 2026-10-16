@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">OpenCode に接続</string>
+    <string name="connect_subtitle">このスマートフォンをパソコン上の OpenCode サーバーとペアリングして、コーディングセッションの確認や操作を行えます。</string>
+    <string name="connect_add_title">サーバーを追加</string>
+    <string name="connect_scan">QR コードをスキャン</string>
+    <string name="connect_paste">リンクを貼り付け</string>
+    <string name="connect_manual">または手動で接続</string>
+    <string name="connect_url_label">サーバー URL</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">ペアリングコード</string>
+    <string name="connect_method_password">パスワード</string>
+    <string name="connect_code_label">ペアリングコード</string>
+    <string name="connect_password_label">サーバーのパスワード</string>
+    <string name="connect_test">接続をテスト</string>
+    <string name="connect_submit">接続</string>
+    <string name="connect_probe_ok">接続可能 · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">サーバーに接続できます。ペアリングコードでこの端末を認証します。</string>
+    <string name="connect_hint_title">ペアリング用 QR コードを取得</string>
+    <string name="connect_hint_body">OpenCode が動作しているパソコンで %1$s を実行し、表示された QR コードをスキャンしてください。コードは数分で期限切れになります。</string>
+    <string name="connect_saved_servers">保存済みサーバー</string>
+    <string name="connect_discovered_title">このネットワークで検出</string>
+    <string name="connect_discovering">このネットワークの OpenCode サーバーを検索中…</string>
+    <string name="connect_discovered_hint">タップしてペアリングコードまたはパスワードを入力</string>
+    <string name="connect_discover_again">ネットワークを再検索</string>
+    <string name="connect_active">使用中</string>
+    <string name="connect_error_url_required">サーバー URL を入力してください</string>
+    <string name="connect_error_url_invalid">サーバー URL が無効です</string>
+    <string name="connect_error_code_required">ペアリングコードを入力してください</string>
+    <string name="connect_error_password_required">サーバーのパスワードを入力してください</string>
+    <string name="connect_error_no_reachable_url">QR コード内のどのアドレスにも接続できません。同じネットワークまたは VPN に接続しているか確認するか、接続可能なアドレスを指定して opencode pair --url を実行してください。</string>
+    <string name="connect_paste_invalid">クリップボードに OpenCode のリンクがありません</string>
+    <string name="connect_scan_invalid">この QR コードは OpenCode のペアリングリンクではありません</string>
+    <string name="connect_scanner_title">ペアリング用 QR をスキャン</string>
+    <string name="connect_scanner_hint">opencode pair が表示する QR コードにカメラを向けてください</string>
+    <string name="connect_camera_rationale_title">カメラへのアクセスが必要です</string>
+    <string name="connect_camera_rationale">OpenCode はペアリング用 QR コードの読み取りにのみカメラを使用します。録画や保存は行いません。</string>
+    <string name="connect_camera_grant">カメラを許可</string>
+    <string name="connect_camera_denied">カメラへのアクセスが拒否されました。システム設定で許可するか、リンクを貼り付けてください。</string>
+    <string name="connect_open_settings">設定を開く</string>
+    <string name="connect_camera_unavailable">この端末ではカメラを利用できません。</string>
+    <string name="connect_warning_public_http">このアドレスは公開アドレスのようで、暗号化されていない HTTP を使っています。パスワードが暗号化されずにインターネットを通ります。LAN、VPN、または HTTPS を使ってください。</string>
+</resources>

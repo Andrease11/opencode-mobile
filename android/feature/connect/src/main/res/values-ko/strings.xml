@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">OpenCode에 연결</string>
+    <string name="connect_subtitle">이 휴대폰을 컴퓨터의 OpenCode 서버와 페어링하여 코딩 세션을 확인하고 제어하세요.</string>
+    <string name="connect_add_title">서버 추가</string>
+    <string name="connect_scan">QR 코드 스캔</string>
+    <string name="connect_paste">링크 붙여넣기</string>
+    <string name="connect_manual">또는 수동으로 연결</string>
+    <string name="connect_url_label">서버 URL</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">페어링 코드</string>
+    <string name="connect_method_password">비밀번호</string>
+    <string name="connect_code_label">페어링 코드</string>
+    <string name="connect_password_label">서버 비밀번호</string>
+    <string name="connect_test">연결 테스트</string>
+    <string name="connect_submit">연결</string>
+    <string name="connect_probe_ok">연결 가능 · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">서버에 연결할 수 있습니다. 페어링 코드로 이 기기를 인증합니다.</string>
+    <string name="connect_hint_title">페어링 QR 코드 받기</string>
+    <string name="connect_hint_body">OpenCode가 실행 중인 컴퓨터에서 %1$s 명령을 실행하고 표시된 QR 코드를 스캔하세요. 코드는 몇 분 후 만료됩니다.</string>
+    <string name="connect_saved_servers">저장된 서버</string>
+    <string name="connect_discovered_title">이 네트워크에서 발견됨</string>
+    <string name="connect_discovering">이 네트워크에서 OpenCode 서버 검색 중…</string>
+    <string name="connect_discovered_hint">탭한 다음 페어링 코드 또는 비밀번호 입력</string>
+    <string name="connect_discover_again">네트워크 다시 검색</string>
+    <string name="connect_active">사용 중</string>
+    <string name="connect_error_url_required">서버 URL을 입력하세요</string>
+    <string name="connect_error_url_invalid">올바른 서버 URL이 아닙니다</string>
+    <string name="connect_error_code_required">페어링 코드를 입력하세요</string>
+    <string name="connect_error_password_required">서버 비밀번호를 입력하세요</string>
+    <string name="connect_error_no_reachable_url">QR 코드의 모든 서버 주소에 연결할 수 없습니다. 같은 네트워크나 VPN에 연결되어 있는지 확인하거나 접근 가능한 주소로 opencode pair --url을 실행하세요.</string>
+    <string name="connect_paste_invalid">클립보드에 OpenCode 링크가 없습니다</string>
+    <string name="connect_scan_invalid">OpenCode 페어링 링크가 아닌 QR 코드입니다</string>
+    <string name="connect_scanner_title">페어링 QR 스캔</string>
+    <string name="connect_scanner_hint">opencode pair가 표시한 QR 코드를 카메라로 비추세요</string>
+    <string name="connect_camera_rationale_title">카메라 접근 권한 필요</string>
+    <string name="connect_camera_rationale">OpenCode는 페어링 QR 코드를 읽는 데만 카메라를 사용합니다. 녹화하거나 저장하지 않습니다.</string>
+    <string name="connect_camera_grant">카메라 허용</string>
+    <string name="connect_camera_denied">카메라 권한이 거부되었습니다. 시스템 설정에서 허용하거나 링크를 붙여넣으세요.</string>
+    <string name="connect_open_settings">설정 열기</string>
+    <string name="connect_camera_unavailable">이 기기에서 카메라를 사용할 수 없습니다.</string>
+    <string name="connect_warning_public_http">이 주소는 공개 주소로 보이며 암호화되지 않은 HTTP를 사용합니다. 비밀번호가 암호화 없이 인터넷으로 전송됩니다. 로컬 네트워크, VPN 또는 HTTPS를 사용하세요.</string>
+</resources>

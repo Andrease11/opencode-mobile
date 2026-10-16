@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">إعادة المحاولة</string>
+    <string name="oc_cancel">إلغاء</string>
+    <string name="oc_clear">مسح</string>
+    <string name="oc_close">إغلاق</string>
+    <string name="oc_back">رجوع</string>
+    <string name="oc_copy">نسخ</string>
+    <string name="oc_copied">تم النسخ إلى الحافظة</string>
+    <string name="oc_show_password">إظهار كلمة المرور</string>
+    <string name="oc_hide_password">إخفاء كلمة المرور</string>
+    <string name="oc_just_now">الآن</string>
+    <string name="oc_error_unauthorized">فشلت المصادقة. تحقق من كلمة المرور أو أعد الاقتران.</string>
+    <string name="oc_error_unreachable">تعذر الوصول إلى الخادم. تحقق من الرابط ومن أن الخادم قيد التشغيل.</string>
+    <string name="oc_error_pairing">رمز الاقتران غير صالح أو انتهت صلاحيته. أنشئ رمزًا جديدًا.</string>
+    <string name="oc_error_not_found">لم يتم العثور عليه في الخادم.</string>
+    <string name="oc_error_server">خطأ في الخادم (%1$d): %2$s</string>
+    <string name="oc_error_generic">حدث خطأ: %1$s</string>
+    <string name="oc_models_title">اختيار النموذج</string>
+    <string name="oc_models_search">البحث عن نماذج</string>
+    <string name="oc_models_recent">المستخدمة مؤخرًا</string>
+    <string name="oc_models_variant">الاستدلال</string>
+    <string name="oc_models_variant_default">الافتراضي</string>
+    <string name="oc_models_empty">لا توجد نماذج تطابق بحثك</string>
+</resources>

@@ -1,0 +1,35 @@
+# With a saved server, searches the session list, opens the first result and returns.
+# Pass -e OC_SESSION_QUERY="<title words>" to pick a specific session.
+appId: io.github.beppe2880.opencodemobile.debug
+name: Sessions - search and open
+env:
+  OC_SESSION_QUERY: probe
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: sessions_list
+    timeout: 15000
+- tapOn:
+    id: sessions_search_field
+- inputText: ${OC_SESSION_QUERY}
+- hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: "session_row_.*"
+    timeout: 10000
+- tapOn:
+    id: "session_row_.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: chat_transcript
+    timeout: 15000
+- assertVisible:
+    id: chat_composer_field
+- takeScreenshot: .maestro/output/sessions-open-session
+- tapOn:
+    id: chat_back_button
+- assertVisible:
+    id: sessions_list

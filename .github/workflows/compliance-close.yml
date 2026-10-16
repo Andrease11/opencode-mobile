@@ -1,0 +1,54 @@
+name: Compliance Close
+
+# Closes issues and pull requests labeled needs:compliance whose explanatory comment
+# (see issue-standards.yml and pr-standards.yml) is older than 72 hours.
+
+on:
+  schedule:
+    - cron: "17 * * * *" # hourly
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  close:
+    name: Close non-compliant issues and PRs
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.fork }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const window = 72 * 60 * 60 * 1000;
+            const items = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'needs:compliance',
+              state: 'open',
+              per_page: 100,
+            });
+            for (const item of items) {
+              const repo = { owner: context.repo.owner, repo: context.repo.repo, issue_number: item.number };
+              const comments = await github.paginate(github.rest.issues.listComments, repo);
+              const notice = comments.find((c) => c.body.includes('<!-- compliance -->'));
+              if (!notice) continue;
+              const age = Date.now() - new Date(notice.created_at).getTime();
+              if (age < window) continue;
+
+              const kind = item.pull_request ? 'pull request' : 'issue';
+              await github.rest.issues.createComment({
+                ...repo,
+                body: `Closing this ${kind} because it still does not follow the ` +
+                  '[contributing guidelines](../blob/main/CONTRIBUTING.md) after 72 hours. ' +
+                  'Feel free to open a new one that does.',
+              });
+              if (item.pull_request) {
+                await github.rest.pulls.update({ owner: repo.owner, repo: repo.repo, pull_number: item.number, state: 'closed' });
+              } else {
+                await github.rest.issues.update({ ...repo, state: 'closed', state_reason: 'not_planned' });
+              }
+              core.info(`Closed ${kind} #${item.number}`);
+            }

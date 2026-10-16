@@ -1,0 +1,14 @@
+{
+  "name": "opencode-mobile-api-gen",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "bun src/generate.ts generate",
+    "refresh": "bun src/generate.ts refresh",
+    "check": "bun src/generate.ts check"
+  },
+  "dependencies": {
+    "@opencode/schema": "2.0.27",
+    "effect": "4.0.1"
+  }
+}

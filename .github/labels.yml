@@ -1,0 +1,68 @@
+# Repository labels, synced by .github/workflows/labels.yml. Labels missing here are deleted.
+
+- name: bug
+  color: "d73a4a"
+  description: Something does not work
+- name: feature
+  color: "a2eeef"
+  description: New feature or improvement
+- name: question
+  color: "d876e3"
+  description: Setup or usage question
+- name: documentation
+  color: "0075ca"
+  description: README, guides and other docs
+- name: dependencies
+  color: "0366d6"
+  description: Dependency update
+- name: good first issue
+  color: "7057ff"
+  description: Good for newcomers
+- name: help wanted
+  color: "008672"
+  description: Extra attention is needed
+- name: duplicate
+  color: "cfd3d7"
+  description: Already reported
+- name: wontfix
+  color: "ffffff"
+  description: Will not be worked on
+
+# Never marked stale (stale.yml)
+- name: confirmed
+  color: "0e8a16"
+  description: Reproduced or accepted; never marked stale
+- name: pinned
+  color: "5319e7"
+  description: Never marked stale
+- name: security
+  color: "b60205"
+  description: Security related; never marked stale
+- name: stale
+  color: "cfd3d7"
+  description: No recent activity
+
+# Pull request and issue checks (pr-standards.yml, issue-standards.yml, compliance-close.yml)
+- name: wip
+  color: "fbca04"
+  description: Work in progress; title check skipped
+- name: "needs:compliance"
+  color: "e99695"
+  description: Does not follow the contributing guidelines yet
+- name: "needs:title"
+  color: "e99695"
+  description: PR title is not a Conventional Commit
+- name: "needs:template"
+  color: "e99695"
+  description: PR template not filled in
+- name: "needs:info"
+  color: "e99695"
+  description: Waiting for more information
+
+# release-please (release.yml)
+- name: "autorelease: pending"
+  color: "ededed"
+  description: Release pull request not merged yet
+- name: "autorelease: tagged"
+  color: "ededed"
+  description: Release published

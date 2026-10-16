@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit AI review for pull requests (free for public repositories).
+language: en-US
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: true
+  sequence_diagrams: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: [main]
+    ignore_title_keywords: [WIP]
+  finishing_touches:
+    docstrings:
+      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+  path_filters:
+    - "!android/core/api/**" # generated from api/openapi.json
+    - "!api/openapi.json"
+    - "!**/*.png"
+    - "!android/core/ui/src/main/res/font/**"
+    - "!CHANGELOG.md" # written by release-please
+    - "!version.txt"
+    - "!.release-please-manifest.json"
+  path_instructions:
+    - path: "android/feature/**/*.kt"
+      instructions: |
+        - Features depend only on core:ui, core:mvi and core:domain, never on core:data,
+          core:network, core:api or other features.
+        - Screens follow MVI: immutable State, Event, one-shot Effect, a BaseViewModel with one
+          onEvent, a Route that wires Koin and a stateless, previewable Screen.
+        - Use Oc* components and OcTheme tokens; flag hard-coded colors and missing testTags on
+          interactive controls.
+        - User-visible text comes from string resources with translations in every supported locale.
+    - path: "android/core/network/**/*.kt"
+      instructions: |
+        - Server payloads use the generated models in core:api; flag hand-written DTOs.
+        - Never log passwords, tokens, pairing codes, Authorization headers, prompts or tool output.
+    - path: "android/**/src/test/**/*.kt"
+      instructions: |
+        - Fixtures in core:testing must contain only neutral data: no real paths, hosts,
+          session titles, prompts or credentials.
+    - path: "android/**/res/values*/strings.xml"
+      instructions: |
+        - Every translatable string in values/strings.xml needs a matching entry in every supported
+          locale. Preserve placeholders and locale-specific plurals (especially Russian and Arabic).
+    - path: ".github/workflows/*.yml"
+      instructions: |
+        - Actions are pinned to a full commit SHA with the version in a comment.
+        - Permissions are minimal; pull_request_target workflows never check out PR code.
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "**/AGENTS.md"
+      - "docs/design-system.md"
+
+chat:
+  auto_reply: true

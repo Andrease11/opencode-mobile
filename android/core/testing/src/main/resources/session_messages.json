@@ -1,0 +1,178 @@
+{
+  "data": [
+    {
+      "id": "msg_13634b644001FZJ7cqjGjVVWUe",
+      "time": {
+        "created": 1791910787034
+      },
+      "text": "Read the file a.txt with the read tool, then run `echo probe-ok` with bash, then reply with one short sentence.",
+      "type": "user"
+    },
+    {
+      "id": "msg_13634b7df001wGBBBLY8KNsul8",
+      "time": {
+        "created": 1791910787046,
+        "streamed": 1791910788336,
+        "completed": 1791910788337
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "claude-haiku-5-5",
+        "providerID": "anthropic",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "",
+          "state": {
+            "signature": "omitted"
+          },
+          "time": {
+            "created": 1791910787613,
+            "completed": 1791910788046
+          }
+        },
+        {
+          "type": "tool",
+          "id": "toolu_01FxbsWdoDPjLcZNVYRnNMVg",
+          "name": "read",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "path": "a.txt"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Read file a.txt, lines 1-1\n1: hello"
+              }
+            ],
+            "metadata": {
+              "truncated": false
+            }
+          },
+          "time": {
+            "created": 1791910788049,
+            "ran": 1791910788211,
+            "completed": 1791910788216
+          }
+        },
+        {
+          "type": "tool",
+          "id": "toolu_01CH4WEmdNhyAZrkMQ2hJu6p",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "echo probe-ok"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "probe-ok\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791910788212,
+            "ran": 1791910788324,
+            "completed": 1791910788333
+          }
+        }
+      ],
+      "finish": "tool-calls",
+      "rawFinish": "tool_use",
+      "cost": 0.001880525,
+      "tokens": {
+        "input": 4,
+        "output": 202,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 14233
+        }
+      }
+    },
+    {
+      "id": "msg_13634bcfb001qaI7MQyc8xYT8l",
+      "metadata": {
+        "notice": "instructions",
+        "instructionSources": [
+          "core/codemode",
+          "core/mcp-guidance"
+        ]
+      },
+      "time": {
+        "created": 1791910788347
+      },
+      "type": "system",
+      "text": "(system instructions omitted)",
+      "description": "Instructions updated: core/codemode, core/mcp-guidance"
+    },
+    {
+      "id": "msg_13634bd00001zEWdjJa2S6pPsJ",
+      "time": {
+        "created": 1791910788359,
+        "streamed": 1791910789782,
+        "completed": 1791910789784
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "claude-haiku-5-5",
+        "providerID": "anthropic",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "",
+          "state": {
+            "signature": "omitted"
+          },
+          "time": {
+            "created": 1791910789108,
+            "completed": 1791910789605
+          }
+        },
+        {
+          "type": "text",
+          "text": "Read `a.txt` (it contains \"hello\") and ran `echo probe-ok`, which printed `probe-ok`."
+        }
+      ],
+      "finish": "stop",
+      "rawFinish": "end_turn",
+      "cost": 0.00076478,
+      "tokens": {
+        "input": 2,
+        "output": 152,
+        "reasoning": 0,
+        "cache": {
+          "read": 14233,
+          "write": 4370
+        }
+      }
+    },
+    {
+      "id": "msg_13634c29a001sUSC1CxpcTg4ER",
+      "time": {
+        "created": 1791910789786
+      },
+      "type": "idle",
+      "outcome": "succeeded"
+    }
+  ],
+  "cursor": {
+    "previous": "eyJpZCI6Im1zZ18xMzYzNGI2NDQwMDFGWko3Y3FqR2pWVldVZSIsIm9yZGVyIjoiYXNjIiwiZGlyZWN0aW9uIjoicHJldmlvdXMifQ",
+    "next": "eyJpZCI6Im1zZ18xMzYzNGMyOWEwMDFzVVNDMUN4cGNUZzRFUiIsIm9yZGVyIjoiYXNjIiwiZGlyZWN0aW9uIjoibmV4dCJ9"
+  }
+}

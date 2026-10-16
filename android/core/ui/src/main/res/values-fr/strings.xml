@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Réessayer</string>
+    <string name="oc_cancel">Annuler</string>
+    <string name="oc_clear">Effacer</string>
+    <string name="oc_close">Fermer</string>
+    <string name="oc_back">Retour</string>
+    <string name="oc_copy">Copier</string>
+    <string name="oc_copied">Copié dans le presse-papiers</string>
+    <string name="oc_show_password">Afficher le mot de passe</string>
+    <string name="oc_hide_password">Masquer le mot de passe</string>
+    <string name="oc_just_now">à l’instant</string>
+    <string name="oc_error_unauthorized">Échec de l’authentification. Vérifiez le mot de passe ou associez à nouveau l’appareil.</string>
+    <string name="oc_error_unreachable">Serveur inaccessible. Vérifiez l’URL et que le serveur est en cours d’exécution.</string>
+    <string name="oc_error_pairing">Le code d’association est invalide ou a expiré. Générez-en un nouveau.</string>
+    <string name="oc_error_not_found">Introuvable sur le serveur.</string>
+    <string name="oc_error_server">Erreur du serveur (%1$d) : %2$s</string>
+    <string name="oc_error_generic">Une erreur est survenue : %1$s</string>
+    <string name="oc_models_title">Choisir un modèle</string>
+    <string name="oc_models_search">Rechercher des modèles</string>
+    <string name="oc_models_recent">Utilisés récemment</string>
+    <string name="oc_models_variant">Raisonnement</string>
+    <string name="oc_models_variant_default">Par défaut</string>
+    <string name="oc_models_empty">Aucun modèle ne correspond à votre recherche</string>
+</resources>

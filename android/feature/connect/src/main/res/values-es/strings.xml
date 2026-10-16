@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Conectar a OpenCode</string>
+    <string name="connect_subtitle">Vincula este teléfono con un servidor OpenCode en tu ordenador para seguir y dirigir tus sesiones de programación.</string>
+    <string name="connect_add_title">Añadir servidor</string>
+    <string name="connect_scan">Escanear código QR</string>
+    <string name="connect_paste">Pegar enlace</string>
+    <string name="connect_manual">O conectar manualmente</string>
+    <string name="connect_url_label">URL del servidor</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Código de vinculación</string>
+    <string name="connect_method_password">Contraseña</string>
+    <string name="connect_code_label">Código de vinculación</string>
+    <string name="connect_password_label">Contraseña del servidor</string>
+    <string name="connect_test">Probar conexión</string>
+    <string name="connect_submit">Conectar</string>
+    <string name="connect_probe_ok">Accesible · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Servidor accesible. El código de vinculación autenticará este dispositivo.</string>
+    <string name="connect_hint_title">Obtener un QR de vinculación</string>
+    <string name="connect_hint_body">En el ordenador que ejecuta OpenCode, ejecuta %1$s y escanea el código QR que aparece. Los códigos caducan en unos minutos.</string>
+    <string name="connect_saved_servers">Servidores guardados</string>
+    <string name="connect_discovered_title">Encontrados en esta red</string>
+    <string name="connect_discovering">Buscando servidores OpenCode en esta red…</string>
+    <string name="connect_discovered_hint">Requiere código o contraseña</string>
+    <string name="connect_discover_again">Volver a buscar en la red</string>
+    <string name="connect_active">Activo</string>
+    <string name="connect_error_url_required">Introduce la URL del servidor</string>
+    <string name="connect_error_url_invalid">La URL del servidor no es válida</string>
+    <string name="connect_error_code_required">Introduce el código de vinculación</string>
+    <string name="connect_error_password_required">Introduce la contraseña del servidor</string>
+    <string name="connect_error_no_reachable_url">Ninguna dirección del QR responde desde este teléfono. Comprueba que esté en la misma red o VPN, o ejecuta opencode pair --url con una dirección accesible.</string>
+    <string name="connect_paste_invalid">El portapapeles no contiene un enlace de OpenCode</string>
+    <string name="connect_scan_invalid">Este QR no es un enlace de vinculación de OpenCode</string>
+    <string name="connect_scanner_title">Escanear QR de vinculación</string>
+    <string name="connect_scanner_hint">Apunta la cámara al QR que muestra opencode pair</string>
+    <string name="connect_camera_rationale_title">Se necesita acceso a la cámara</string>
+    <string name="connect_camera_rationale">OpenCode solo usa la cámara para leer el QR de vinculación. No se graba ni guarda nada.</string>
+    <string name="connect_camera_grant">Permitir cámara</string>
+    <string name="connect_camera_denied">Se denegó el permiso de cámara. Actívalo en los ajustes del sistema o pega el enlace.</string>
+    <string name="connect_open_settings">Abrir ajustes</string>
+    <string name="connect_camera_unavailable">La cámara no está disponible en este dispositivo.</string>
+    <string name="connect_warning_public_http">Esta dirección parece pública y usa HTTP sin cifrar: la contraseña viajaría sin cifrar por internet. Usa mejor tu red local, una VPN o HTTPS.</string>
+</resources>

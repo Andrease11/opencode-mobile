@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sessions_title_fallback">Sesiones</string>
+    <string name="sessions_search">Buscar sesiones</string>
+    <string name="sessions_all_projects">Todos los proyectos</string>
+    <string name="sessions_settings">Ajustes</string>
+    <string name="sessions_new">Nueva sesión</string>
+    <string name="sessions_today">Hoy</string>
+    <string name="sessions_yesterday">Ayer</string>
+    <string name="sessions_this_week">Esta semana</string>
+    <string name="sessions_older">Anteriores</string>
+    <string name="sessions_running">En ejecución</string>
+    <string name="sessions_failed">Fallida</string>
+    <string name="sessions_interrupted">Interrumpida</string>
+    <string name="sessions_empty_title">Aún no hay sesiones</string>
+    <string name="sessions_empty_message">Inicia una sesión para asignar una tarea al agente en uno de tus proyectos.</string>
+    <string name="sessions_empty_search_title">No hay sesiones coincidentes</string>
+    <string name="sessions_empty_search_message">Prueba otra búsqueda o filtro de proyecto.</string>
+    <string name="sessions_error_title">No se pudieron cargar las sesiones</string>
+    <string name="sessions_connection_connected">Conectado</string>
+    <string name="sessions_connection_connecting">Conectando…</string>
+    <string name="sessions_connection_reconnecting">Reconectando…</string>
+    <string name="sessions_connection_disconnected">Sin conexión</string>
+    <string name="sessions_connection_unauthorized">Acceso caducado · vuelve a vincular</string>
+    <string name="sessions_rename">Renombrar</string>
+    <string name="sessions_delete">Eliminar</string>
+    <string name="sessions_rename_title">Renombrar sesión</string>
+    <string name="sessions_rename_label">Título</string>
+    <string name="sessions_save">Guardar</string>
+    <string name="sessions_delete_title">¿Eliminar sesión?</string>
+    <string name="sessions_delete_message">Se eliminarán permanentemente «%1$s» y su historial del servidor.</string>
+    <string name="sessions_new_title">Nueva sesión</string>
+    <string name="sessions_new_directory">Carpeta del proyecto</string>
+    <string name="sessions_new_other_directory">Otra carpeta</string>
+    <string name="sessions_new_path_label">Ruta absoluta</string>
+    <string name="sessions_new_path_placeholder">/home/me/project</string>
+    <string name="sessions_new_agent">Agente</string>
+    <string name="sessions_new_model">Modelo</string>
+    <string name="sessions_new_model_default">Predeterminado del servidor</string>
+    <string name="sessions_new_create">Crear sesión</string>
+    <string name="sessions_actions_title">Acciones de la sesión</string>
+    <string name="sessions_running_a11y">El agente está trabajando</string>
+    <string name="sessions_new_show_all">Mostrar los %1$d proyectos</string>
+</resources>

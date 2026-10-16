@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Reintentar</string>
+    <string name="oc_cancel">Cancelar</string>
+    <string name="oc_clear">Borrar</string>
+    <string name="oc_close">Cerrar</string>
+    <string name="oc_back">Volver</string>
+    <string name="oc_copy">Copiar</string>
+    <string name="oc_copied">Copiado al portapapeles</string>
+    <string name="oc_show_password">Mostrar contraseña</string>
+    <string name="oc_hide_password">Ocultar contraseña</string>
+    <string name="oc_just_now">ahora mismo</string>
+    <string name="oc_error_unauthorized">Error de autenticación. Comprueba la contraseña o vuelve a vincular el dispositivo.</string>
+    <string name="oc_error_unreachable">No se puede acceder al servidor. Comprueba la URL y que el servidor esté en ejecución.</string>
+    <string name="oc_error_pairing">El código de vinculación no es válido o ha caducado. Genera uno nuevo.</string>
+    <string name="oc_error_not_found">No se encontró en el servidor.</string>
+    <string name="oc_error_server">Error del servidor (%1$d): %2$s</string>
+    <string name="oc_error_generic">Se ha producido un error: %1$s</string>
+    <string name="oc_models_title">Elegir modelo</string>
+    <string name="oc_models_search">Buscar modelos</string>
+    <string name="oc_models_recent">Usados recientemente</string>
+    <string name="oc_models_variant">Razonamiento</string>
+    <string name="oc_models_variant_default">Predeterminado</string>
+    <string name="oc_models_empty">No hay modelos que coincidan con tu búsqueda</string>
+</resources>

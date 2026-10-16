@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_servers">Server</string>
+    <string name="settings_add_server">Aggiungi server</string>
+    <string name="settings_active">Attivo</string>
+    <string name="settings_password">Password</string>
+    <string name="settings_paired">Abbinato</string>
+    <string name="settings_server_actions">Azioni server</string>
+    <string name="settings_rename">Rinomina</string>
+    <string name="settings_remove">Rimuovi</string>
+    <string name="settings_switch">Passa a questo server</string>
+    <string name="settings_rename_title">Rinomina server</string>
+    <string name="settings_rename_label">Nome</string>
+    <string name="settings_save">Salva</string>
+    <string name="settings_remove_title">Rimuovere il server?</string>
+    <string name="settings_remove_message">“%1$s” e le sue credenziali salvate verranno rimossi da questo dispositivo. Potrai abbinarlo di nuovo in seguito.</string>
+    <string name="settings_appearance">Aspetto</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_theme_light">Chiaro</string>
+    <string name="settings_theme_dark">Scuro</string>
+    <string name="settings_conversation">Conversazione</string>
+    <string name="settings_show_reasoning">Mostra ragionamento</string>
+    <string name="settings_show_reasoning_sub">Mostra i blocchi compressi “Ragionato per…” nella conversazione</string>
+    <string name="settings_expand_tools">Espandi chiamate agli strumenti</string>
+    <string name="settings_expand_tools_sub">Mostra le righe degli strumenti espanse invece di un riepilogo</string>
+    <string name="settings_show_cost">Mostra costo</string>
+    <string name="settings_show_cost_sub">Mostra sotto la risposta il costo in dollari di ogni turno</string>
+    <string name="settings_swipe_chats">Scorri tra le chat</string>
+    <string name="settings_swipe_chats_sub">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente della lista</string>
+    <string name="settings_group_activity">Raggruppa ragionamento e strumenti</string>
+    <string name="settings_group_activity_sub">Mostra in un\'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
+    <string name="settings_agent_outline">Bordo col colore dell\'agente</string>
+    <string name="settings_agent_outline_sub">Colora il bordo del riquadro di scrittura con il colore dell\'agente selezionato</string>
+    <string name="settings_about">Informazioni</string>
+    <string name="settings_app_version">Versione app</string>
+    <string name="settings_server_version">Versione server</string>
+    <string name="settings_api_version">API OpenCode</string>
+    <string name="settings_unknown">Non disponibile</string>
+</resources>

@@ -1,0 +1,60 @@
+name: Issue Standards
+
+# Issues must come from a template (bug report, feature request or question) with the main
+# field filled in. Others get the needs:compliance label and one explanatory comment;
+# compliance-close.yml closes them after 72 hours.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    name: Check issue standards
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.fork }}
+    timeout-minutes: 2
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (['OWNER', 'MEMBER', 'COLLABORATOR'].includes(issue.author_association) || issue.user.type === 'Bot') {
+              core.info(`Skipping: ${issue.user.login} (${issue.author_association})`);
+              return;
+            }
+
+            const repo = { owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number };
+            const body = issue.body || '';
+            const field = (heading) => {
+              const match = body.match(new RegExp(`###\\s*${heading}\\s*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i'));
+              const value = match ? match[1].trim() : '';
+              return value === '_No response_' ? '' : value;
+            };
+            // The required field of each issue form (.github/ISSUE_TEMPLATE).
+            const main = field('What happened\\?') || field('Problem') || field('Question');
+            const compliant = main.length >= 15;
+
+            if (compliant) {
+              await github.rest.issues.removeLabel({ ...repo, name: 'needs:compliance' }).catch(() => {});
+              return;
+            }
+            await github.rest.issues.addLabels({ ...repo, labels: ['needs:compliance'] });
+
+            const marker = '<!-- compliance -->';
+            const comments = await github.paginate(github.rest.issues.listComments, repo);
+            if (comments.some((c) => c.body.includes(marker))) return;
+            await github.rest.issues.createComment({
+              ...repo,
+              body: [
+                marker,
+                'Thanks for opening an issue! Please edit it to use one of the templates ' +
+                '(bug report, feature request or question) and fill in the required fields, ' +
+                'so it can be triaged.',
+                '',
+                'Issues that still miss them after 72 hours are closed automatically.',
+              ].join('\n'),
+            });

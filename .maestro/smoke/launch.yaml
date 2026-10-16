@@ -1,0 +1,12 @@
+# Launches the installed debug app without clearing state and checks that it lands on
+# either the connect screen (no saved server) or the session list.
+appId: io.github.beppe2880.opencodemobile.debug
+name: Smoke - launch
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible:
+      id: "sessions_list|connect_url_field"
+    timeout: 15000
+- takeScreenshot: .maestro/output/smoke-launch

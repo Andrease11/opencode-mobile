@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sessions_title_fallback">세션</string>
+    <string name="sessions_search">세션 검색</string>
+    <string name="sessions_all_projects">모든 프로젝트</string>
+    <string name="sessions_settings">설정</string>
+    <string name="sessions_new">새 세션</string>
+    <string name="sessions_today">오늘</string>
+    <string name="sessions_yesterday">어제</string>
+    <string name="sessions_this_week">이번 주</string>
+    <string name="sessions_older">이전</string>
+    <string name="sessions_running">실행 중</string>
+    <string name="sessions_failed">실패</string>
+    <string name="sessions_interrupted">중단됨</string>
+    <string name="sessions_empty_title">아직 세션이 없습니다</string>
+    <string name="sessions_empty_message">새 세션을 시작하여 프로젝트에서 에이전트에게 작업을 맡기세요.</string>
+    <string name="sessions_empty_search_title">일치하는 세션이 없습니다</string>
+    <string name="sessions_empty_search_message">다른 검색어나 프로젝트 필터를 사용하세요.</string>
+    <string name="sessions_error_title">세션을 불러올 수 없습니다</string>
+    <string name="sessions_connection_connected">연결됨</string>
+    <string name="sessions_connection_connecting">연결 중…</string>
+    <string name="sessions_connection_reconnecting">다시 연결 중…</string>
+    <string name="sessions_connection_disconnected">오프라인</string>
+    <string name="sessions_connection_unauthorized">로그인 만료 · 다시 페어링</string>
+    <string name="sessions_rename">이름 변경</string>
+    <string name="sessions_delete">삭제</string>
+    <string name="sessions_rename_title">세션 이름 변경</string>
+    <string name="sessions_rename_label">제목</string>
+    <string name="sessions_save">저장</string>
+    <string name="sessions_delete_title">세션을 삭제할까요?</string>
+    <string name="sessions_delete_message">“%1$s” 및 기록이 서버에서 영구적으로 삭제됩니다.</string>
+    <string name="sessions_new_title">새 세션</string>
+    <string name="sessions_new_directory">프로젝트 디렉터리</string>
+    <string name="sessions_new_other_directory">다른 디렉터리</string>
+    <string name="sessions_new_path_label">절대 경로</string>
+    <string name="sessions_new_path_placeholder">/home/me/project</string>
+    <string name="sessions_new_agent">에이전트</string>
+    <string name="sessions_new_model">모델</string>
+    <string name="sessions_new_model_default">서버 기본값</string>
+    <string name="sessions_new_create">세션 만들기</string>
+    <string name="sessions_actions_title">세션 작업</string>
+    <string name="sessions_running_a11y">에이전트 실행 중</string>
+    <string name="sessions_new_show_all">프로젝트 %1$d개 모두 보기</string>
+</resources>

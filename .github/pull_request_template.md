@@ -1,0 +1,30 @@
+### Issue
+
+Closes #
+
+### Type of change
+
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Refactor or code improvement
+- [ ] Documentation
+- [ ] Build or CI
+
+### What does this PR do?
+
+<!-- What changed and why it works. If you are not sure why it works, say so. Long
+AI-generated descriptions may be closed. -->
+
+### How did you verify your code works?
+
+<!-- Tests added or run, and the device or emulator you checked it on. -->
+
+### Screenshots or recordings
+
+<!-- Required for UI changes: light and dark theme. Hide server addresses and private sessions. -->
+
+### Checklist
+
+- [ ] `./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug` passes (in `android/`)
+- [ ] New user-visible strings are translated in all supported languages (`bun test tools/locales.test.ts`)
+- [ ] No unrelated changes, no edits to the generated `android/core/api`

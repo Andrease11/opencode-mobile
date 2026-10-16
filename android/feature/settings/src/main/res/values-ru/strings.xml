@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_servers">Серверы</string>
+    <string name="settings_add_server">Добавить сервер</string>
+    <string name="settings_active">Активен</string>
+    <string name="settings_password">Пароль</string>
+    <string name="settings_paired">Сопряжён</string>
+    <string name="settings_server_actions">Действия с сервером</string>
+    <string name="settings_rename">Переименовать</string>
+    <string name="settings_remove">Удалить</string>
+    <string name="settings_switch">Переключиться на этот сервер</string>
+    <string name="settings_rename_title">Переименовать сервер</string>
+    <string name="settings_rename_label">Имя</string>
+    <string name="settings_save">Сохранить</string>
+    <string name="settings_remove_title">Удалить сервер?</string>
+    <string name="settings_remove_message">«%1$s» и сохранённые учётные данные будут удалены с этого устройства. Позже можно выполнить сопряжение заново.</string>
+    <string name="settings_appearance">Оформление</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_conversation">Разговор</string>
+    <string name="settings_show_reasoning">Показывать рассуждения</string>
+    <string name="settings_show_reasoning_sub">Показывать свёрнутые блоки «Размышлял…» в истории</string>
+    <string name="settings_expand_tools">Разворачивать вызовы инструментов</string>
+    <string name="settings_expand_tools_sub">Показывать вызовы инструментов развёрнутыми вместо краткой строки</string>
+    <string name="settings_show_cost">Показывать стоимость</string>
+    <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>
+    <string name="settings_swipe_chats">Перелистывать чаты</string>
+    <string name="settings_swipe_chats_sub">Смахните в чате влево или вправо, чтобы открыть следующую или предыдущую сессию в списке</string>
+    <string name="settings_group_activity">Группировать рассуждения и инструменты</string>
+    <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
+    <string name="settings_agent_outline">Рамка цвета агента</string>
+    <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_app_version">Версия приложения</string>
+    <string name="settings_server_version">Версия сервера</string>
+    <string name="settings_api_version">API OpenCode</string>
+    <string name="settings_unknown">Недоступно</string>
+</resources>

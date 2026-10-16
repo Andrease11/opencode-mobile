@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sessions_title_fallback">Sessions</string>
+    <string name="sessions_search">Search sessions</string>
+    <string name="sessions_all_projects">All projects</string>
+    <string name="sessions_settings">Settings</string>
+    <string name="sessions_new">New session</string>
+    <string name="sessions_today">Today</string>
+    <string name="sessions_yesterday">Yesterday</string>
+    <string name="sessions_this_week">This week</string>
+    <string name="sessions_older">Older</string>
+    <string name="sessions_running">Running</string>
+    <string name="sessions_failed">Failed</string>
+    <string name="sessions_interrupted">Interrupted</string>
+    <string name="sessions_empty_title">No sessions yet</string>
+    <string name="sessions_empty_message">Start a new session to give the agent a task in one of your projects.</string>
+    <string name="sessions_empty_search_title">No matching sessions</string>
+    <string name="sessions_empty_search_message">Try a different search or project filter.</string>
+    <string name="sessions_error_title">Could not load sessions</string>
+    <string name="sessions_connection_connected">Connected</string>
+    <string name="sessions_connection_connecting">Connecting…</string>
+    <string name="sessions_connection_reconnecting">Reconnecting…</string>
+    <string name="sessions_connection_disconnected">Offline</string>
+    <string name="sessions_connection_unauthorized">Sign-in expired · pair again</string>
+    <string name="sessions_rename">Rename</string>
+    <string name="sessions_delete">Delete</string>
+    <string name="sessions_rename_title">Rename session</string>
+    <string name="sessions_rename_label">Title</string>
+    <string name="sessions_save">Save</string>
+    <string name="sessions_delete_title">Delete session?</string>
+    <string name="sessions_delete_message">“%1$s” and its history will be permanently deleted from the server.</string>
+    <string name="sessions_new_title">New session</string>
+    <string name="sessions_new_directory">Project directory</string>
+    <string name="sessions_new_other_directory">Other directory</string>
+    <string name="sessions_new_path_label">Absolute path</string>
+    <string name="sessions_new_path_placeholder">/home/me/project</string>
+    <string name="sessions_new_agent">Agent</string>
+    <string name="sessions_new_model">Model</string>
+    <string name="sessions_new_model_default">Server default</string>
+    <string name="sessions_new_create">Create session</string>
+    <string name="sessions_actions_title">Session actions</string>
+    <string name="sessions_running_a11y">Agent is running</string>
+    <string name="sessions_new_show_all">Show all %1$d projects</string>
+</resources>

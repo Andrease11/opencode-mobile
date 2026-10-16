@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Tentar novamente</string>
+    <string name="oc_cancel">Cancelar</string>
+    <string name="oc_clear">Limpar</string>
+    <string name="oc_close">Fechar</string>
+    <string name="oc_back">Voltar</string>
+    <string name="oc_copy">Copiar</string>
+    <string name="oc_copied">Copiado para a área de transferência</string>
+    <string name="oc_show_password">Mostrar senha</string>
+    <string name="oc_hide_password">Ocultar senha</string>
+    <string name="oc_just_now">agora mesmo</string>
+    <string name="oc_error_unauthorized">Falha na autenticação. Confira a senha ou faça o pareamento novamente.</string>
+    <string name="oc_error_unreachable">Não foi possível acessar o servidor. Confira a URL e se o servidor está em execução.</string>
+    <string name="oc_error_pairing">O código de pareamento é inválido ou expirou. Gere um novo.</string>
+    <string name="oc_error_not_found">Não encontrado no servidor.</string>
+    <string name="oc_error_server">Erro do servidor (%1$d): %2$s</string>
+    <string name="oc_error_generic">Ocorreu um erro: %1$s</string>
+    <string name="oc_models_title">Escolher modelo</string>
+    <string name="oc_models_search">Buscar modelos</string>
+    <string name="oc_models_recent">Usados recentemente</string>
+    <string name="oc_models_variant">Raciocínio</string>
+    <string name="oc_models_variant_default">Padrão</string>
+    <string name="oc_models_empty">Nenhum modelo corresponde à busca</string>
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Connect to OpenCode</string>
+    <string name="connect_subtitle">Pair this phone with an OpenCode server running on your computer to follow and drive your coding sessions.</string>
+    <string name="connect_add_title">Add server</string>
+    <string name="connect_scan">Scan QR code</string>
+    <string name="connect_paste">Paste link</string>
+    <string name="connect_manual">Or connect manually</string>
+    <string name="connect_url_label">Server URL</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Pairing code</string>
+    <string name="connect_method_password">Password</string>
+    <string name="connect_code_label">Pairing code</string>
+    <string name="connect_password_label">Server password</string>
+    <string name="connect_test">Test connection</string>
+    <string name="connect_submit">Connect</string>
+    <string name="connect_probe_ok">Reachable · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Server reachable. The pairing code will authenticate this device.</string>
+    <string name="connect_hint_title">Get a pairing QR code</string>
+    <!-- %1$s is the command (connect_hint_command), shown highlighted. -->
+    <string name="connect_hint_body">On the computer running OpenCode, run %1$s and scan the QR code it prints. Codes expire after a few minutes.</string>
+    <string name="connect_hint_command" translatable="false">opencode pair</string>
+    <string name="connect_saved_servers">Saved servers</string>
+    <string name="connect_discovered_title">Found on this network</string>
+    <string name="connect_discovering">Looking for OpenCode servers on this network…</string>
+    <string name="connect_discovered_hint">Tap, then enter a pairing code or the password</string>
+    <string name="connect_discover_again">Search the network again</string>
+    <string name="connect_active">Active</string>
+    <string name="connect_error_url_required">Enter the server URL</string>
+    <string name="connect_error_url_invalid">This is not a valid server URL</string>
+    <string name="connect_error_code_required">Enter the pairing code</string>
+    <string name="connect_error_password_required">Enter the server password</string>
+    <string name="connect_error_no_reachable_url">None of the server addresses in the QR code answers from this phone. Check that the phone is on the same network or VPN, or run opencode pair --url with an address it can reach.</string>
+    <string name="connect_paste_invalid">The clipboard does not contain an OpenCode link</string>
+    <string name="connect_scan_invalid">This QR code is not an OpenCode pairing link</string>
+    <string name="connect_scanner_title">Scan pairing QR</string>
+    <string name="connect_scanner_hint">Point the camera at the QR code shown by opencode pair</string>
+    <string name="connect_camera_rationale_title">Camera access needed</string>
+    <string name="connect_camera_rationale">OpenCode uses the camera only to read the pairing QR code. Nothing is recorded or stored.</string>
+    <string name="connect_camera_grant">Allow camera</string>
+    <string name="connect_camera_denied">Camera permission was denied. Enable it in system settings or paste the link instead.</string>
+    <string name="connect_open_settings">Open settings</string>
+    <string name="connect_camera_unavailable">The camera is not available on this device.</string>
+    <string name="connect_warning_public_http">This address looks public and uses plain HTTP: the password would travel unencrypted over the internet. Prefer your LAN, a VPN or HTTPS.</string>
+</resources>

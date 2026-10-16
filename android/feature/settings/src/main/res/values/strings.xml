@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_servers">Servers</string>
+    <string name="settings_add_server">Add server</string>
+    <string name="settings_active">Active</string>
+    <string name="settings_password">Password</string>
+    <string name="settings_paired">Paired</string>
+    <string name="settings_server_actions">Server actions</string>
+    <string name="settings_rename">Rename</string>
+    <string name="settings_remove">Remove</string>
+    <string name="settings_switch">Switch to this server</string>
+    <string name="settings_rename_title">Rename server</string>
+    <string name="settings_rename_label">Name</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_remove_title">Remove server?</string>
+    <string name="settings_remove_message">“%1$s” and its saved credentials will be removed from this device. You can pair again later.</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_conversation">Conversation</string>
+    <string name="settings_show_reasoning">Show reasoning</string>
+    <string name="settings_show_reasoning_sub">Display collapsed “Thought for…” blocks in the transcript</string>
+    <string name="settings_expand_tools">Expand tool calls</string>
+    <string name="settings_expand_tools_sub">Show tool rows expanded instead of a one-line summary</string>
+    <string name="settings_show_cost">Show cost</string>
+    <string name="settings_show_cost_sub">Show the cost in dollars of each turn below the reply</string>
+    <string name="settings_swipe_chats">Swipe between chats</string>
+    <string name="settings_swipe_chats_sub">Swipe left or right on a chat to open the next or previous session in the list</string>
+    <string name="settings_group_activity">Group thinking and tools</string>
+    <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
+    <string name="settings_agent_outline">Agent color outline</string>
+    <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
+    <string name="settings_about">About</string>
+    <string name="settings_app_version">App version</string>
+    <string name="settings_server_version">Server version</string>
+    <string name="settings_api_version">OpenCode API</string>
+    <string name="settings_unknown">Unavailable</string>
+</resources>

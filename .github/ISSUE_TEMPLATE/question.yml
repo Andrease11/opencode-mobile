@@ -1,0 +1,24 @@
+name: Question
+description: Ask about setup, pairing or how something works
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the README first: it covers pairing, emulators and remote access.
+        Do not paste server addresses, passwords or pairing codes.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Setup
+      description: App and OpenCode versions, how the phone reaches the server (LAN, VPN, emulator).
+    validations:
+      required: false

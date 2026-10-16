@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Retry</string>
+    <string name="oc_cancel">Cancel</string>
+    <string name="oc_clear">Clear</string>
+    <string name="oc_close">Close</string>
+    <string name="oc_back">Back</string>
+    <string name="oc_copy">Copy</string>
+    <string name="oc_copied">Copied to clipboard</string>
+    <string name="oc_show_password">Show password</string>
+    <string name="oc_hide_password">Hide password</string>
+    <string name="oc_just_now">just now</string>
+    <string name="oc_error_unauthorized">Authentication failed. Check the password or pair again.</string>
+    <string name="oc_error_unreachable">Cannot reach the server. Check the URL and that the server is running.</string>
+    <string name="oc_error_pairing">The pairing code is invalid or expired. Create a new one.</string>
+    <string name="oc_error_not_found">Not found on the server.</string>
+    <string name="oc_error_server">Server error (%1$d): %2$s</string>
+    <string name="oc_error_generic">Something went wrong: %1$s</string>
+    <string name="oc_models_title">Choose model</string>
+    <string name="oc_models_search">Search models</string>
+    <string name="oc_models_recent">Recently used</string>
+    <string name="oc_models_variant">Reasoning</string>
+    <string name="oc_models_variant_default">Default</string>
+    <string name="oc_models_empty">No models match your search</string>
+</resources>
