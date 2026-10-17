@@ -28,9 +28,9 @@ agent's questions while you are away from the desk.
 
 - **Live transcripts**: text, reasoning and tool calls stream in as the agent works, with
   diffs, shell output and subagent sessions one tap away.
-- **Drive the agent**: send prompts (steer or queue while it runs), `/` commands, `!` shell
-  commands, `@` file mentions and image attachments; stop, undo and redo, compact the context, fork a session
-  from any prompt.
+- **Drive the agent**: send prompts (steer or queue while it runs, then send queued ones
+  now, edit or remove them), `/` commands, `!` shell commands, `@` file mentions and image
+  attachments; stop, undo and redo, compact the context, fork a session from any prompt.
 - **Review the changes**: every file the agent edited, with its diff, for the whole session
   or the last turn.
 - **Approve from the phone**: permission requests and the agent's questions show up in
@@ -117,7 +117,6 @@ Architecture, conventions and the design system are documented in [`AGENTS.md`](
 Planned work lives in [issues labeled `feature`](../../issues?q=is%3Aissue+is%3Aopen+label%3Afeature).
 Highlights:
 
-- Management of queued prompts.
 - A terminal through the server's PTY.
 
 Issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
