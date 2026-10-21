@@ -658,6 +658,69 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `reverted messages stay gone while the prompt that commits the revert is sent and after it fails`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("hello again"))
+        vm.onEvent(ChatEvent.Send)
+        assertTrue(vm.state.value.items.none { it.key == "u1" })
+
+        advanceUntilIdle()
+        // The commit went through, so the server no longer has u1.
+        assertEquals(1, chat.commits)
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(0, vm.state.value.revertedCount)
+        assertEquals("hello again", vm.state.value.draft)
+    }
+
+    @Test
+    fun `a failed revert commit keeps the revert staged`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        chat.commitResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("hello again"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(1, vm.state.value.revertedCount)
+        assertEquals("hello again", vm.state.value.draft)
+        // Redo still brings the staged messages back.
+        vm.onEvent(ChatEvent.DraftChanged("/redo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+    }
+
+    @Test
+    fun `a failed shell command after a committed revert does not bring the reverted messages back`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        chat.shellResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("!ls"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(1, chat.commits)
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(0, vm.state.value.revertedCount)
+    }
+
+    @Test
     fun `permission reply removes the request`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -829,9 +892,10 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         return Result.success(Unit)
     }
     var commits = 0
+    var commitResult: Result<Unit> = Result.success(Unit)
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
-        return Result.success(Unit)
+        return commitResult
     }
     var inbox: List<QueuedPrompt> = emptyList()
     val cancelled = mutableListOf<String>()
