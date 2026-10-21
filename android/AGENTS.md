@@ -84,9 +84,10 @@ From `android/`:
 ./gradlew testDebugUnitTest
 ./gradlew :core:network:testDebugUnitTest
 ANDROID_SERIAL=<serial> ./gradlew :app:installDebug
+./gradlew spotlessApply   # ktlint formatting, rules in .editorconfig; core/api is excluded
 ```
 
-Before finishing: `./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug` (what CI
+Before finishing: `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug` (what CI
 runs), plus `bun run check` in `../tools/api-gen` when the API changed.
 
 After every UI or behavior change, install the debug build (`io.github.beppe2880.opencodemobile.debug`)

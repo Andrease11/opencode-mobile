@@ -30,7 +30,7 @@ this network"; alternatively `adb reverse tcp:4096 tcp:4096` makes it reachable 
 Before opening a pull request, run what CI runs:
 
 ```bash
-(cd android && ./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug)
+(cd android && ./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug)
 (cd tools/api-gen && bun install && bun run check)   # only if you touched the API or the generator
 ```
 
@@ -52,6 +52,9 @@ The architecture and rules are documented in [`AGENTS.md`](AGENTS.md) and
 - **Server contract**: `android/core/api` is generated from `api/openapi.json`; never edit it
   and never hand-write DTOs. Run `bun run generate` in `tools/api-gen` after changing
   the spec (Bun and Java are needed; `bun run refresh` pulls the spec from a local server).
+- **Formatting**: ktlint through Spotless, configured in
+  [`android/.editorconfig`](android/.editorconfig), which Android Studio also reads. Run
+  `./gradlew spotlessApply` in `android/` to fix formatting before committing.
 - **Tests**: ViewModels and repositories get unit tests next to their module; fixtures are
   shared in `core:testing` and contain only neutral data.
 
@@ -85,7 +88,7 @@ Optional scopes: `chat`, `sessions`, `connect`, `settings`, `ui`, `data`, `netwo
 - Fill in the template: what changed, how you verified it, screenshots for UI changes
   (light and dark theme).
 - Keep each pull request to one change; no unrelated edits.
-- CI must pass: unit tests, lint, debug build and the generated API check.
+- CI must pass: formatting, unit tests, lint, debug build and the generated API check.
 - [CodeRabbit](https://coderabbit.ai) reviews every pull request automatically. Its comments
   are suggestions: reply or resolve them, a maintainer makes the final call.
 
@@ -107,7 +110,7 @@ name and code come from `version.txt` (1.2.3 becomes version code 1002003).
 
 | Workflow | What it does |
 |---|---|
-| `ci.yml` | Unit tests, lint, debug build, generated API check |
+| `ci.yml` | Formatting, unit tests, lint, debug build, generated API check |
 | `pr-title.yml` | Conventional Commit PR titles |
 | `pr-standards.yml`, `issue-standards.yml` | Label and comment on PRs and issues that skip the templates |
 | `compliance-close.yml` | Closes them after 72 hours |

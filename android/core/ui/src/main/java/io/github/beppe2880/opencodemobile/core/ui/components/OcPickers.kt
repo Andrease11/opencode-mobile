@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Check
@@ -98,7 +98,12 @@ fun OcModelPicker(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (onBack != null) {
-                OcIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.oc_back), onBack, modifier = Modifier.testTag("model_picker_back_button"))
+                OcIconButton(
+                    Icons.AutoMirrored.Outlined.ArrowBack,
+                    stringResource(R.string.oc_back),
+                    onBack,
+                    modifier = Modifier.testTag("model_picker_back_button"),
+                )
             }
             Text(
                 text = stringResource(R.string.oc_models_title),

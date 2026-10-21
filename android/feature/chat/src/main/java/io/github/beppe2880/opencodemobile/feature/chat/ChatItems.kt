@@ -167,18 +167,21 @@ object ChatItemsBuilder {
                 val end = last.completedAt
                 val start = turnStart ?: turn.first().createdAt
                 val label = modelLabel(last.model)
-                out.add(turnEnd, ChatItem.Footer(
-                    key = "footer-${last.id}",
-                    agent = last.agent,
-                    model = label.name,
-                    provider = label.provider,
-                    durationMs = end?.let { (it - start).coerceAtLeast(0) },
-                    tokensPerSecond = tokensPerSecond(turn),
-                    cost = turn.sumOf { it.cost },
-                    copyText = turn.flatMap { it.parts }.filterIsInstance<Part.Text>().joinToString("\n\n") { it.text.trim() }.trim(),
-                    interrupted = last.error != null || idle?.outcome == SessionOutcome.Interrupted,
-                    totalTokens = turn.sumOf { it.tokens.total - it.tokens.cacheRead },
-                ))
+                out.add(
+                    turnEnd,
+                    ChatItem.Footer(
+                        key = "footer-${last.id}",
+                        agent = last.agent,
+                        model = label.name,
+                        provider = label.provider,
+                        durationMs = end?.let { (it - start).coerceAtLeast(0) },
+                        tokensPerSecond = tokensPerSecond(turn),
+                        cost = turn.sumOf { it.cost },
+                        copyText = turn.flatMap { it.parts }.filterIsInstance<Part.Text>().joinToString("\n\n") { it.text.trim() }.trim(),
+                        interrupted = last.error != null || idle?.outcome == SessionOutcome.Interrupted,
+                        totalTokens = turn.sumOf { it.tokens.total - it.tokens.cacheRead },
+                    ),
+                )
             }
             turn = ArrayList()
             turnStart = null

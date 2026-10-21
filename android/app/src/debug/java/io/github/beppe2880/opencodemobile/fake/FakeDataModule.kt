@@ -1,45 +1,46 @@
+@file:Suppress("ktlint:standard:max-line-length") // sample transcripts and replies
+
 package io.github.beppe2880.opencodemobile.fake
 
-import io.github.beppe2880.opencodemobile.core.domain.ConnectTarget
-import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
-import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.core.domain.Agent
+import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
-import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
+import io.github.beppe2880.opencodemobile.core.domain.ConnectTarget
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.DailyActivity
+import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
+import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
-import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
-import io.github.beppe2880.opencodemobile.core.domain.UsageStats
-import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
-import io.github.beppe2880.opencodemobile.core.domain.FileDiff
-import io.github.beppe2880.opencodemobile.core.domain.Form
-import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
-import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
-import io.github.beppe2880.opencodemobile.core.domain.DailyActivity
-import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
-import java.time.Instant
-import java.time.ZoneId
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
+import io.github.beppe2880.opencodemobile.core.domain.UsageStats
+import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import org.koin.dsl.module
-import io.github.beppe2880.opencodemobile.core.data.di.AppScope
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * In-memory data layer with realistic sample data for UI work on the emulator without a
@@ -125,9 +127,10 @@ internal class FakeStore {
 internal class FakeServers : ServerRepository {
     private val _servers = MutableStateFlow(SampleData.servers)
     override val servers: StateFlow<List<ServerProfile>> = _servers.asStateFlow()
+
     // Starts signed in to the first sample server; "Add server" still opens the connect flow.
-    private val _active = MutableStateFlow(SampleData.servers.firstOrNull())
-    override val activeServer: StateFlow<ServerProfile?> = _active.asStateFlow()
+    private val _activeServer = MutableStateFlow(SampleData.servers.firstOrNull())
+    override val activeServer: StateFlow<ServerProfile?> = _activeServer.asStateFlow()
 
     override suspend fun probe(baseUrl: String, password: String?): Result<ServerInfo> {
         delay(LATENCY)
@@ -161,22 +164,22 @@ internal class FakeServers : ServerRepository {
             addedAt = System.currentTimeMillis(),
         )
         if (existing == null) _servers.value = listOf(profile) + _servers.value
-        _active.value = profile
+        _activeServer.value = profile
         return profile
     }
 
     override suspend fun activate(serverId: String) {
-        _active.value = _servers.value.firstOrNull { it.id == serverId }
+        _activeServer.value = _servers.value.firstOrNull { it.id == serverId }
     }
 
     override suspend fun rename(serverId: String, name: String) {
         _servers.value = _servers.value.map { if (it.id == serverId) it.copy(name = name) else it }
-        if (_active.value?.id == serverId) _active.value = _servers.value.first { it.id == serverId }
+        if (_activeServer.value?.id == serverId) _activeServer.value = _servers.value.first { it.id == serverId }
     }
 
     override suspend fun remove(serverId: String) {
         _servers.value = _servers.value.filterNot { it.id == serverId }
-        if (_active.value?.id == serverId) _active.value = null
+        if (_activeServer.value?.id == serverId) _activeServer.value = null
     }
 
     override fun parseConnectTarget(raw: String): ConnectTarget? = ConnectLinkParser.parse(raw)
@@ -211,7 +214,7 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
         delay(LATENCY)
         val now = System.currentTimeMillis()
         val session = Session(
-            id = "ses_${now}", parentId = null, projectId = "p", title = "New session",
+            id = "ses_$now", parentId = null, projectId = "p", title = "New session",
             directory = directory, agent = agent ?: "build", model = model ?: SampleData.haiku,
             cost = 0.0, tokens = TokenUsage(), outcome = null, createdAt = now, updatedAt = now, archivedAt = null,
         )

@@ -86,7 +86,7 @@ class EventMappingTest {
             listOf("reasoning", "tool:read", "tool:shell", "reasoning", "text"),
             parts.map { if (it is Part.Tool) "tool:${it.name}" else it.key.substringBefore('-') },
         )
-        assertTrue(parts.none { it is Part.Reasoning && it.streaming || it is Part.Text && it.streaming })
+        assertTrue(parts.none { (it is Part.Reasoning && it.streaming) || (it is Part.Text && it.streaming) })
 
         val tools = parts.filterIsInstance<Part.Tool>()
         assertTrue(tools.all { it.status == ToolStatus.Completed })

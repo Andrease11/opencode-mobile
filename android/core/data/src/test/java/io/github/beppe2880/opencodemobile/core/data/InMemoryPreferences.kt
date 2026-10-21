@@ -8,6 +8,7 @@ internal class InMemoryPreferences : SharedPreferences {
 
     override fun getAll(): Map<String, *> = values.toMap()
     override fun getString(key: String, defValue: String?) = values[key] as String? ?: defValue
+
     @Suppress("UNCHECKED_CAST")
     override fun getStringSet(key: String, defValues: Set<String>?) = values[key] as Set<String>? ?: defValues
     override fun getInt(key: String, defValue: Int) = values[key] as Int? ?: defValue

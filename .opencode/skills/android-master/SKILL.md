@@ -79,7 +79,7 @@ credentials keep their existing stores.
 
 ## Completion
 
-Run module-qualified checks from `android/`, then `./gradlew testDebugUnitTest
-:app:lintDebug :app:assembleDebug` for broad changes. Load `android-runtime-verification`
+Run module-qualified checks from `android/`, then `./gradlew spotlessCheck
+testDebugUnitTest :app:lintDebug :app:assembleDebug` for broad changes. Load `android-runtime-verification`
 when runtime behavior can change. Report checks run, device used, and anything
 that could not be verified.

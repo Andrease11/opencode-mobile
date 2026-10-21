@@ -50,9 +50,11 @@ val LocalOcColors = staticCompositionLocalOf { OcLightColors }
 /** Entry point for OpenCode tokens beyond Material's scheme. */
 object OcTheme {
     val colors: OcColors
-        @Composable @ReadOnlyComposable get() = LocalOcColors.current
+        @Composable @ReadOnlyComposable
+        get() = LocalOcColors.current
     val mono: OcMonoTypography
-        @Composable @ReadOnlyComposable get() = OcMono
+        @Composable @ReadOnlyComposable
+        get() = OcMono
     val spacing: OcSpacing get() = OcSpacing
     val radius: OcRadius get() = OcRadius
 }

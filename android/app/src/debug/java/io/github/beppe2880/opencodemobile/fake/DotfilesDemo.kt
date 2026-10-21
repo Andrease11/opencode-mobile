@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length") // sample transcripts and replies
+
 package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
@@ -37,7 +39,8 @@ internal class DotfilesDemo(private val store: FakeStore, private val events: Fa
         scope.launch {
             events.emit(ServerEvent.PermissionChanged(SESSION))
             when {
-                decision == PermissionDecision.Reject -> rejected(if (requestId == BACKUP) "a_1" else "a_2", if (requestId == BACKUP) "c_backup" else "c_reload")
+                decision == PermissionDecision.Reject ->
+                    if (requestId == BACKUP) rejected("a_1", "c_backup") else rejected("a_2", "c_reload")
                 requestId == BACKUP -> afterBackup()
                 else -> afterReload()
             }
@@ -87,7 +90,12 @@ internal class DotfilesDemo(private val store: FakeStore, private val events: Fa
                 add("+alias gl='git pull --rebase'")
             }
         }
-        val shortcuts = FakeSamples.diff(".config/zsh/aliases.zsh", "modified", "@@ -10,1 +10,${lines.count { it.startsWith("+") }} @@\n" + lines.joinToString("\n"))
+        val shortcuts = FakeSamples.diff(
+            ".config/zsh/aliases.zsh", "modified",
+            "@@ -10,1 +10,${lines.count {
+                it.startsWith("+")
+            }} @@\n" + lines.joinToString("\n"),
+        )
         tool("a_2", "c_edit2", "edit", editInput(FILE, "alias ll='eza -la --git'", "alias ll='$listing'"), "Edit applied successfully.", 900, listOf(shortcuts))
         tool("a_2", "c_edit3", "edit", editInput("/home/user/.zshrc", "source ~/.aliases", "source ~/.config/zsh/aliases.zsh"), "Edit applied successfully.", 700, listOf(FakeSamples.zshrc))
         text("a_2", 3, "Now I'll reload the shell to check that everything loads.")
