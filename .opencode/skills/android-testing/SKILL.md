@@ -55,6 +55,6 @@ initial State -> onEvent -> fake response or failure -> State transition -> Effe
 
 ## Verification
 
-Run the focused module test first, then `./gradlew testDebugUnitTest :app:lintDebug
+Run the focused module test first, then `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug
 :app:assembleDebug` from `android/`. See
 `references/test-matrix.md` for risk-based evidence.

@@ -72,5 +72,5 @@ openapi-generator 7.22 (`kotlin`, `jvm-retrofit2`, `kotlinx_serialization`) -> `
 - After Android UI or behavior changes, install the debug build on the emulator and inspect
   the changed screen before finishing (see `android/AGENTS.md`).
 - Before declaring Android work complete, run from `android/`
-  `./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug`, and `bun run check` in
+  `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug`, and `bun run check` in
   `tools/api-gen` when the API or the generator changed. CI runs both.

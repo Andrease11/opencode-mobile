@@ -42,5 +42,5 @@ single-purpose. Do not use `allprojects`/`subprojects` hacks.
 
 - Module tasks while iterating, e.g. `./gradlew :feature:chat:testDebugUnitTest`.
 - `./gradlew :app:assembleDebug` as the standard build check.
-- `./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug` before finishing broad
+- `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug` before finishing broad
   changes.
