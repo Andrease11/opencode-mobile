@@ -1,21 +1,20 @@
 package io.github.beppe2880.opencodemobile.feature.connect
 
 import io.github.beppe2880.opencodemobile.core.domain.ConnectTarget
-
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
-import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -222,6 +221,7 @@ private class FakeServerRepository : ServerRepository {
     }
     override suspend fun rename(serverId: String, name: String) = Unit
     override suspend fun remove(serverId: String) = Unit
+
     /** The real parser is tested in core:network; this covers pairing links and bare hosts. */
     override fun parseConnectTarget(raw: String): ConnectTarget? {
         val text = raw.trim()

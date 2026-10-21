@@ -180,4 +180,3 @@ class StoredServerRepositoryTest {
         assertNull(repository.activeServer.value)
     }
 }
-

@@ -10,18 +10,18 @@ import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
-import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
-import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.domain.isComplete
+import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.domain.reply
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
@@ -53,6 +53,7 @@ class ChatViewModel(
     private var reloadJob: Job? = null
     private var olderJob: Job? = null
     private var previewJob: Job? = null
+
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
     private val imageRequests = HashSet<String>()
     private var suggestJob: Job? = null
@@ -89,7 +90,13 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 groupActivity = s.groupActivity
                 updateState {
-                    it.copy(expandToolsByDefault = s.expandToolsByDefault, showCost = s.showCost, swipeEnabled = s.swipeBetweenChats, agentColorOutline = s.agentColorOutline, dictation = s.dictation)
+                    it.copy(
+                        expandToolsByDefault = s.expandToolsByDefault,
+                        showCost = s.showCost,
+                        swipeEnabled = s.swipeBetweenChats,
+                        agentColorOutline = s.agentColorOutline,
+                        dictation = s.dictation,
+                    )
                 }
                 rebuild()
             }

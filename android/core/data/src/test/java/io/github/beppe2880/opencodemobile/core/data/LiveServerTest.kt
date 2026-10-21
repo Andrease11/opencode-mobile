@@ -1,8 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.data
 
 import io.github.beppe2880.opencodemobile.core.data.cache.InMemoryMessageCache
-import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.catalog.RemoteCatalogRepository
+import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.events.AppVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository

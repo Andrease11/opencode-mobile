@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -41,8 +41,6 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
-import io.github.beppe2880.opencodemobile.core.ui.R as UiR
-import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
@@ -56,9 +54,11 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSwitchRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
 @Composable
 fun SettingsScreen(

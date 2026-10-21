@@ -41,7 +41,6 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
-import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
@@ -64,6 +63,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.util.Locale
+import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
 @Composable
 fun UsageScreen(state: UsageState, onEvent: (UsageEvent) -> Unit, modifier: Modifier = Modifier) {
@@ -162,7 +162,11 @@ private fun Summary(stats: UsageStats) {
                 Figure(stringResource(R.string.usage_steps), numbers.format(stats.steps), Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.md)) {
-                Figure(stringResource(R.string.usage_input), formatTokens(stats.tokens.input + stats.tokens.cacheRead + stats.tokens.cacheWrite), Modifier.weight(1f))
+                Figure(
+                    stringResource(R.string.usage_input),
+                    formatTokens(stats.tokens.input + stats.tokens.cacheRead + stats.tokens.cacheWrite),
+                    Modifier.weight(1f),
+                )
                 Figure(stringResource(R.string.usage_output), formatTokens(stats.tokens.output + stats.tokens.reasoning), Modifier.weight(1f))
                 Figure(
                     stringResource(R.string.usage_cached),
@@ -238,7 +242,12 @@ private fun Activity(days: List<DailyActivity>, period: UsagePeriod) {
                 }
             } else if (days.size > 1) {
                 Row(Modifier.fillMaxWidth()) {
-                    Text(dayLabel(days.first().date, long = true), style = MaterialTheme.typography.labelSmall, color = c.textFaint, modifier = Modifier.weight(1f))
+                    Text(
+                        dayLabel(days.first().date, long = true),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = c.textFaint,
+                        modifier = Modifier.weight(1f),
+                    )
                     Text(dayLabel(days.last().date, long = true), style = MaterialTheme.typography.labelSmall, color = c.textFaint)
                 }
             }

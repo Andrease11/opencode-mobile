@@ -29,7 +29,9 @@ internal object FakeSamples {
     )
 
     fun shellOutput(command: String): String = when (command.trim().substringBefore(' ')) {
-        "git" -> "On branch main\nYour branch is up to date with 'origin/main'.\n\nChanges not staged for commit:\n\tmodified:   src/cart/Cart.kt\n\tmodified:   src/cart/Coupon.kt"
+        "git" ->
+            "On branch main\nYour branch is up to date with 'origin/main'.\n\n" +
+                "Changes not staged for commit:\n\tmodified:   src/cart/Cart.kt\n\tmodified:   src/cart/Coupon.kt"
         "ls" -> "README.md\nbuild.gradle.kts\nsettings.gradle.kts\nsrc"
         "pwd" -> "/home/user/code/shop"
         else -> "ok"

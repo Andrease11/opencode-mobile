@@ -135,22 +135,29 @@ sealed interface ChatEvent {
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent
     data object Send : ChatEvent
     data object Stop : ChatEvent
+
     /** Moves the running shell command or subagent to the background (TUI ctrl+b). */
     data object MoveToBackground : ChatEvent
+
     /** Summarizes the history to free context (`/compact`). */
     data object Compact : ChatEvent
+
     /** Opens a subagent's child session. */
     data class OpenSession(val sessionId: String) : ChatEvent
+
     /** Replaces this chat with a neighbor in the session list (swipe). */
     data class SwitchSession(val sessionId: String) : ChatEvent
+
     /** The user scrolled near the oldest loaded message. */
     data object LoadOlder : ChatEvent
+
     /** The transcript scrolled; null once back at the bottom. */
     data class ScrollMoved(val anchor: ScrollMemory.Anchor?) : ChatEvent
     data class Toggle(val key: String) : ChatEvent
     data class SelectAgent(val agent: String) : ChatEvent
     data class ModelSheet(val open: Boolean) : ChatEvent
     data class SelectModel(val model: ModelRef) : ChatEvent
+
     /** Reasoning level of the current model; null is its default. */
     data class SelectVariant(val variant: String?) : ChatEvent
     data class ReplyPermission(val requestId: String, val decision: PermissionDecision) : ChatEvent
@@ -159,11 +166,14 @@ sealed interface ChatEvent {
     /** Files read from the system pickers, ready to send. */
     data class AddAttachments(val attachments: List<PromptAttachment>) : ChatEvent
     data class RemoveAttachment(val uri: String) : ChatEvent
+
     /** Opens an attachment of the composer full screen. */
     data class PreviewAttachment(val uri: String) : ChatEvent
+
     /** Opens the [index]th image of a sent prompt full screen. */
     data class OpenImage(val messageId: String, val index: Int) : ChatEvent
     data object ClosePreview : ChatEvent
+
     /** A picked file could not be read or is too large. */
     data object AttachmentFailed : ChatEvent
     data class PickSuggestion(val suggestion: Suggestion) : ChatEvent
@@ -181,11 +191,13 @@ sealed interface ChatEvent {
 
     data object OpenChanges : ChatEvent
     data object CloseChanges : ChatEvent
+
     /** Shows another range in the open changes sheet, or reloads the current one. */
     data class LoadChanges(val scope: ChangesScope) : ChatEvent
 
     /** Delivers a queued prompt at the next step instead of after the current work. */
     data class SteerQueued(val id: String) : ChatEvent
+
     /** Takes a queued prompt back into the composer. */
     data class EditQueued(val id: String) : ChatEvent
     data class RemoveQueued(val id: String) : ChatEvent

@@ -10,9 +10,6 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcMonoTypography
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeBlock
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeFence
@@ -26,6 +23,9 @@ import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.SyntaxThemes
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMonoTypography
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 
 /**
  * Renders assistant markdown with highlighted code fences (with copy header).

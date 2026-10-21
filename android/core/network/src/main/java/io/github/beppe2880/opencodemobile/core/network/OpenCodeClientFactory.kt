@@ -38,12 +38,14 @@ class OpenCodeClientFactory(debugLogging: Boolean = false) {
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(Interceptor { chain ->
-            val request = chain.request()
-            // Required by /auth/connect to answer with JSON instead of an HTML page.
-            if (request.header("Accept") != null) return@Interceptor chain.proceed(request)
-            chain.proceed(request.newBuilder().header("Accept", "application/json").build())
-        })
+        .addInterceptor(
+            Interceptor { chain ->
+                val request = chain.request()
+                // Required by /auth/connect to answer with JSON instead of an HTML page.
+                if (request.header("Accept") != null) return@Interceptor chain.proceed(request)
+                chain.proceed(request.newBuilder().header("Accept", "application/json").build())
+            },
+        )
         .build()
 
     fun create(baseUrl: String, credentials: BasicCredentials?): OpenCodeClient {

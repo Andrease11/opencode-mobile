@@ -55,7 +55,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
-import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
@@ -63,7 +63,6 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
-import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSearchField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSectionHeader
@@ -71,6 +70,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing

@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length") // sample transcripts and replies
+
 package io.github.beppe2880.opencodemobile.core.ui.sample
 
 import io.github.beppe2880.opencodemobile.core.domain.Agent
@@ -39,7 +41,14 @@ object SampleData {
         Project("p-blog", "/home/user/code/blog", null, "git", NOW - 3 * DAY),
     )
 
-    private fun session(id: String, title: String, dir: String, ago: Long, outcome: SessionOutcome? = SessionOutcome.Succeeded, agent: String = "build") = Session(
+    private fun session(
+        id: String,
+        title: String,
+        dir: String,
+        ago: Long,
+        outcome: SessionOutcome? = SessionOutcome.Succeeded,
+        agent: String = "build",
+    ) = Session(
         id = id,
         parentId = null,
         projectId = "p",
@@ -52,7 +61,7 @@ object SampleData {
         outcome = outcome,
         createdAt = NOW - ago - HOUR,
         updatedAt = NOW - ago,
-    archivedAt = null,
+        archivedAt = null,
     )
 
     val sessions = listOf(

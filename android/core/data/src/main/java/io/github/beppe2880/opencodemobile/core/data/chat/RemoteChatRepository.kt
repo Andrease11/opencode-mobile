@@ -42,8 +42,8 @@ import io.github.beppe2880.opencodemobile.core.network.receivedCount
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 

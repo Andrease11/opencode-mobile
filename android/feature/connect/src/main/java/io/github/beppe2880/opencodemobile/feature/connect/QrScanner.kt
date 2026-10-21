@@ -51,10 +51,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import io.github.beppe2880.opencodemobile.core.ui.R as UiR
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
@@ -63,15 +69,9 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcDarkColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.DecodeHintType
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.NotFoundException
-import com.google.zxing.PlanarYUVLuminanceSource
-import com.google.zxing.common.HybridBinarizer
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
 /**
  * Full-screen QR scanner overlay. Handles the camera permission with a rationale and a

@@ -14,6 +14,7 @@ sealed interface ServerEvent {
     data class SessionChanged(override val sessionId: String, val deleted: Boolean = false) : SessionScoped
 
     data class ExecutionStarted(override val sessionId: String) : SessionScoped
+
     /**
      * End of an execution. The server stores it as an idle message whose id is the event id with
      * `msg_` instead of `evt_`; [idleId] lets the live transcript insert the same [Message.Idle].

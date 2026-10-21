@@ -5,26 +5,25 @@ import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
-import io.github.beppe2880.opencodemobile.core.domain.FileDiff
-import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
-import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
+import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.FormCondition
 import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
+import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
-import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.Part
+import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
-import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
@@ -35,6 +34,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -861,6 +861,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     val olderPages = ArrayDeque<List<Message>>()
 
     override suspend fun cachedMessages(sessionId: String) = cached
+
     /** When set, returned by [olderMessages] instead of the next page. */
     var olderResult: Result<List<Message>?>? = null
     override suspend fun olderMessages(sessionId: String): Result<List<Message>?> =
@@ -912,6 +913,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         forms = forms.filterNot { it.id == formId }
         return Result.success(Unit)
     }
+
     /** All prompts on the server, newest first. */
     var serverPrompts: List<Message.User> = emptyList()
     override suspend fun previousPrompt(sessionId: String, beforeMessageId: String?): Result<Message.User?> =

@@ -128,7 +128,7 @@ object TranscriptReducer {
      */
     fun merge(server: List<Message>, local: List<Message>): List<Message> {
         val serverIds = server.mapTo(HashSet()) { it.id }
-        val pending = local.filter { it.id !in serverIds && (it is Message.User && it.pending || it is Message.Assistant && it.isStreaming) }
+        val pending = local.filter { it.id !in serverIds && ((it is Message.User && it.pending) || (it is Message.Assistant && it.isStreaming)) }
         return server + pending
     }
 

@@ -92,7 +92,15 @@ class ConnectViewModel(
         }
         if (target is ConnectTarget.Pairing) {
             updateState {
-                it.copy(url = target.baseUrl, method = AuthMethod.PairingCode, secret = target.code, urlError = null, secretError = null, probe = null, submitError = null)
+                it.copy(
+                    url = target.baseUrl,
+                    method = AuthMethod.PairingCode,
+                    secret = target.code,
+                    urlError = null,
+                    secretError = null,
+                    probe = null,
+                    submitError = null,
+                )
             }
             return
         }
@@ -104,7 +112,15 @@ class ConnectViewModel(
         when (target) {
             is ConnectTarget.Pairing -> {
                 updateState {
-                    it.copy(url = target.baseUrl, method = AuthMethod.PairingCode, secret = target.code, urlError = null, secretError = null, submitError = null, probe = null)
+                    it.copy(
+                        url = target.baseUrl,
+                        method = AuthMethod.PairingCode,
+                        secret = target.code,
+                        urlError = null,
+                        secretError = null,
+                        submitError = null,
+                        probe = null,
+                    )
                 }
                 if (target.otherUrls.isEmpty()) submit() else pairWithReachableUrl(target.urls)
             }
