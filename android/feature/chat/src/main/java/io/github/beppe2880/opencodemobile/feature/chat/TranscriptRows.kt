@@ -184,23 +184,32 @@ internal fun AssistantText(item: ChatItem.Text, cache: MarkdownCache, modifier: 
 }
 
 @Composable
-internal fun ReasoningBlock(item: ChatItem.Reasoning, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ReasoningBlock(
+    item: ChatItem.Reasoning,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    live: LiveFollow? = null,
+) {
     val c = OcTheme.colors
     val label = when {
         item.streaming -> stringResource(R.string.chat_thinking)
         item.durationMs != null && item.durationMs >= 1_000 -> stringResource(R.string.chat_thought_for, formatDuration(item.durationMs))
         else -> stringResource(R.string.chat_thought)
     }
+    // Thinking in progress stays open so it can be followed live.
+    val open = expanded || (live?.thinking == true && item.streaming)
     Column(modifier = modifier.fillMaxWidth()) {
         DisclosureRow(
-            expanded = expanded,
+            expanded = open,
             onToggle = onToggle,
             testTag = "chat_reasoning_${item.key}",
         ) {
             Text(label, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
             if (item.streaming) OcSpinner(size = 10.dp)
         }
-        AnimatedVisibility(visible = expanded) {
+        // Summarized thinking only arrives at the end: no empty box while it streams.
+        AnimatedVisibility(visible = open && item.text.isNotBlank()) {
             Text(
                 text = item.text,
                 style = MaterialTheme.typography.bodySmall,

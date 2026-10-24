@@ -125,6 +125,9 @@ interface DraftRepository {
 
 enum class PromptDelivery { Steer, Queue }
 
+/** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
+data class ShellOutput(val text: String, val cursor: Long)
+
 /** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
 data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
 
@@ -181,6 +184,13 @@ interface ChatRepository {
      * transcript. Long commands keep running on the server after this returns.
      */
     suspend fun shell(sessionId: String, command: String): Result<Unit> = Result.success(Unit)
+
+    /**
+     * Output a shell command (for example a running `bash` tool) has written since byte
+     * [cursor]; the returned cursor is where the next read starts.
+     */
+    suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> =
+        Result.success(ShellOutput("", cursor))
 
     /** Prompts sent but not delivered yet, oldest first. */
     suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
@@ -255,6 +265,22 @@ data class AppSettings(
     val theme: ThemeMode = ThemeMode.System,
     val showReasoning: Boolean = true,
     val expandToolsByDefault: Boolean = false,
+    /** Running work stays open while the agent works; the kinds below choose which. */
+    val followRunningTools: Boolean = true,
+    /** With [followRunningTools]: thinking in progress. */
+    val liveThinking: Boolean = true,
+    /** With [followRunningTools]: shell commands, with their output as it arrives. */
+    val liveShell: Boolean = true,
+    /** With [followRunningTools]: file edits and writes, with their diff once applied. */
+    val liveEdits: Boolean = true,
+    /** With [followRunningTools]: reads and searches, with their result. */
+    val liveReads: Boolean = false,
+    /** With [followRunningTools]: every other tool (web, subagents, todos, MCP...). */
+    val liveOther: Boolean = false,
+    /** Opening a tool group shows each tool's output or diff, not only its name. */
+    val showToolDetails: Boolean = true,
+    /** Long commands and paths in tool rows wrap instead of being cut to one line. */
+    val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
