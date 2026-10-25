@@ -2,22 +2,28 @@ package io.github.beppe2880.opencodemobile.feature.terminal
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
+import android.provider.Settings
 import android.text.InputType
 import android.util.Base64
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.SoftwareKeyboardControllerCompat
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.terminalAnsi
@@ -30,11 +36,17 @@ private const val PAGE = "file:///android_asset/terminal/index.html"
 @Composable
 internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier) {
     val colors = OcTheme.colors
+    val keyboardRequest = rememberSaveable(
+        saver = Saver<TerminalKeyboardRequest, Boolean>(
+            save = { it.handled },
+            restore = { TerminalKeyboardRequest(it) },
+        ),
+    ) { TerminalKeyboardRequest() }
     LaunchedEffect(surface, colors) { surface.setTheme(colors.xtermTheme()) }
     AndroidView(
         modifier = modifier,
         factory = { context ->
-            TerminalWebView(context).apply {
+            TerminalWebView(context, keyboardRequest).apply {
                 // Wrap-content height would give the page a zero-height viewport.
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -46,7 +58,8 @@ internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier)
                 isVerticalScrollBarEnabled = false
                 val page = object : WebTerminalPage {
                     override fun call(function: String, vararg arguments: String) {
-                        evaluateJavascript("window.oc.$function(${arguments.joinToString(",")})", null)
+                        val callback = if (function == "focus") ValueCallback<String> { onPageFocused() } else null
+                        evaluateJavascript("window.oc.$function(${arguments.joinToString(",")})", callback)
                     }
                 }
                 addJavascriptInterface(Bridge(surface, page, this, resources), "OcTerminal")
@@ -70,7 +83,31 @@ internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier)
  * Asks the keyboard for plain keystrokes: with word suggestions on, Android keyboards compose
  * whole words and xterm.js sends every intermediate version of them to the shell.
  */
-private class TerminalWebView(context: Context) : WebView(context) {
+private class TerminalWebView(context: Context, private val keyboardRequest: TerminalKeyboardRequest) : WebView(context) {
+    private var pageFocused = false
+
+    fun onPageFocused() {
+        pageFocused = true
+        showInitialKeyboard()
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (hasWindowFocus) showInitialKeyboard()
+    }
+
+    private fun showInitialKeyboard() {
+        val configuration = resources.configuration
+        val hardwareKeyboardActive = configuration.keyboard != Configuration.KEYBOARD_NOKEYS &&
+            configuration.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO
+        // Respect Android's "Show on-screen keyboard" preference when a hardware keyboard is connected.
+        val allowSoftKeyboard = !hardwareKeyboardActive ||
+            Settings.Secure.getInt(context.contentResolver, "show_ime_with_hard_keyboard", 0) != 0
+        if (keyboardRequest.consumeIfReady(pageFocused, isAttachedToWindow && hasWindowFocus(), allowSoftKeyboard)) {
+            SoftwareKeyboardControllerCompat(this).show()
+        }
+    }
+
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val connection = super.onCreateInputConnection(outAttrs)
         outAttrs.inputType = InputType.TYPE_CLASS_TEXT or
