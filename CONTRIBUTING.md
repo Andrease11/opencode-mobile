@@ -34,6 +34,8 @@ Before opening a pull request, run what CI runs:
 (cd tools/api-gen && bun install && bun run check)   # only if you touched the API or the generator
 ```
 
+For terminal WebView changes, also run `bun test tools/terminal-touch.test.ts` from the root.
+
 ## Code conventions
 
 The architecture and rules are documented in [`AGENTS.md`](AGENTS.md) and
