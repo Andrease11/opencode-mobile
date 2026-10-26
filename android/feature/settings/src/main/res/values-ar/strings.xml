@@ -117,6 +117,9 @@
         <item quantity="other">%s خطوة</item>
     </plurals>
     <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_terminal">الطرفية</string>
+    <string name="settings_terminal_keyboard">فتح لوحة المفاتيح</string>
+    <string name="settings_terminal_keyboard_sub">إظهار لوحة المفاتيح على الشاشة فور فتح الطرفية</string>
     <string name="settings_session_notifications">إشعارات الجلسات</string>
     <string name="settings_session_notifications_sub">أثناء تشغيل الجلسات، يبقى التطبيق متصلًا في الخلفية ويُعلمك عندما تنتظر جلسة ردًا أو تنتهي</string>
     <string name="settings_notify_permissions">طلبات الأذونات</string>

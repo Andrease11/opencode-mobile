@@ -105,6 +105,9 @@
         <item quantity="other">%s étapes</item>
     </plurals>
     <string name="settings_notifications">Notifications</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_terminal_keyboard">Ouvrir le clavier</string>
+    <string name="settings_terminal_keyboard_sub">Afficher le clavier à l\'écran dès l\'ouverture du terminal</string>
     <string name="settings_session_notifications">Notifications des sessions</string>
     <string name="settings_session_notifications_sub">Pendant l’exécution des sessions, reste connectée en arrière-plan et vous prévient quand l’une attend une réponse ou se termine</string>
     <string name="settings_notify_permissions">Demandes d\'autorisation</string>

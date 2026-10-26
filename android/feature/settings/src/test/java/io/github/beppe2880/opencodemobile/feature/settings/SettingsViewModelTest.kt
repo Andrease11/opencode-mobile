@@ -55,6 +55,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
+        vm.onEvent(SettingsEvent.TerminalKeyboardChanged(false))
         vm.onEvent(SettingsEvent.OutputPreviewLinesChanged(24))
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
@@ -79,6 +80,7 @@ class SettingsViewModelTest {
                 liveOther = true,
                 showFullCommands = true,
                 showToolDetails = false,
+                terminalOpenKeyboard = false,
                 outputPreviewLines = 24,
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,

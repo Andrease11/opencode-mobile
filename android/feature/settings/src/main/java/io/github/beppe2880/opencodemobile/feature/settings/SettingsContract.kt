@@ -48,6 +48,7 @@ sealed interface SettingsEvent {
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
+    data class TerminalKeyboardChanged(val enabled: Boolean) : SettingsEvent
     data class OutputPreviewLinesChanged(val lines: Int) : SettingsEvent
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent

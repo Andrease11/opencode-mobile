@@ -50,6 +50,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_NOTIFY_FINISHED, next.notifyFinished)
             .putBoolean(KEY_NOTIFICATIONS_INTRO, next.notificationsIntroShown)
             .putString(KEY_TERMINAL_KEYS, next.terminalKeys?.let { Json.encodeToString(KeyRows, it) })
+            .putBoolean(KEY_TERMINAL_KEYBOARD, next.terminalOpenKeyboard)
             .apply()
     }
 
@@ -84,6 +85,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             notifyQuestions = prefs.getBoolean(KEY_NOTIFY_QUESTIONS, defaults.notifyQuestions),
             notifyFinished = prefs.getBoolean(KEY_NOTIFY_FINISHED, defaults.notifyFinished),
             notificationsIntroShown = prefs.getBoolean(KEY_NOTIFICATIONS_INTRO, defaults.notificationsIntroShown),
+            terminalOpenKeyboard = prefs.getBoolean(KEY_TERMINAL_KEYBOARD, defaults.terminalOpenKeyboard),
             terminalKeys = prefs.getString(KEY_TERMINAL_KEYS, null)?.let { stored ->
                 try {
                     Json.decodeFromString(KeyRows, stored)
@@ -121,6 +123,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_NOTIFY_FINISHED = "notify_finished"
         const val KEY_NOTIFICATIONS_INTRO = "notifications_intro_shown"
         const val KEY_TERMINAL_KEYS = "terminal_keys"
+        const val KEY_TERMINAL_KEYBOARD = "terminal_open_keyboard"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }
