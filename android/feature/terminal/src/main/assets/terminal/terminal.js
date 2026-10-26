@@ -66,6 +66,8 @@
   }
 
   // xterm 6 scrolls a virtual viewport, so browser panning cannot move its history.
+  // Upstream fixes touch scrolling in 6.1 (https://github.com/xtermjs/xterm.js/issues/5489);
+  // remove this when upgrading, or the two would handle the same swipe.
   function bindTouchScroll() {
     const screen = term.element.querySelector(".xterm-screen");
     let gesture = null;
