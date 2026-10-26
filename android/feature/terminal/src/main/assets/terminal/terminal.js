@@ -65,6 +65,61 @@
     return "";
   }
 
+  // xterm 6 scrolls a virtual viewport, so browser panning cannot move its history.
+  // Upstream fixes touch scrolling in 6.1 (https://github.com/xtermjs/xterm.js/issues/5489);
+  // remove this when upgrading, or the two would handle the same swipe.
+  function bindTouchScroll() {
+    const screen = term.element.querySelector(".xterm-screen");
+    let gesture = null;
+    let suppressClick = false;
+    const canScroll = () => term.buffer.active.type === "normal" &&
+      term.buffer.active.baseY > 0 && term.modes.mouseTrackingMode === "none" &&
+      !term.hasSelection() && !window.getSelection()?.toString();
+
+    screen.addEventListener("touchstart", (event) => {
+      gesture = null;
+      suppressClick = false;
+      if (event.touches.length !== 1 || !canScroll()) return;
+      const touch = event.touches[0];
+      gesture = { id: touch.identifier, x: touch.clientX, y: touch.clientY, lastY: touch.clientY, remainder: 0, scrolling: false };
+    }, { passive: true });
+    screen.addEventListener("touchmove", (event) => {
+      if (!gesture) return;
+      if (event.touches.length !== 1 || !canScroll()) { gesture = null; return; }
+      const touch = event.touches[0];
+      if (touch.identifier !== gesture.id) { gesture = null; return; }
+      if (!gesture.scrolling) {
+        const dx = Math.abs(touch.clientX - gesture.x);
+        const dy = Math.abs(touch.clientY - gesture.y);
+        if (Math.max(dx, dy) < 8) return;
+        if (dx >= dy) { gesture = null; return; }
+        gesture.scrolling = true;
+      }
+      const rowHeight = screen.getBoundingClientRect().height / term.rows;
+      if (!(rowHeight > 0)) { gesture = null; return; }
+      event.preventDefault();
+      suppressClick = true;
+      gesture.remainder += (gesture.lastY - touch.clientY) / rowHeight;
+      gesture.lastY = touch.clientY;
+      const rows = Math.trunc(gesture.remainder);
+      if (rows) {
+        term.scrollLines(rows);
+        gesture.remainder -= rows;
+      }
+    }, { passive: false });
+    for (const type of ["touchend", "touchcancel", "contextmenu"]) {
+      screen.addEventListener(type, () => { gesture = null; }, { passive: true });
+    }
+    // Some WebViews synthesize a click after a drag; do not focus the input or open the IME.
+    screen.addEventListener("click", (event) => {
+      if (!suppressClick || event.pointerType === "mouse" || event.detail === 0 ||
+          event.sourceCapabilities?.firesTouchEvents === false) return;
+      suppressClick = false;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+  }
+
   window.oc = {
     write(data) { term.write(data); },
     setLive(value) {
@@ -112,6 +167,7 @@
     fit = new FitAddon.FitAddon();
     term.loadAddon(fit);
     term.open(document.getElementById("terminal"));
+    bindTouchScroll();
     term.onData((data) => {
       if (modifiers && data.length === 1) {
         data = withModifiers(data, modifiers);

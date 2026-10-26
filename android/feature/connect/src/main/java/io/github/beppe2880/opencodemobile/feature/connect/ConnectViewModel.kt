@@ -58,7 +58,9 @@ class ConnectViewModel(
         when (event) {
             is ConnectEvent.UrlChanged -> onUrlChanged(event.value)
             is ConnectEvent.SecretChanged -> updateState {
-                it.copy(secret = event.value.trim(), secretError = null, submitError = null)
+                // Pairing codes tolerate stray whitespace; passwords keep spaces but lose pasted line breaks.
+                val secret = if (it.method == AuthMethod.Password) event.value.trim('\r', '\n') else event.value.trim()
+                it.copy(secret = secret, secretError = null, submitError = null)
             }
             is ConnectEvent.MethodChanged -> updateState {
                 it.copy(method = event.method, secret = "", secretError = null, submitError = null, probe = null)
@@ -190,7 +192,7 @@ class ConnectViewModel(
     private fun testConnection() {
         val base = validatedUrl() ?: return
         val state = currentState
-        val password = state.secret.takeIf { state.method == AuthMethod.Password && it.isNotBlank() }
+        val password = state.secret.takeIf { state.method == AuthMethod.Password && it.isNotEmpty() }
         probeJob?.cancel()
         updateState { it.copy(url = base, probing = true, probe = null, submitError = null) }
         probeJob = viewModelScope.launch {
@@ -209,7 +211,8 @@ class ConnectViewModel(
         if (currentState.submitting) return
         val base = validatedUrl()
         val state = currentState
-        if (state.secret.isBlank()) {
+        val secretMissing = if (state.method == AuthMethod.PairingCode) state.secret.isBlank() else state.secret.isEmpty()
+        if (secretMissing) {
             updateState {
                 it.copy(
                     secretError = UiText.Res(
@@ -218,7 +221,7 @@ class ConnectViewModel(
                 )
             }
         }
-        if (base == null || state.secret.isBlank()) return
+        if (base == null || secretMissing) return
         probeJob?.cancel()
         updateState { it.copy(url = base, submitting = true, probing = false, submitError = null) }
         viewModelScope.launch {
