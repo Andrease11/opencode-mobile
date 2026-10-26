@@ -25,6 +25,7 @@ class PreferencesRepositoriesTest {
             liveOutputIntervalMs = 3_000,
             keepLiveStepsOpen = true,
             chatTextScale = 1.15f,
+            terminalOpenKeyboard = false,
         )
         PreferencesSettingsRepository(prefs).update { changed }
 

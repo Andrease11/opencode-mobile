@@ -34,7 +34,7 @@ private const val PAGE = "file:///android_asset/terminal/index.html"
 /** xterm.js in a WebView that only loads the bundled page and has no network access. */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier) {
+internal fun WebTerminalView(surface: WebSurface, openKeyboard: Boolean, modifier: Modifier = Modifier) {
     val colors = OcTheme.colors
     val keyboardRequest = rememberSaveable(
         saver = Saver<TerminalKeyboardRequest, Boolean>(
@@ -71,6 +71,7 @@ internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier)
                 loadUrl(PAGE)
             }
         },
+        update = { it.openKeyboard = openKeyboard },
         onRelease = { webView ->
             (webView.tag as? WebTerminalPage)?.let(surface::detach)
             webView.removeJavascriptInterface("OcTerminal")
@@ -85,6 +86,9 @@ internal fun WebTerminalView(surface: WebSurface, modifier: Modifier = Modifier)
  */
 private class TerminalWebView(context: Context, private val keyboardRequest: TerminalKeyboardRequest) : WebView(context) {
     private var pageFocused = false
+
+    /** The setting to show the on-screen keyboard when the terminal opens. */
+    var openKeyboard = true
 
     fun onPageFocused() {
         pageFocused = true
@@ -101,8 +105,8 @@ private class TerminalWebView(context: Context, private val keyboardRequest: Ter
         val hardwareKeyboardActive = configuration.keyboard != Configuration.KEYBOARD_NOKEYS &&
             configuration.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO
         // Respect Android's "Show on-screen keyboard" preference when a hardware keyboard is connected.
-        val allowSoftKeyboard = !hardwareKeyboardActive ||
-            Settings.Secure.getInt(context.contentResolver, "show_ime_with_hard_keyboard", 0) != 0
+        val allowSoftKeyboard = openKeyboard &&
+            (!hardwareKeyboardActive || Settings.Secure.getInt(context.contentResolver, "show_ime_with_hard_keyboard", 0) != 0)
         if (keyboardRequest.consumeIfReady(pageFocused, isAttachedToWindow && hasWindowFocus(), allowSoftKeyboard)) {
             SoftwareKeyboardControllerCompat(this).show()
         }

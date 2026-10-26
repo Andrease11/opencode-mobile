@@ -324,6 +324,8 @@ data class AppSettings(
      * screen; null for its default layout.
      */
     val terminalKeys: List<List<String>>? = null,
+    /** Opening the terminal also shows the on-screen keyboard. */
+    val terminalOpenKeyboard: Boolean = true,
 )
 
 interface SettingsRepository {

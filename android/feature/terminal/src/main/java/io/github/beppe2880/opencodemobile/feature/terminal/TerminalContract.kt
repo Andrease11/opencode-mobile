@@ -13,6 +13,8 @@ data class TerminalState(
     val error: UiText? = null,
     /** Rows of the key bar above the keyboard, as the user arranged them. */
     val keyRows: List<List<BarKey>> = BarKeys.Default,
+    /** Entering the terminal shows the on-screen keyboard (setting). */
+    val openKeyboard: Boolean = true,
     /** Modifiers of the key bar, also applied to keys typed on the keyboard. */
     val modifiers: Map<TermModifier, ModifierState> = emptyMap(),
     val editingKeys: Boolean = false,

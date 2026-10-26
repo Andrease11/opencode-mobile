@@ -108,6 +108,7 @@ fun SettingsScreen(
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
                 item(key = "live") { LiveActivitySection(state.settings, onEvent) }
                 item(key = "notifications") { NotificationsSection(state, onEvent) }
+                item(key = "terminal") { TerminalSection(state.settings, onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
@@ -281,6 +282,21 @@ private fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegme
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
         }
         OcSegmentedControl(segments = choices, selected = selected, onSelect = onSelect)
+    }
+}
+
+@Composable
+private fun TerminalSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(R.string.settings_terminal)) {
+        OcCard {
+            OcSwitchRow(
+                title = stringResource(R.string.settings_terminal_keyboard),
+                subtitle = stringResource(R.string.settings_terminal_keyboard_sub),
+                checked = settings.terminalOpenKeyboard,
+                onCheckedChange = { onEvent(SettingsEvent.TerminalKeyboardChanged(it)) },
+                modifier = Modifier.testTag("settings_terminal_keyboard_switch"),
+            )
+        }
     }
 }
 

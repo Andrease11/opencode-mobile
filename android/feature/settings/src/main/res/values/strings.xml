@@ -105,6 +105,9 @@
         <item quantity="other">%s steps</item>
     </plurals>
     <string name="settings_notifications">Notifications</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_terminal_keyboard">Open the keyboard</string>
+    <string name="settings_terminal_keyboard_sub">Show the on-screen keyboard as soon as the terminal opens</string>
     <string name="settings_session_notifications">Session notifications</string>
     <string name="settings_session_notifications_sub">While sessions run, stay connected in the background and notify you when one needs an answer or finishes</string>
     <string name="settings_notify_permissions">Permission requests</string>

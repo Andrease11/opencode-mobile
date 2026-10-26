@@ -70,6 +70,7 @@ class SettingsViewModel(
             is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
+            is SettingsEvent.TerminalKeyboardChanged -> update { it.copy(terminalOpenKeyboard = event.enabled) }
             is SettingsEvent.OutputPreviewLinesChanged -> update { it.copy(outputPreviewLines = event.lines) }
             is SettingsEvent.LiveOutputIntervalChanged -> update { it.copy(liveOutputIntervalMs = event.millis) }
             is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }

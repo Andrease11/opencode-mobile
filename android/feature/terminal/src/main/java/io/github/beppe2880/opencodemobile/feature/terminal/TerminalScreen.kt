@@ -106,7 +106,7 @@ fun TerminalScreen(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
-                    WebTerminalView(surface, Modifier.fillMaxSize().testTag("terminal_view"))
+                    WebTerminalView(surface, state.openKeyboard, Modifier.fillMaxSize().testTag("terminal_view"))
                     LinkBanner(state.link, onRestart = { onEvent(TerminalEvent.Restart) }, Modifier.align(Alignment.BottomCenter))
                 }
             }

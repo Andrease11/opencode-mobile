@@ -38,9 +38,8 @@ class TerminalViewModel(
     init {
         open()
         viewModelScope.launch {
-            settings.settings.map { BarKeys.fromSettings(it.terminalKeys) }.distinctUntilChanged().collect { rows ->
-                updateState { it.copy(keyRows = rows) }
-            }
+            settings.settings.map { BarKeys.fromSettings(it.terminalKeys) to it.terminalOpenKeyboard }.distinctUntilChanged()
+                .collect { (rows, openKeyboard) -> updateState { it.copy(keyRows = rows, openKeyboard = openKeyboard) } }
         }
         viewModelScope.launch {
             state.map { modifierMask(it) }.distinctUntilChanged().collect(surface::setModifiers)
