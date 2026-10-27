@@ -1,14 +1,23 @@
 package io.github.beppe2880.opencodemobile.navigation
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
@@ -26,6 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
@@ -35,8 +47,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
+import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session_message
+import io.github.beppe2880.opencodemobile.shared.resources.app_show_sessions
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 
@@ -168,7 +182,10 @@ fun AppNavHost(
     }
 }
 
-/** Phone: sessions list only. Expanded width: list + chat detail side by side. */
+/**
+ * Phone: sessions list only. Expanded width: list + chat detail side by side; the handle on
+ * the divider hides the list to give the chat the whole width.
+ */
 @Composable
 private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
@@ -179,6 +196,7 @@ private fun SessionsListDetail(
     onNewSessionOpened: () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
+    var listHidden by rememberSaveable { mutableStateOf(false) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth) {
             SessionsRoute(
@@ -188,14 +206,19 @@ private fun SessionsListDetail(
                 onNewSessionOpened = onNewSessionOpened,
             )
         } else {
+            val listWidth by animateDpAsState(if (listHidden) 0.dp else ListPaneWidth, label = "listWidth")
             Row(Modifier.fillMaxSize()) {
+                // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
                     onOpenChat = { selected = it },
                     onOpenSettings = onOpenSettings,
                     selectedSessionId = selected,
                     openNewSession = openNewSession,
-                    onNewSessionOpened = onNewSessionOpened,
-                    modifier = Modifier.width(ListPaneWidth).fillMaxHeight(),
+                    onNewSessionOpened = {
+                        listHidden = false
+                        onNewSessionOpened()
+                    },
+                    modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
                 val current = selected
@@ -223,6 +246,35 @@ private fun SessionsListDetail(
                     }
                 }
             }
+            // Drawn over both panes so it can straddle the divider and still receive taps.
+            ListPaneHandle(
+                listHidden = listHidden,
+                onToggle = { listHidden = !listHidden },
+                modifier = Modifier.align(Alignment.CenterStart).offset(x = (listWidth - HandleWidth / 2).coerceAtLeast(0.dp)),
+            )
         }
     }
 }
+
+@Composable
+private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    Surface(
+        onClick = onToggle,
+        shape = RoundedCornerShape(OcRadius.md),
+        color = c.layer02,
+        border = BorderStroke(1.dp, c.borderBase),
+        modifier = modifier.size(width = HandleWidth, height = 48.dp).testTag("sessions_pane_toggle"),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = if (listHidden) Icons.AutoMirrored.Outlined.KeyboardArrowRight else Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                contentDescription = stringResource(if (listHidden) Res.string.app_show_sessions else Res.string.app_hide_sessions),
+                tint = c.iconBase,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+private val HandleWidth = 24.dp

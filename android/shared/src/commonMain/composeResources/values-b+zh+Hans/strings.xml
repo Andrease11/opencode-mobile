@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">选择会话</string>
     <string name="app_select_session_message">从列表中选择会话或新建会话。</string>
+    <string name="app_hide_sessions">隐藏会话</string>
+    <string name="app_show_sessions">显示会话</string>
 </resources>

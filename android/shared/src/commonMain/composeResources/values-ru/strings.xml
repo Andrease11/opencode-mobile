@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">Выберите сессию</string>
     <string name="app_select_session_message">Выберите сессию из списка или начните новую.</string>
+    <string name="app_hide_sessions">Скрыть сессии</string>
+    <string name="app_show_sessions">Показать сессии</string>
 </resources>

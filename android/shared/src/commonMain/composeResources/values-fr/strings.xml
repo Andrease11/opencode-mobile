@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">Sélectionnez une session</string>
     <string name="app_select_session_message">Choisissez une session dans la liste ou démarrez-en une nouvelle.</string>
+    <string name="app_hide_sessions">Masquer les sessions</string>
+    <string name="app_show_sessions">Afficher les sessions</string>
 </resources>

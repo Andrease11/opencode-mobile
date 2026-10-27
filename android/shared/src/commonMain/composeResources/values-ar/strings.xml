@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">اختر جلسة</string>
     <string name="app_select_session_message">اختر جلسة من القائمة أو ابدأ جلسة جديدة.</string>
+    <string name="app_hide_sessions">إخفاء الجلسات</string>
+    <string name="app_show_sessions">إظهار الجلسات</string>
 </resources>
