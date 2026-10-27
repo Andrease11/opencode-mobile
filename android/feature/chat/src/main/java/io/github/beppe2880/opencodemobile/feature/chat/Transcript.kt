@@ -45,6 +45,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -78,45 +82,73 @@ internal fun Transcript(
     listState: LazyListState,
     cache: MarkdownCache,
 ) {
-    val reversed = remember(state.items) { state.items.asReversed() }
-    val currentRows by rememberUpdatedState(reversed)
+    val currentRows by rememberUpdatedState(state.items)
+    val historyHeader = if (state.loadingOlder || state.olderFailed) 1 else 0
+    val currentHeader by rememberUpdatedState(historyHeader)
     val scope = rememberCoroutineScope()
     // Where the user left this chat; until it is back on screen nothing follows new messages.
     val saved = remember(state.sessionId) { state.savedScroll }
-    var restored by remember(state.sessionId) { mutableStateOf(saved == null) }
+    var restored by remember(state.sessionId) { mutableStateOf(false) }
     var stickToBottom by remember(state.sessionId) { mutableStateOf(saved == null) }
     // Set when content arrives while the user reads older messages; cleared at the bottom.
-    var hasNew by remember { mutableStateOf(false) }
+    var hasNew by remember(state.sessionId) { mutableStateOf(false) }
     var actionsFor by rememberSaveable { mutableStateOf<String?>(null) }
-    LaunchedEffect(reversed, state.synced) {
-        if (restored || saved == null) return@LaunchedEffect
-        val index = reversed.indexOfFirst { it.key == saved.key }
+    LaunchedEffect(listState, state.sessionId, state.items, state.synced, historyHeader) {
+        if (restored || (state.items.isEmpty() && !state.synced)) return@LaunchedEffect
+        val index = state.items.indexOfFirst { it.key == saved?.key }
         when {
-            index >= 0 -> {
-                listState.scrollToItem(index, saved.offset)
+            saved != null && index >= 0 -> {
+                listState.scrollToItem(index + historyHeader, saved.offset)
                 restored = true
             }
             // The row is gone (reverted, compacted, beyond the cache): start from the bottom.
-            state.synced -> {
+            saved == null || state.synced -> {
                 stickToBottom = true
+                listState.scrollToLatest()
                 restored = true
-                listState.scrollToItem(0)
             }
         }
     }
     LaunchedEffect(listState, state.sessionId) {
-        snapshotFlow { listState.isScrollInProgress to (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset < 48) }
+        snapshotFlow { listState.isScrollInProgress to !listState.canScrollForward }
             .collect { (scrolling, atBottom) ->
                 if (!restored) return@collect
-                if (scrolling || atBottom) stickToBottom = atBottom
-                if (atBottom) hasNew = false
+                if (scrolling && !atBottom) stickToBottom = false
+                if (!scrolling && atBottom) {
+                    stickToBottom = true
+                    hasNew = false
+                }
             }
     }
+    // Detach on the gesture itself, before another streamed update can scroll the list.
+    val readingScroll = remember(listState, state.sessionId) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (source == NestedScrollSource.UserInput && available.y > 0f) stickToBottom = false
+                return Offset.Zero
+            }
+        }
+    }
     LaunchedEffect(listState, state.sessionId) {
-        snapshotFlow { listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset }
-            .collect { (index, offset) ->
+        snapshotFlow {
+            if (!restored || !stickToBottom || listState.isScrollInProgress) null
+            else {
+                val info = listState.layoutInfo
+                val last = info.visibleItemsInfo.lastOrNull()
+                // Observe measured growth too: tokens, tool output, Markdown reflow and IME.
+                Triple(info.totalItemsCount, last?.let { it.offset + it.size }, info.viewportEndOffset)
+            }
+        }.collect { end -> if (end != null && end.first > 0) listState.scrollToLatest() }
+    }
+    LaunchedEffect(listState, state.sessionId) {
+        snapshotFlow {
+            if (!restored || !listState.canScrollForward) null
+            else currentRows.getOrNull(listState.firstVisibleItemIndex - currentHeader)?.let {
+                ScrollMemory.Anchor(it.key, listState.firstVisibleItemScrollOffset)
+            }
+        }
+            .collect { anchor ->
                 if (!restored) return@collect
-                val anchor = if (index == 0 && offset < 48) null else currentRows.getOrNull(index)?.let { ScrollMemory.Anchor(it.key, offset) }
                 onEvent(ChatEvent.ScrollMoved(anchor))
             }
     }
@@ -124,22 +156,20 @@ internal fun Transcript(
     LaunchedEffect(listState, state.synced) {
         snapshotFlow {
             val info = listState.layoutInfo
-            info.totalItemsCount > 0 && (info.visibleItemsInfo.lastOrNull()?.index ?: 0) >= info.totalItemsCount - LOAD_OLDER_WITHIN
+            restored && info.totalItemsCount > 0 && listState.firstVisibleItemIndex <= LOAD_OLDER_WITHIN
         }
             .distinctUntilChanged()
             .collect { nearTop -> if (nearTop) onEvent(ChatEvent.LoadOlder) }
     }
-    val newestKey = state.items.lastOrNull()?.key
+    val newest = state.items.lastOrNull { it !is ChatItem.Working }
     // Newest row once the server transcript is in; swapping cached rows for it is not news.
-    var seenNewest by remember(state.sessionId) { mutableStateOf<String?>(null) }
-    LaunchedEffect(newestKey, state.synced) {
+    var seenNewest by remember(state.sessionId) { mutableStateOf<ChatItem?>(null) }
+    LaunchedEffect(state.sessionId, newest, state.synced, restored) {
         if (!restored) return@LaunchedEffect
-        if (stickToBottom) {
-            listState.scrollToItem(0)
-        } else if (state.synced && newestKey != null) {
-            if (seenNewest != null && newestKey != seenNewest) hasNew = true
+        if (!stickToBottom && state.synced && newest != null) {
+            if (seenNewest != null && newest != seenNewest) hasNew = true
         }
-        if (state.synced) seenNewest = newestKey
+        if (state.synced) seenNewest = newest
     }
     val defaultToolsExpanded = state.expandToolsByDefault
     // While the agent works, its newest tool group stays open between one tool and the next.
@@ -161,13 +191,14 @@ internal fun Transcript(
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 state = listState,
-                reverseLayout = true,
-                modifier = Modifier.fillMaxSize().testTag("chat_transcript"),
+                // Top anchoring keeps the paragraph being read still when this same row grows.
+                modifier = Modifier.fillMaxSize().nestedScroll(readingScroll).testTag("chat_transcript"),
                 contentPadding = PaddingValues(vertical = OcSpacing.lg),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.md, Alignment.Bottom),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                items(reversed, key = { it.key }, contentType = { it::class }) { item ->
+                olderHistory(state, onEvent)
+                items(state.items, key = { it.key }, contentType = { it::class }) { item ->
                     val rowModifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter)
                     when (item) {
                         is ChatItem.User -> UserBubble(
@@ -228,32 +259,6 @@ internal fun Transcript(
                         is ChatItem.Working -> WorkingRow(rowModifier)
                     }
                 }
-                if (state.loadingOlder) {
-                    item(key = "loading-older") {
-                        Box(Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_loading_older"), contentAlignment = Alignment.Center) {
-                            OcSpinner(size = 16.dp)
-                        }
-                    }
-                } else if (state.olderFailed) {
-                    item(key = "older-failed") {
-                        Column(
-                            Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_older_failed"),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-                        ) {
-                            Text(
-                                stringResource(R.string.chat_older_failed),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = OcTheme.colors.textMuted,
-                            )
-                            OcChip(
-                                text = stringResource(R.string.chat_older_retry),
-                                onClick = { onEvent(ChatEvent.LoadOlder) },
-                                modifier = Modifier.testTag("chat_older_retry_button"),
-                            )
-                        }
-                    }
-                }
             }
             AnimatedVisibility(
                 visible = !stickToBottom,
@@ -262,9 +267,14 @@ internal fun Transcript(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
             ) {
                 val jump = {
-                    stickToBottom = true
+                    stickToBottom = false
                     hasNew = false
-                    scope.launch { listState.animateScrollToItem(0) }
+                    scope.launch {
+                        val last = listState.layoutInfo.totalItemsCount - 1
+                        if (last >= 0) listState.animateScrollToItem(last, Int.MAX_VALUE)
+                        stickToBottom = true
+                        hasNew = false
+                    }
                     Unit
                 }
                 if (hasNew) {
@@ -309,6 +319,37 @@ internal fun Transcript(
             },
             onDismiss = { actionsFor = null },
         )
+    }
+}
+
+/** A positive offset beyond the last row is clamped to the actual bottom, including padding. */
+internal suspend fun LazyListState.scrollToLatest() {
+    val last = layoutInfo.totalItemsCount - 1
+    if (last >= 0) scrollToItem(last, Int.MAX_VALUE)
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.olderHistory(state: ChatState, onEvent: (ChatEvent) -> Unit) {
+    if (state.loadingOlder) {
+        item(key = "loading-older") {
+            Box(Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_loading_older"), contentAlignment = Alignment.Center) {
+                OcSpinner(size = 16.dp)
+            }
+        }
+    } else if (state.olderFailed) {
+        item(key = "older-failed") {
+            Column(
+                Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_older_failed"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                Text(stringResource(R.string.chat_older_failed), style = MaterialTheme.typography.bodySmall, color = OcTheme.colors.textMuted)
+                OcChip(
+                    text = stringResource(R.string.chat_older_retry),
+                    onClick = { onEvent(ChatEvent.LoadOlder) },
+                    modifier = Modifier.testTag("chat_older_retry_button"),
+                )
+            }
+        }
     }
 }
 
