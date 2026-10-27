@@ -122,4 +122,11 @@
     <string name="settings_server_version">Versión del servidor</string>
     <string name="settings_api_version">API de OpenCode</string>
     <string name="settings_unknown">No disponible</string>
+    <string name="settings_split_view">Chat junto a la lista</string>
+    <string name="settings_split_view_sub">En pantallas anchas, muestra el chat abierto junto a la lista de sesiones. Arrastra el tirador del divisor para cambiar el tamaño de la lista.</string>
+    <string name="settings_list_width">Ancho de la lista de sesiones</string>
+    <string name="settings_list_width_sub">Parte de la pantalla que ocupa la lista junto al chat</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">Tirador del divisor</string>
+    <string name="settings_list_handle_sub">Muestra la flecha del divisor para ocultar la lista o arrástralo para cambiar su tamaño</string>
 </resources>

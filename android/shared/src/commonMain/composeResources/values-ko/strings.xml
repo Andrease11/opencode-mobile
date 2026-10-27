@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">세션 선택</string>
     <string name="app_select_session_message">목록에서 세션을 선택하거나 새로 시작하세요.</string>
+    <string name="app_hide_sessions">세션 숨기기</string>
+    <string name="app_show_sessions">세션 표시</string>
 </resources>

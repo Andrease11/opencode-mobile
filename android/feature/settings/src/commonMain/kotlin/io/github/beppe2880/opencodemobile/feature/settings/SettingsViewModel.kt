@@ -71,6 +71,9 @@ class SettingsViewModel(
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
             is SettingsEvent.TerminalKeyboardChanged -> update { it.copy(terminalOpenKeyboard = event.enabled) }
+            is SettingsEvent.SplitViewChanged -> update { it.copy(splitView = event.enabled) }
+            is SettingsEvent.ListPaneFractionChanged -> update { it.copy(listPaneFraction = event.fraction) }
+            is SettingsEvent.ListPaneHandleChanged -> update { it.copy(listPaneHandle = event.enabled) }
             is SettingsEvent.OutputPreviewLinesChanged -> update { it.copy(outputPreviewLines = event.lines) }
             is SettingsEvent.LiveOutputIntervalChanged -> update { it.copy(liveOutputIntervalMs = event.millis) }
             is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }

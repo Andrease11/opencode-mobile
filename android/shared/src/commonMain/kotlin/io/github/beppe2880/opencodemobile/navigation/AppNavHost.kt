@@ -1,31 +1,55 @@
 package io.github.beppe2880.opencodemobile.navigation
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
+import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
@@ -35,10 +59,14 @@ import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
+import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session_message
+import io.github.beppe2880.opencodemobile.shared.resources.app_show_sessions
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 @Serializable
 data class ConnectDestination(val addServer: Boolean = false)
@@ -61,9 +89,19 @@ data class TerminalDestination(val directory: String)
 @Serializable
 data class FileDestination(val directory: String, val path: String)
 
-/** Width at which Sessions and Chat are shown side by side. */
-private val ListDetailMinWidth = 840.dp
-private val ListPaneWidth = 360.dp
+/**
+ * Width at which Sessions and Chat are shown side by side: medium windows and up, so unfolded
+ * foldables (about 670-820 dp) get both panes, not only tablets.
+ */
+private val ListDetailMinWidth = 600.dp
+
+/** By default the list takes [DEFAULT_LIST_PANE_FRACTION] of the width, between the bounds, leaving the chat the most room. */
+private val ListPaneDefaultMinWidth = 280.dp
+private val ListPaneDefaultMaxWidth = 360.dp
+
+/** Bounds when the list is resized by dragging the handle; dropping it narrower hides it. */
+private val ListPaneMinWidth = 240.dp
+private val ChatMinWidth = 320.dp
 
 @Composable
 fun AppNavHost(
@@ -168,7 +206,11 @@ fun AppNavHost(
     }
 }
 
-/** Phone: sessions list only. Expanded width: list + chat detail side by side. */
+/**
+ * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
+ * side by side. Tapping the handle on the divider hides the list to give the chat the whole
+ * width; dragging it resizes the list, and the share of the width is saved.
+ */
 @Composable
 private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
@@ -178,9 +220,12 @@ private fun SessionsListDetail(
     openNewSession: Boolean,
     onNewSessionOpened: () -> Unit,
 ) {
+    val settingsRepository = koinInject<SettingsRepository>()
+    val appSettings by settingsRepository.settings.collectAsStateWithLifecycle()
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
+    var listHidden by rememberSaveable { mutableStateOf(false) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        if (maxWidth < ListDetailMinWidth) {
+        if (maxWidth < ListDetailMinWidth || !appSettings.splitView) {
             SessionsRoute(
                 onOpenChat = onOpenChatFullScreen,
                 onOpenSettings = onOpenSettings,
@@ -188,14 +233,34 @@ private fun SessionsListDetail(
                 onNewSessionOpened = onNewSessionOpened,
             )
         } else {
+            val windowWidth = maxWidth
+            val maxListWidth = (windowWidth - ChatMinWidth).coerceAtLeast(ListPaneMinWidth)
+            // Applied at once on release; the saved value catches up through the settings flow.
+            var fraction by remember(appSettings.listPaneFraction) { mutableStateOf(appSettings.listPaneFraction) }
+            val shownWidth = fraction?.let { (windowWidth * it).coerceIn(ListPaneMinWidth, maxListWidth) }
+                ?: (windowWidth * DEFAULT_LIST_PANE_FRACTION).coerceIn(ListPaneDefaultMinWidth, ListPaneDefaultMaxWidth)
+            // Without the handle there is no way to bring a hidden list back.
+            val hidden = listHidden && appSettings.listPaneHandle
+            val target = if (hidden) 0.dp else shownWidth
+            val animatedWidth = remember { Animatable(target, Dp.VectorConverter) }
+            var dragWidth by remember { mutableStateOf<Dp?>(null) }
+            LaunchedEffect(target) { animatedWidth.animateTo(target) }
+            val listWidth = dragWidth ?: animatedWidth.value
+            val scope = rememberCoroutineScope()
+            val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+            val density = LocalDensity.current
             Row(Modifier.fillMaxSize()) {
+                // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
                     onOpenChat = { selected = it },
                     onOpenSettings = onOpenSettings,
                     selectedSessionId = selected,
                     openNewSession = openNewSession,
-                    onNewSessionOpened = onNewSessionOpened,
-                    modifier = Modifier.width(ListPaneWidth).fillMaxHeight(),
+                    onNewSessionOpened = {
+                        listHidden = false
+                        onNewSessionOpened()
+                    },
+                    modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
                 val current = selected
@@ -223,6 +288,63 @@ private fun SessionsListDetail(
                     }
                 }
             }
+            // Drawn over both panes so it can straddle the divider and still receive taps.
+            if (appSettings.listPaneHandle) ListPaneHandle(
+                listHidden = hidden,
+                onToggle = { listHidden = !listHidden },
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = (listWidth - HandleWidth / 2).coerceAtLeast(0.dp))
+                    .pointerInput(windowWidth, rtl) {
+                        detectHorizontalDragGestures(
+                            onDragStart = { dragWidth = animatedWidth.value },
+                            onDragCancel = { dragWidth = null },
+                            onDragEnd = {
+                                val dropped = dragWidth ?: return@detectHorizontalDragGestures
+                                scope.launch {
+                                    // Continue from where the finger left the list, without a jump.
+                                    animatedWidth.snapTo(dropped)
+                                    dragWidth = null
+                                    if (dropped < ListPaneMinWidth / 2) {
+                                        listHidden = true
+                                    } else {
+                                        listHidden = false
+                                        val chosen = dropped.coerceIn(ListPaneMinWidth, maxListWidth) / windowWidth
+                                        fraction = chosen
+                                        settingsRepository.update { it.copy(listPaneFraction = chosen) }
+                                    }
+                                }
+                            },
+                        ) { change, amount ->
+                            change.consume()
+                            val delta = with(density) { amount.toDp() } * if (rtl) -1f else 1f
+                            dragWidth = ((dragWidth ?: animatedWidth.value) + delta).coerceIn(0.dp, maxListWidth)
+                        }
+                    },
+            )
         }
     }
 }
+
+@Composable
+private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    Surface(
+        onClick = onToggle,
+        shape = RoundedCornerShape(OcRadius.md),
+        color = c.layer02,
+        border = BorderStroke(1.dp, c.borderBase),
+        modifier = modifier.size(width = HandleWidth, height = 48.dp).testTag("sessions_pane_toggle"),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = if (listHidden) Icons.AutoMirrored.Outlined.KeyboardArrowRight else Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                contentDescription = stringResource(if (listHidden) Res.string.app_show_sessions else Res.string.app_hide_sessions),
+                tint = c.iconBase,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+private val HandleWidth = 24.dp

@@ -60,6 +60,8 @@ internal fun SessionRow(
     onLongClick: () -> Unit,
     onSwipeDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    /** A narrow list (beside the chat): the time moves under the title so the title keeps the width. */
+    compact: Boolean = false,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -117,7 +119,7 @@ internal fun SessionRow(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = session.directoryName,
+                        text = if (compact) session.directoryName + " · " + relativeTime(session.updatedAt, now) else session.directoryName,
                         style = MaterialTheme.typography.bodySmall,
                         color = c.textMuted,
                         maxLines = 1,
@@ -128,12 +130,14 @@ internal fun SessionRow(
                 }
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = relativeTime(session.updatedAt, now),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = c.textFaint,
-                    maxLines = 1,
-                )
+                if (!compact) {
+                    Text(
+                        text = relativeTime(session.updatedAt, now),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = c.textFaint,
+                        maxLines = 1,
+                    )
+                }
                 if (running) OcPulsingDot(c.info.fg, Modifier.testTag("session_running_${session.id}"))
             }
         }

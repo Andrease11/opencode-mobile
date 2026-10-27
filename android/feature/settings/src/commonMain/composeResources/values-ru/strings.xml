@@ -128,4 +128,11 @@
     <string name="settings_server_version">Версия сервера</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Недоступно</string>
+    <string name="settings_split_view">Чат рядом со списком</string>
+    <string name="settings_split_view_sub">На широких экранах показывать открытый чат рядом со списком сессий. Перетащите ручку разделителя, чтобы изменить размер списка.</string>
+    <string name="settings_list_width">Ширина списка сессий</string>
+    <string name="settings_list_width_sub">Доля экрана, которую занимает список рядом с чатом</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">Ручка разделителя</string>
+    <string name="settings_list_handle_sub">Показывать стрелку на разделителе, чтобы скрыть список, или перетаскивать его для изменения размера</string>
 </resources>

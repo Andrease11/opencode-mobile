@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -50,6 +51,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -153,10 +156,13 @@ fun SessionsScreen(
             onRefresh = { onEvent(SessionsEvent.Refresh) },
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
+            var listWidthPx by remember { mutableIntStateOf(Int.MAX_VALUE) }
             val listState = rememberLazyListState()
+            // Narrower than any phone: the list sits beside the chat.
+            val compact = with(LocalDensity.current) { listWidthPx.toDp() } < CompactListWidth
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize().testTag("sessions_list"),
+                modifier = Modifier.fillMaxSize().onSizeChanged { listWidthPx = it.width }.testTag("sessions_list"),
                 contentPadding = PaddingValues(bottom = 96.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
             ) {
                 item(key = "header", contentType = "header") { ListHeader(state, onEvent) }
@@ -185,6 +191,7 @@ fun SessionsScreen(
                                 onLongClick = { onEvent(SessionsEvent.ShowActions(session)) },
                                 onSwipeDelete = { onEvent(SessionsEvent.RequestDelete(session)) },
                                 modifier = Modifier.animateItem(),
+                                compact = compact,
                             )
                         }
                     }
@@ -414,3 +421,6 @@ private fun SessionsEmptyPreview() {
         SessionsScreen(state = SessionsState(serverName = "Desktop", loading = false), onEvent = {})
     }
 }
+
+/** Below this width the session rows show their time under the title. */
+private val CompactListWidth = 360.dp

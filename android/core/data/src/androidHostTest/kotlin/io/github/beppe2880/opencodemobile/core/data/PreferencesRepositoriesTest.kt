@@ -27,6 +27,9 @@ class PreferencesRepositoriesTest {
             keepLiveStepsOpen = true,
             chatTextScale = 1.15f,
             terminalOpenKeyboard = false,
+            splitView = false,
+            listPaneFraction = 0.35f,
+            listPaneHandle = false,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 

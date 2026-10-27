@@ -119,4 +119,11 @@
     <string name="settings_server_version">サーバーのバージョン</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">利用不可</string>
+    <string name="settings_split_view">チャットをリストの横に表示</string>
+    <string name="settings_split_view_sub">横長の画面では、開いているチャットをセッション一覧の横に表示します。仕切り線のハンドルをドラッグして一覧の幅を変更できます。</string>
+    <string name="settings_list_width">セッション一覧の幅</string>
+    <string name="settings_list_width_sub">チャットの横で一覧が占める画面の割合</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">仕切り線のハンドル</string>
+    <string name="settings_list_handle_sub">仕切り線の矢印を表示して一覧を隠すか、ドラッグして幅を変更します</string>
 </resources>

@@ -119,4 +119,11 @@
     <string name="settings_server_version">서버 버전</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">사용 불가</string>
+    <string name="settings_split_view">목록 옆에 채팅 표시</string>
+    <string name="settings_split_view_sub">넓은 화면에서 열린 채팅을 세션 목록 옆에 표시합니다. 구분선의 핸들을 끌어 목록 크기를 조정하세요.</string>
+    <string name="settings_list_width">세션 목록 너비</string>
+    <string name="settings_list_width_sub">채팅 옆에서 목록이 차지하는 화면 비율</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">구분선 핸들</string>
+    <string name="settings_list_handle_sub">구분선에 화살표를 표시해 목록을 숨기거나, 끌어서 크기를 조정합니다</string>
 </resources>

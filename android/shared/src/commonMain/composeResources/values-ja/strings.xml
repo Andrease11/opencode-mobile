@@ -2,4 +2,6 @@
 <resources>
     <string name="app_select_session">セッションを選択</string>
     <string name="app_select_session_message">一覧からセッションを選ぶか、新しく開始してください。</string>
+    <string name="app_hide_sessions">セッションを隠す</string>
+    <string name="app_show_sessions">セッションを表示</string>
 </resources>
