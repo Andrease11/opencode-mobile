@@ -5,14 +5,16 @@ import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
-import io.ktor.http.ContentType
+import io.ktor.client.utils.EmptyContent
 import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
 import kotlin.io.encoding.Base64
 
 /** HTTP Basic credentials. [toString] never reveals the secret. */
@@ -34,10 +36,10 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
             connectTimeoutMillis = 10_000
             socketTimeoutMillis = 30_000
         }
-        // Also sends `Accept: application/json`, which /auth/connect needs to answer with JSON.
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, TolerantPagesConverter(OpenCodeJson))
-        }
+        // Encodes request bodies and sends `Accept: application/json`, which /auth/connect needs
+        // to answer with JSON. Responses are decoded by [awaitBody].
+        install(ContentNegotiation) { json(OpenCodeJson) }
+        install(NoContentTypeWithoutBody)
     }
 
     fun create(baseUrl: String, credentials: BasicCredentials?): OpenCodeClient {
@@ -61,5 +63,15 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
         awaitBody { ServerApi(baseUrl, baseHttp).serverConnect(code) }.token
     } catch (e: OpenCodeError) {
         throw pairingError(e)
+    }
+}
+
+/**
+ * The generated client marks every POST/PUT/PATCH as JSON, also without a body (interrupt,
+ * revert commit, pair); send those without `Content-Type`, as before.
+ */
+private val NoContentTypeWithoutBody = createClientPlugin("NoContentTypeWithoutBody") {
+    onRequest { request, _ ->
+        if (request.body is EmptyContent) request.headers.remove(HttpHeaders.ContentType)
     }
 }

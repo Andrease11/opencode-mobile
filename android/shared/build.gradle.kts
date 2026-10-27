@@ -46,6 +46,10 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
         }
+        androidMain.dependencies {
+            // Keeps the AndroidX patch releases newer than the one JetBrains' navigation maps to.
+            implementation(libs.androidx.navigation.compose)
+        }
         iosMain.dependencies {
             implementation(project(":core:data"))
         }

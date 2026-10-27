@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.network
 
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEvent
+import io.github.beppe2880.opencodemobile.api.models.SessionUpdateRequest
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
@@ -47,6 +48,32 @@ class OpenCodeClientTest {
         assertEquals("/api/info", request.path)
         assertEquals("Basic b3BlbmNvZGU6czNjcmV0", request.getHeader("Authorization"))
         assertEquals("application/json", request.getHeader("Accept"))
+    }
+
+    @Test
+    fun `bodies decode without a JSON content type`() = runBlocking {
+        server.enqueue(MockResponse().setBody(info))
+        server.enqueue(MockResponse().setHeader("Content-Type", "text/plain").setBody(info))
+        val client = factory.create(baseUrl, BasicCredentials(password = "p"))
+
+        assertEquals("2.0.27", awaitBody { client.server.serverInfo() }.version)
+        assertEquals("2.0.27", awaitBody { client.server.serverInfo() }.version)
+    }
+
+    @Test
+    fun `posts without a body send no content type`() = runBlocking {
+        server.enqueue(MockResponse().setResponseCode(204))
+        server.enqueue(MockResponse().setResponseCode(204))
+        val client = factory.create(baseUrl, BasicCredentials(password = "p"))
+
+        awaitSuccess { client.sessions.sessionInterrupt("ses_1") }
+        awaitSuccess { client.sessions.sessionUpdate("ses_1", SessionUpdateRequest(title = "t")) }
+
+        val empty = server.takeRequest()
+        assertEquals("POST", empty.method)
+        assertNull(empty.getHeader("Content-Type"))
+        assertEquals(0L, empty.bodySize)
+        assertTrue(server.takeRequest().getHeader("Content-Type")!!.startsWith("application/json"))
     }
 
     @Test

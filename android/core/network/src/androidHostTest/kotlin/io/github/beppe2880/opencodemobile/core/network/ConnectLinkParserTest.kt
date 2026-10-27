@@ -71,4 +71,28 @@ class ConnectLinkParserTest {
     fun `normalizeBaseUrl drops pairing paths`() {
         assertEquals("http://host:4096", ConnectLinkParser.normalizeBaseUrl("http://host:4096/auth/connect/xyz"))
     }
+
+    @Test
+    fun `hosts are normalized like OkHttp`() {
+        assertEquals(ConnectTarget.Url("http://xn--bcher-kva.de:4096"), ConnectLinkParser.parse("bücher.de"))
+        assertEquals(ConnectTarget.Url("http://my-box:4096"), ConnectLinkParser.parse("MY-Box"))
+        assertEquals(ConnectTarget.Url("http://my-box:4096"), ConnectLinkParser.parse("http://my%2Dbox:4096"))
+        assertEquals(ConnectTarget.Url("http://host"), ConnectLinkParser.parse("http://host:+80"))
+        assertEquals(ConnectTarget.Pairing("http://host:4096", "abc"), ConnectLinkParser.parse("http://host:4096\\auth\\connect\\abc"))
+    }
+
+    @Test
+    fun `ipv6 hosts are canonical and mapped ipv4 becomes ipv4`() {
+        assertEquals(ConnectTarget.Url("http://[::1]:4096"), ConnectLinkParser.parse("[0:0:0:0:0:0:0:1]"))
+        assertEquals(ConnectTarget.Url("http://[2001:db8::1]:4096"), ConnectLinkParser.parse("[2001:DB8:0:0:0:0:0:1]"))
+        assertEquals(ConnectTarget.Url("http://1.2.3.4:4096"), ConnectLinkParser.parse("[::ffff:1.2.3.4]"))
+        assertNull(ConnectLinkParser.parse("http://[fe80::1%25wlan0]:4096"))
+        assertNull(ConnectLinkParser.parse("http://[1:2:3]:4096"))
+    }
+
+    @Test
+    fun `loopback in any ipv6 form goes last in pair codes`() {
+        val qr = """{"code":"c","urls":["http://[0:0:0:0:0:0:0:1]:4096","http://192.168.1.20:4096"]}"""
+        assertEquals(ConnectTarget.Pairing("http://192.168.1.20:4096", "c", listOf("http://[::1]:4096")), ConnectLinkParser.parse(qr))
+    }
 }

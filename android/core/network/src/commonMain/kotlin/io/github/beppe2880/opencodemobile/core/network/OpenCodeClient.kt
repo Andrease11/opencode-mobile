@@ -75,6 +75,9 @@ class OpenCodeClient internal constructor(
         }
     }
 
+    /** Releases this client; the shared engine and its connections stay open for the others. */
+    fun close() = http.close()
+
     companion object {
         /** Three missed server heartbeats (sent every 15 s). */
         const val STREAM_READ_TIMEOUT_MILLIS: Long = 45_000

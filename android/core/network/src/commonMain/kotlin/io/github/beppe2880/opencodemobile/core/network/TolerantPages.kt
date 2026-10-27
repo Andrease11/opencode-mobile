@@ -7,15 +7,6 @@ import io.github.beppe2880.opencodemobile.api.models.SessionMessagesResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionMessagesResponseCursor
 import io.github.beppe2880.opencodemobile.api.models.SessionsResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionsResponseCursor
-import io.ktor.http.ContentType
-import io.ktor.http.content.OutgoingContent
-import io.ktor.serialization.ContentConverter
-import io.ktor.serialization.kotlinx.KotlinxSerializationConverter
-import io.ktor.util.reflect.TypeInfo
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.charsets.Charset
-import io.ktor.utils.io.readBuffer
-import kotlinx.io.readString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -115,18 +106,4 @@ internal object TolerantPages {
     /** The item's `type` discriminator, bounded; never any other field. */
     private fun typeOf(element: JsonElement): String =
         ((element as? JsonObject)?.get("type") as? JsonPrimitive)?.takeIf { it.isString }?.content?.take(40) ?: "?"
-}
-
-/** Routes the list pages to [TolerantPages]; everything else goes to the regular JSON converter. */
-internal class TolerantPagesConverter(private val json: Json) : ContentConverter {
-    private val delegate = KotlinxSerializationConverter(json)
-
-    override suspend fun serialize(contentType: ContentType, charset: Charset, typeInfo: TypeInfo, value: Any?): OutgoingContent? =
-        delegate.serialize(contentType, charset, typeInfo, value)
-
-    override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: ByteReadChannel): Any? = when (typeInfo.type) {
-        SessionMessagesResponse::class -> TolerantPages.messages(json, content.readBuffer().readString())
-        SessionsResponse::class -> TolerantPages.sessions(json, content.readBuffer().readString())
-        else -> delegate.deserialize(charset, typeInfo, content)
-    }
 }

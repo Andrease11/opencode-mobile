@@ -60,7 +60,7 @@ import kotlin.io.encoding.Base64
 /** Decodes a base64 `data:` image, downsampled so its longer side is about [maxSide] pixels. */
 internal fun decodeDataImage(dataUri: String, maxSide: Int): ImageBitmap? = try {
     val payload = dataUri.substringAfter(',').filterNot { it.isWhitespace() }
-    decodeImage(Base64.Default.decode(payload), maxSide)
+    decodeImage(Base64.Default.withPadding(Base64.PaddingOption.PRESENT_OPTIONAL).decode(payload), maxSide)
 } catch (e: IllegalArgumentException) {
     null
 }

@@ -19,11 +19,14 @@ internal class OpenCodeClients(
     private val cache = ConcurrentMap<String, Pair<ServerProfile, OpenCodeClient>>()
 
     fun forProfile(profile: ServerProfile): OpenCodeClient {
-        cache[profile.id]?.let { (cached, client) ->
+        val previous = cache[profile.id]
+        previous?.let { (cached, client) ->
             if (cached.baseUrl == profile.baseUrl && cached.secret == profile.secret) return client
         }
         val client = factory.create(profile.baseUrl, BasicCredentials(profile.username, profile.secret))
         cache[profile.id] = profile to client
+        // The old address or secret is no longer valid; its calls fail like a dropped connection.
+        previous?.second?.close()
         return client
     }
 
