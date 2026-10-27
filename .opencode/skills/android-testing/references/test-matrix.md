@@ -26,5 +26,7 @@ Commands (from `android/`):
 ```
 
 CI runs all unit tests, `:app:lintDebug`, `:app:assembleDebug`, the iOS klib compilation,
-an Xcode simulator build on macOS, plus the API freshness check (`bun run check` in
-`tools/api-gen`).
+an Xcode simulator build on macOS (pull requests only when they touch `iosApp/`, `iosMain`
+or the Gradle setup; always on `main`), plus the API freshness check (`bun run check` in
+`tools/api-gen`). `commonTest` runs on the JVM in CI; run it on the simulator locally after
+iOS-specific changes.

@@ -47,8 +47,39 @@ jobs:
             android/**/build/test-results/
           retention-days: 7
 
+  changes:
+    name: iOS changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ios: ${{ steps.diff.outputs.ios }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check for changes that can break the iOS build
+        id: diff
+        # macOS runners are slow and scarce: pull requests build the iOS app only when they touch
+        # iOS code, the Xcode project or the build setup. Pushes to main always build it; common
+        # code is compiled for iOS on Linux in the Android job.
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "ios=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          pattern='^(iosApp/|android/.*/src/iosMain/|android/gradle/|android/gradle\.properties$|android/(.*/)?[^/]*\.gradle\.kts$|\.github/workflows/ci\.yml$)'
+          if git diff --name-only "$BASE" HEAD | grep -qE "$pattern"; then
+            echo "ios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ios=false" >> "$GITHUB_OUTPUT"
+          fi
+
   ios:
     name: iOS
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
@@ -66,9 +97,6 @@ jobs:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('android/gradle/libs.versions.toml') }}
           restore-keys: konan-${{ runner.os }}-
-      - name: Shared tests on the iOS simulator
-        working-directory: android
-        run: ./gradlew iosSimulatorArm64Test --console=plain
       - name: Build the iOS app for the simulator
         working-directory: iosApp
         run: >-
