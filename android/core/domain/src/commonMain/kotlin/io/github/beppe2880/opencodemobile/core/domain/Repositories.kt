@@ -333,7 +333,19 @@ data class AppSettings(
     val terminalKeys: List<List<String>>? = null,
     /** Opening the terminal also shows the on-screen keyboard. */
     val terminalOpenKeyboard: Boolean = true,
+    /** On wide screens (unfolded foldables, tablets) the open chat is shown next to the session list. */
+    val splitView: Boolean = true,
+    /** Share of the window width taken by the session list beside the chat; null for the default. */
+    val listPaneFraction: Float? = null,
+    /** With [splitView]: a handle on the divider hides the list or resizes it by dragging. */
+    val listPaneHandle: Boolean = true,
 )
+
+/** Share of the window width the session list can be given from Settings. */
+val LIST_PANE_FRACTION_RANGE = 0.25f..0.6f
+
+/** Share of the window width taken by the session list until it is changed. */
+const val DEFAULT_LIST_PANE_FRACTION = 0.4f
 
 interface SettingsRepository {
     val settings: StateFlow<AppSettings>

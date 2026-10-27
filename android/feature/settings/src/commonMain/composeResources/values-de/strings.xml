@@ -122,4 +122,11 @@
     <string name="settings_server_version">Serverversion</string>
     <string name="settings_api_version">OpenCode-API</string>
     <string name="settings_unknown">Nicht verfügbar</string>
+    <string name="settings_split_view">Chat neben der Liste</string>
+    <string name="settings_split_view_sub">Auf breiten Bildschirmen den geöffneten Chat neben der Sitzungsliste anzeigen. Ziehe den Griff am Trenner, um die Liste in der Größe anzupassen.</string>
+    <string name="settings_list_width">Breite der Sitzungsliste</string>
+    <string name="settings_list_width_sub">Anteil des Bildschirms, den die Liste neben dem Chat einnimmt</string>
+    <string name="settings_list_width_value">%1$d %</string>
+    <string name="settings_list_handle">Trenner-Griff</string>
+    <string name="settings_list_handle_sub">Pfeil am Trenner anzeigen, um die Liste auszublenden, oder ziehen, um sie in der Größe anzupassen</string>
 </resources>

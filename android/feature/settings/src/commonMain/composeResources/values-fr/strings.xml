@@ -122,4 +122,11 @@
     <string name="settings_server_version">Version du serveur</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Indisponible</string>
+    <string name="settings_split_view">Chat à côté de la liste</string>
+    <string name="settings_split_view_sub">Sur grand écran, afficher le chat ouvert à côté de la liste des sessions. Faites glisser la poignée du séparateur pour redimensionner la liste.</string>
+    <string name="settings_list_width">Largeur de la liste des sessions</string>
+    <string name="settings_list_width_sub">Part de l’écran occupée par la liste à côté du chat</string>
+    <string name="settings_list_width_value">%1$d %</string>
+    <string name="settings_list_handle">Poignée du séparateur</string>
+    <string name="settings_list_handle_sub">Afficher la flèche sur le séparateur pour masquer la liste, ou le faire glisser pour la redimensionner</string>
 </resources>

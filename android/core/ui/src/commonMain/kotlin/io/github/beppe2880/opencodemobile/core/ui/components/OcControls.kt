@@ -24,6 +24,8 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -251,6 +254,47 @@ fun OcSwitchRow(
                 uncheckedTrackColor = c.layer02,
                 uncheckedBorderColor = c.borderStrong,
             ),
+        )
+    }
+}
+
+/** Settings style row with a slider under the title; [valueLabel] shows the current value. */
+@Composable
+fun OcSliderRow(
+    title: String,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    valueLabel: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    steps: Int = 0,
+) {
+    val c = OcTheme.colors
+    Column(modifier = modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+                if (subtitle != null) {
+                    Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+                }
+            }
+            Box(Modifier.width(OcSpacing.md))
+            Text(valueLabel, style = MaterialTheme.typography.labelLarge, color = c.textBase)
+        }
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = valueRange,
+            steps = steps,
+            colors = SliderDefaults.colors(
+                thumbColor = c.bgAccent,
+                activeTrackColor = c.bgAccent,
+                inactiveTrackColor = c.layer03,
+                activeTickColor = Color.Transparent,
+                inactiveTickColor = Color.Transparent,
+            ),
+            modifier = Modifier.semantics { contentDescription = title },
         )
     }
 }

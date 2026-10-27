@@ -122,4 +122,11 @@
     <string name="settings_server_version">Versione server</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Non disponibile</string>
+    <string name="settings_split_view">Chat accanto all'elenco</string>
+    <string name="settings_split_view_sub">Sugli schermi larghi mostra la chat aperta accanto all'elenco delle sessioni. Trascina la maniglia sul divisore per cambiarne la larghezza.</string>
+    <string name="settings_list_width">Larghezza dell'elenco</string>
+    <string name="settings_list_width_sub">Parte dello schermo occupata dall'elenco accanto alla chat</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">Maniglia sul divisore</string>
+    <string name="settings_list_handle_sub">Mostra la freccia sul divisore per nascondere l'elenco o trascinarla per ridimensionarlo</string>
 </resources>

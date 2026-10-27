@@ -122,4 +122,11 @@
     <string name="settings_server_version">Server version</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">Unavailable</string>
+    <string name="settings_split_view">Chat beside the list</string>
+    <string name="settings_split_view_sub">On wide screens, show the open chat next to the session list. Drag the handle on the divider to resize the list.</string>
+    <string name="settings_list_width">Session list width</string>
+    <string name="settings_list_width_sub">Share of the screen taken by the list next to the chat</string>
+    <string name="settings_list_width_value">%1$d%</string>
+    <string name="settings_list_handle">Divider handle</string>
+    <string name="settings_list_handle_sub">Show the arrow on the divider to hide the list or drag it to resize</string>
 </resources>

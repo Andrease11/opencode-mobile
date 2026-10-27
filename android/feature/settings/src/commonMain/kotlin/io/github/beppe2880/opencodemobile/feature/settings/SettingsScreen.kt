@@ -32,6 +32,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -39,6 +41,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
+import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -55,6 +59,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegmentedControl
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSliderRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSwitchRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
@@ -86,6 +91,11 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_gr
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width_value
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_activity
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits_sub
@@ -136,6 +146,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_switch
@@ -159,6 +171,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_us
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.usage_title
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 @Composable
@@ -342,6 +355,8 @@ private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
 
 @Composable
 private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    // Only wide windows (unfolded foldables, tablets) can show the chat beside the list.
+    val wide = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= SplitViewMinWidth
     Section(stringResource(Res.string.settings_appearance)) {
         OcSegmentedControl(
             segments = listOf(
@@ -362,9 +377,45 @@ private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) ->
                 selected = settings.chatTextScale,
                 onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
             )
+            if (wide) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_split_view),
+                    subtitle = stringResource(Res.string.settings_split_view_sub),
+                    checked = settings.splitView,
+                    onCheckedChange = { onEvent(SettingsEvent.SplitViewChanged(it)) },
+                    modifier = Modifier.testTag("settings_split_view_switch"),
+                )
+                if (settings.splitView) {
+                    OcDivider()
+                    val fraction = settings.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION
+                    OcSliderRow(
+                        title = stringResource(Res.string.settings_list_width),
+                        subtitle = stringResource(Res.string.settings_list_width_sub),
+                        value = fraction.coerceIn(LIST_PANE_FRACTION_RANGE),
+                        onValueChange = { onEvent(SettingsEvent.ListPaneFractionChanged(it)) },
+                        valueRange = LIST_PANE_FRACTION_RANGE,
+                        // 5% steps.
+                        steps = ((LIST_PANE_FRACTION_RANGE.endInclusive - LIST_PANE_FRACTION_RANGE.start) * 20).roundToInt() - 1,
+                        valueLabel = stringResource(Res.string.settings_list_width_value, (fraction * 100).roundToInt()),
+                        modifier = Modifier.testTag("settings_list_width_slider"),
+                    )
+                    OcDivider()
+                    OcSwitchRow(
+                        title = stringResource(Res.string.settings_list_handle),
+                        subtitle = stringResource(Res.string.settings_list_handle_sub),
+                        checked = settings.listPaneHandle,
+                        onCheckedChange = { onEvent(SettingsEvent.ListPaneHandleChanged(it)) },
+                        modifier = Modifier.testTag("settings_list_handle_switch"),
+                    )
+                }
+            }
         }
     }
 }
+
+/** Matches the width at which the app shows the chat beside the session list. */
+private val SplitViewMinWidth = 600.dp
 
 /** A title and subtitle with a segmented choice under them, inside a card. */
 @Composable
