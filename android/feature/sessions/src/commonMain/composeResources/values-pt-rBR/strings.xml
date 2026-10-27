@@ -41,4 +41,5 @@
     <string name="sessions_actions_title">Ações da sessão</string>
     <string name="sessions_running_a11y">O agente está trabalhando</string>
     <string name="sessions_new_show_all">Mostrar todos os %1$d projetos</string>
+    <string name="sessions_untitled">Sessão sem título</string>
 </resources>

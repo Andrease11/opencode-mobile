@@ -58,6 +58,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_titl
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
@@ -174,7 +175,8 @@ private fun ChatTopBar(
     val c = OcTheme.colors
     var menuOpen by remember { mutableStateOf(false) }
     OcTopBar(
-        title = state.title.ifEmpty { " " },
+        // Blank until the session is known, then a placeholder until the server names it.
+        title = state.title.ifBlank { if (state.directory.isEmpty()) " " else stringResource(Res.string.chat_untitled) },
         subtitle = state.directory.takeIf { it.isNotEmpty() },
         leading = if (showBack) {
             {

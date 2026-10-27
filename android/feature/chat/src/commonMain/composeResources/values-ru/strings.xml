@@ -155,4 +155,5 @@
     <string name="chat_mcps_failed">Ошибка подключения</string>
     <string name="chat_mcps_needs_auth">Требуется авторизация</string>
     <string name="chat_mcps_auth_hint">Войдите через OpenCode на компьютере, затем обновите здесь.</string>
+    <string name="chat_untitled">Сессия без названия</string>
 </resources>

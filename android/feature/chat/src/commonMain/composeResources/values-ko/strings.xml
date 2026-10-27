@@ -137,4 +137,5 @@
     <string name="chat_mcps_failed">연결 실패</string>
     <string name="chat_mcps_needs_auth">인증 필요</string>
     <string name="chat_mcps_auth_hint">컴퓨터의 OpenCode에서 로그인한 후 여기에서 새로고침하세요.</string>
+    <string name="chat_untitled">제목 없는 세션</string>
 </resources>

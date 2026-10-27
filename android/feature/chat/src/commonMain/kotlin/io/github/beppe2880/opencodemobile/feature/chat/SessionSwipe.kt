@@ -37,7 +37,10 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 
 /** Share of the width a drag must cover to switch session. */
@@ -145,7 +148,7 @@ private fun SwipePeek(peek: SessionPeek, forward: Boolean, ready: Boolean, modif
         val tint = if (ready) c.textInverse else c.textBase
         if (!forward) Icon(Icons.AutoMirrored.Outlined.ArrowBack, null, tint = tint, modifier = Modifier.size(16.dp))
         Text(
-            peek.title.ifBlank { peek.id },
+            peek.title.ifBlank { stringResource(Res.string.chat_untitled) },
             style = MaterialTheme.typography.labelMedium,
             color = tint,
             maxLines = 2,

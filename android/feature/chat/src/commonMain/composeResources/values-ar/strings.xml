@@ -167,4 +167,5 @@
     <string name="chat_mcps_failed">فشل الاتصال</string>
     <string name="chat_mcps_needs_auth">المصادقة مطلوبة</string>
     <string name="chat_mcps_auth_hint">سجّل الدخول من OpenCode على الكمبيوتر ثم حدّث هنا.</string>
+    <string name="chat_untitled">جلسة بلا عنوان</string>
 </resources>

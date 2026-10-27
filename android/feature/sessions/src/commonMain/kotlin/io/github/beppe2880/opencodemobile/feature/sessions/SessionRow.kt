@@ -45,6 +45,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fa
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -108,9 +109,9 @@ internal fun SessionRow(
             OcProjectAvatar(session.directoryName)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = session.title,
+                    text = session.displayTitle(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = c.textBase,
+                    color = if (session.title.isBlank()) c.textMuted else c.textBase,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -149,3 +150,7 @@ private fun OutcomeBadge(outcome: SessionOutcome?, running: Boolean) {
         else -> Unit
     }
 }
+
+/** The session's title, or a placeholder while the server has not named it yet. */
+@Composable
+internal fun Session.displayTitle(): String = title.ifBlank { stringResource(Res.string.sessions_untitled) }

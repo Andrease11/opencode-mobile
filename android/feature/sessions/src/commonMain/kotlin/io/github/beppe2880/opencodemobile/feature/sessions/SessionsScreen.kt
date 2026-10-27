@@ -131,10 +131,12 @@ fun SessionsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(WindowInsets.navigationBars)) },
         floatingActionButton = {
             if (!state.isEmpty || state.query.isNotEmpty() || state.directoryFilter != null) {
+                val newLabel = stringResource(Res.string.sessions_new)
                 ExtendedFloatingActionButton(
                     onClick = { onEvent(SessionsEvent.StartNewSession) },
-                    icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
-                    text = { Text(stringResource(Res.string.sessions_new)) },
+                    // Material clears the semantics of the (animated) text: the icon names the button.
+                    icon = { Icon(Icons.Outlined.Add, contentDescription = newLabel) },
+                    text = { Text(newLabel) },
                     containerColor = c.bgInverse,
                     contentColor = c.textInverse,
                     shape = RoundedCornerShape(OcRadius.lg),
@@ -328,7 +330,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
     state.actionsFor?.let { session ->
         OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissActions) }, testTag = "sessions_actions_sheet") {
             Text(
-                session.title,
+                session.displayTitle(),
                 style = MaterialTheme.typography.titleSmall,
                 color = OcTheme.colors.textBase,
                 maxLines = 2,
@@ -364,7 +366,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
     state.deleting?.let { session ->
         OcConfirmDialog(
             title = stringResource(Res.string.sessions_delete_title),
-            text = stringResource(Res.string.sessions_delete_message, session.title),
+            text = stringResource(Res.string.sessions_delete_message, session.displayTitle()),
             confirmLabel = stringResource(Res.string.sessions_delete),
             destructive = true,
             onConfirm = { onEvent(SessionsEvent.ConfirmDelete) },

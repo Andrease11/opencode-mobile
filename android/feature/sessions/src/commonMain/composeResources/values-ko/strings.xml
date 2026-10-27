@@ -41,4 +41,5 @@
     <string name="sessions_actions_title">세션 작업</string>
     <string name="sessions_running_a11y">에이전트 실행 중</string>
     <string name="sessions_new_show_all">프로젝트 %1$d개 모두 보기</string>
+    <string name="sessions_untitled">제목 없는 세션</string>
 </resources>

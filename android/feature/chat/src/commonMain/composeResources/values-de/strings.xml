@@ -143,4 +143,5 @@
     <string name="chat_mcps_failed">Verbindung fehlgeschlagen</string>
     <string name="chat_mcps_needs_auth">Authentifizierung erforderlich</string>
     <string name="chat_mcps_auth_hint">Melde dich in OpenCode auf deinem Computer an und aktualisiere hier.</string>
+    <string name="chat_untitled">Unbenannte Sitzung</string>
 </resources>

@@ -41,4 +41,5 @@
     <string name="sessions_actions_title">Session actions</string>
     <string name="sessions_running_a11y">Agent is running</string>
     <string name="sessions_new_show_all">Show all %1$d projects</string>
+    <string name="sessions_untitled">Untitled session</string>
 </resources>

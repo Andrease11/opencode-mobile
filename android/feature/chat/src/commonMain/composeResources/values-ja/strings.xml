@@ -137,4 +137,5 @@
     <string name="chat_mcps_failed">接続に失敗</string>
     <string name="chat_mcps_needs_auth">認証が必要です</string>
     <string name="chat_mcps_auth_hint">パソコンの OpenCode でログインしてから、ここで更新してください。</string>
+    <string name="chat_untitled">無題のセッション</string>
 </resources>

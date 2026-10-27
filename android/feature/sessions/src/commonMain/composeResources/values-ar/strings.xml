@@ -41,4 +41,5 @@
     <string name="sessions_actions_title">إجراءات الجلسة</string>
     <string name="sessions_running_a11y">الوكيل قيد التشغيل</string>
     <string name="sessions_new_show_all">عرض كل المشاريع (%1$d)</string>
+    <string name="sessions_untitled">جلسة بلا عنوان</string>
 </resources>

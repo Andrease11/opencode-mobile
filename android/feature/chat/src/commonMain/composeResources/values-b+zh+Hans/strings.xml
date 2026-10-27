@@ -137,4 +137,5 @@
     <string name="chat_mcps_failed">连接失败</string>
     <string name="chat_mcps_needs_auth">需要身份验证</string>
     <string name="chat_mcps_auth_hint">请在电脑上的 OpenCode 中登录，然后在此刷新。</string>
+    <string name="chat_untitled">未命名会话</string>
 </resources>
