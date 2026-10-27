@@ -82,7 +82,7 @@ data class FileDestination(val directory: String, val path: String)
 private val ListDetailMinWidth = 600.dp
 
 /** The list takes this share of the width, between the bounds, leaving the chat the most room. */
-private const val ListPaneFraction = 0.4f
+private const val LIST_PANE_FRACTION = 0.4f
 private val ListPaneMinWidth = 280.dp
 private val ListPaneMaxWidth = 360.dp
 
@@ -213,7 +213,7 @@ private fun SessionsListDetail(
                 onNewSessionOpened = onNewSessionOpened,
             )
         } else {
-            val shownWidth = (maxWidth * ListPaneFraction).coerceIn(ListPaneMinWidth, ListPaneMaxWidth)
+            val shownWidth = (maxWidth * LIST_PANE_FRACTION).coerceIn(ListPaneMinWidth, ListPaneMaxWidth)
             val listWidth by animateDpAsState(if (listHidden) 0.dp else shownWidth, label = "listWidth")
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
