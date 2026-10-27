@@ -35,6 +35,8 @@ function terminal() {
   let focused = 0
   let selected = false
   let nativeSelection = ""
+  let keyHandler: (event: any) => boolean = () => true
+  const sent: string[] = []
   const term = {
     element: root, rows: 20, cols: 80,
     buffer: { active: { type: "normal", baseY: 200 } },
@@ -43,9 +45,15 @@ function terminal() {
     scrollLines: (rows: number) => scrolls.push(rows),
     focus: () => { focused++ },
     loadAddon() {}, open() {}, onData() {}, onResize() {},
+    attachCustomKeyEventHandler(handler: (event: any) => boolean) { keyHandler = handler },
+    write(_data: string, done?: () => void) { done?.() },
+  }
+  const window: any = {
+    OcTerminal: { font() { throw new Error("Use fallback font") }, resize() {}, ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
+    getSelection: () => nativeSelection,
   }
   runInNewContext(script, {
-    window: { OcTerminal: { font() { throw new Error("Use fallback font") }, resize() {}, ready() {} }, getSelection: () => nativeSelection },
+    window,
     document: { getElementById: () => root },
     Terminal: function () { return term },
     FitAddon: { FitAddon: class { fit() {} } },
@@ -53,7 +61,11 @@ function terminal() {
   })
   const touch = (x: number, y: number, id = 1) => ({ identifier: id, clientX: x, clientY: y })
   return {
-    term, screen, scrolls, touch,
+    term, screen, scrolls, touch, sent,
+    live: () => window.oc.setLive(true),
+    setModifiers: (mask: number) => window.oc.setModifiers(mask),
+    key: (event: object) => keyHandler({ type: "keydown", isComposing: false, ...event }),
+    input: (event: object) => root.dispatch("input", [], { isComposing: false, ...event }),
     select: () => { selected = true },
     selectNative: () => { nativeSelection = "selected text" },
     start: (x = 100, y = 100) => screen.dispatch("touchstart", [touch(x, y)]),
@@ -151,3 +163,37 @@ for (const mode of ["alternate buffer", "no history", "mouse tracking", "xterm s
     expect(t.scrolls).toEqual([])
   })
 }
+
+// Android routes keys through the input method: keydown 229, then an input event with the text.
+test("input method keys send exactly the typed text", () => {
+  const t = terminal()
+  t.live()
+  for (const ch of "echo hi") {
+    expect(t.key({ keyCode: 229 })).toBe(false)
+    expect(t.input({ inputType: "insertText", data: ch }).stopped).toBe(true)
+  }
+  t.key({ keyCode: 229 })
+  t.input({ inputType: "deleteContentBackward", data: null })
+  t.key({ keyCode: 229 })
+  t.input({ inputType: "insertLineBreak", data: null })
+  expect(t.sent.join("")).toBe("echo hi\x7f\r")
+})
+
+test("input method keys take the key bar modifiers", () => {
+  const t = terminal()
+  t.live()
+  t.setModifiers(4)
+  t.key({ keyCode: 229 })
+  t.input({ inputType: "insertText", data: "c" })
+  expect(t.sent).toEqual(["\x03"])
+})
+
+test("compositions and real key codes are left to xterm", () => {
+  const t = terminal()
+  t.live()
+  expect(t.key({ keyCode: 229, isComposing: true })).toBe(true)
+  expect(t.input({ inputType: "insertCompositionText", data: "か", isComposing: true }).stopped).toBe(false)
+  expect(t.key({ keyCode: 72 })).toBe(true)
+  expect(t.input({ inputType: "insertText", data: "h" }).stopped).toBe(false)
+  expect(t.sent).toEqual([])
+})

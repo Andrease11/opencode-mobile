@@ -120,6 +120,43 @@
     }, true);
   }
 
+  // Applies the key bar modifiers to one typed character, then sends it.
+  function typed(data) {
+    if (modifiers && data.length === 1) {
+      data = withModifiers(data, modifiers);
+      bridge.modifiersUsed();
+    }
+    send(data);
+  }
+
+  // Android delivers keys through the input method: keydown has keyCode 229 and the text
+  // arrives in the next input event. xterm 6 instead diffs its textarea after a timeout,
+  // which repeats text when keys come faster than the timeout or when Enter clears the
+  // textarea, so that input is sent straight from the input event. Compositions (and every
+  // other platform, where keydown carries the real key) are left to xterm.
+  function bindImeInput() {
+    let imeKey = false;
+    term.attachCustomKeyEventHandler((event) => {
+      if (event.type !== "keydown") return true;
+      imeKey = event.keyCode === 229 && !event.isComposing;
+      return !imeKey;
+    });
+    // Capture on an ancestor runs before xterm's own listener on the textarea.
+    term.element.addEventListener("input", (event) => {
+      if (!imeKey || event.isComposing) return;
+      imeKey = false;
+      let data = null;
+      switch (event.inputType) {
+        case "insertText": data = event.data; break;
+        case "insertLineBreak": case "insertParagraph": data = "\r"; break;
+        case "deleteContentBackward": data = "\x7f"; break;
+      }
+      if (!data) return;
+      event.stopImmediatePropagation();
+      typed(data);
+    }, true);
+  }
+
   window.oc = {
     write(data) { term.write(data); },
     setLive(value) {
@@ -168,13 +205,8 @@
     term.loadAddon(fit);
     term.open(document.getElementById("terminal"));
     bindTouchScroll();
-    term.onData((data) => {
-      if (modifiers && data.length === 1) {
-        data = withModifiers(data, modifiers);
-        bridge.modifiersUsed();
-      }
-      send(data);
-    });
+    bindImeInput();
+    term.onData(typed);
     term.onResize(({ cols, rows }) => bridge.resize(cols, rows));
     // A tap is the user gesture that lets the focus open the soft keyboard.
     document.getElementById("terminal").addEventListener("click", () => term.focus());
