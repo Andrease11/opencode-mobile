@@ -75,9 +75,16 @@ data class TerminalDestination(val directory: String)
 @Serializable
 data class FileDestination(val directory: String, val path: String)
 
-/** Width at which Sessions and Chat are shown side by side. */
-private val ListDetailMinWidth = 840.dp
-private val ListPaneWidth = 360.dp
+/**
+ * Width at which Sessions and Chat are shown side by side: medium windows and up, so unfolded
+ * foldables (about 670-820 dp) get both panes, not only tablets.
+ */
+private val ListDetailMinWidth = 600.dp
+
+/** The list takes this share of the width, between the bounds, leaving the chat the most room. */
+private const val ListPaneFraction = 0.4f
+private val ListPaneMinWidth = 280.dp
+private val ListPaneMaxWidth = 360.dp
 
 @Composable
 fun AppNavHost(
@@ -206,7 +213,8 @@ private fun SessionsListDetail(
                 onNewSessionOpened = onNewSessionOpened,
             )
         } else {
-            val listWidth by animateDpAsState(if (listHidden) 0.dp else ListPaneWidth, label = "listWidth")
+            val shownWidth = (maxWidth * ListPaneFraction).coerceIn(ListPaneMinWidth, ListPaneMaxWidth)
+            val listWidth by animateDpAsState(if (listHidden) 0.dp else shownWidth, label = "listWidth")
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
