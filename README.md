@@ -1,6 +1,6 @@
 # OpenCode Mobile
 
-**An unofficial native Android client for [OpenCode](https://opencode.ai).** Follow your
+**An unofficial native Android and iOS client for [OpenCode](https://opencode.ai).** Follow your
 coding sessions live from your phone, send prompts, approve permissions and answer the
 agent's questions while you are away from the desk.
 
@@ -34,7 +34,7 @@ agent's questions while you are away from the desk.
   or the last turn.
 - **Approve from the phone**: permission requests and the agent's questions show up in
   the chat.
-- **Notifications**: while sessions run, the app stays connected in the background and tells
+- **Notifications** (Android): while sessions run, the app stays connected in the background and tells
   you when one needs an answer or finishes. Allow or reject an edit right from the
   notification. The app explains them and asks for permission after you connect; in Settings
   you choose which kinds you get (permission requests, questions, finished sessions) or turn
@@ -54,7 +54,7 @@ agent's questions while you are away from the desk.
 
 ## Requirements
 
-- Android 8.0 or newer.
+- Android 8.0 or newer, or iOS 15 or newer (the iOS app is built from source for now).
 - An [OpenCode](https://opencode.ai) **2.x** server (`opencode serve` or the background
   service) that the phone can reach: same Wi‑Fi, or a VPN such as WireGuard or Tailscale.
 
@@ -107,7 +107,8 @@ environment variables (see [`android/app/build.gradle.kts`](android/app/build.gr
 
 ## How it works
 
-- Multi-module app: Kotlin, Jetpack Compose, Material 3, MVI, Koin, Retrofit, Room.
+- Kotlin Multiplatform: one codebase for Android and iOS with Compose Multiplatform,
+  Material 3, MVI, Koin, Ktor and Room. The iOS app (`iosApp/`) hosts the shared UI.
 - The OpenCode HTTP client in `android/core/api` is **generated** from the server's OpenAPI
   document (`api/openapi.json`) and event schemas, so it follows the server contract exactly
   (`bun run generate` in `tools/api-gen`).

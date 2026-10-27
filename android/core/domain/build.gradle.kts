@@ -1,20 +1,26 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
 }
 
-android {
-    namespace = "io.github.beppe2880.opencodemobile.core.domain"
-    compileSdk = 37
-    defaultConfig {
+kotlin {
+    android {
+        namespace = "io.github.beppe2880.opencodemobile.core.domain"
+        compileSdk = 37
         minSdk = 26
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
+        withHostTest {}
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
+    iosArm64()
+    iosSimulatorArm64()
 
-dependencies {
-    api(libs.kotlinx.coroutines.core)
-    testImplementation(libs.junit)
+    sourceSets {
+        commonMain.dependencies {
+            api(libs.kotlinx.coroutines.core)
+            implementation(libs.atomicfu)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.junit)
+        }
+    }
 }

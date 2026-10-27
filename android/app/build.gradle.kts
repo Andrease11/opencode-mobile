@@ -113,6 +113,7 @@ dependencies {
     implementation(project(":feature:sessions"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:settings"))
+    implementation(project(":shared"))
     // Link parsing for the in-memory fake data module.
     debugImplementation(project(":core:network"))
 
@@ -128,11 +129,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.process)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.compose.components.resources)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 

@@ -2,9 +2,10 @@
 
 ## Scope
 
-Native Android client for an OpenCode V2 server (`opencode serve`, default port 4096).
+Native Android and iOS client for an OpenCode V2 server (`opencode serve`, default port 4096).
 The app pairs with a server, lists sessions, streams conversations live, sends prompts,
-switches agent/model and answers permission requests.
+switches agent/model and answers permission requests. Code is shared with Kotlin
+Multiplatform and Compose Multiplatform; the Gradle build lives in `android/`.
 
 Read the nearest nested `AGENTS.md` before changing a subsystem. Nested instructions take
 precedence over this file.
@@ -13,8 +14,9 @@ precedence over this file.
 
 | Path | Responsibility | Instructions |
 |---|---|---|
-| `android/` | Multi-module Android app: Compose, Material 3, MVI, Koin, Retrofit | `android/AGENTS.md` |
-| `android/core/api/` | **Generated** OpenCode client (models, events, Retrofit APIs) | Do not edit; see API Contract |
+| `android/` | Gradle build: Kotlin Multiplatform modules, the Android app, Compose Multiplatform, MVI, Koin, Ktor | `android/AGENTS.md` |
+| `android/core/api/` | **Generated** OpenCode client (models, events, Ktor APIs) | Do not edit; see API Contract |
+| `iosApp/` | Xcode project of the iOS app; hosts the `Shared` framework built from `android/shared` | `android/AGENTS.md` |
 | `api/` | Pinned server contract: `openapi.json`, `OPENCODE_VERSION` | This file |
 | `tools/api-gen/` | Spec preprocessing for the generator (Bun) | This file |
 | `.maestro/` | Android end-to-end test flows (testing only) | `.maestro/AGENTS.md` |
@@ -35,7 +37,8 @@ bun run check     # fail when committed generated code is stale
 
 Pipeline: `api/openapi.json` + event schemas from npm `@opencode/schema` (same version as
 the server, pinned in `tools/api-gen/package.json`) -> `tools/api-gen` preprocessing ->
-openapi-generator 7.22 (`kotlin`, `jvm-retrofit2`, `kotlinx_serialization`) -> `android/core/api`.
+openapi-generator 7.22 (`kotlin`, `kotlinx_serialization`; models from `jvm-retrofit2`, APIs
+from the Ktor-based `multiplatform` library) -> `android/core/api/src/commonMain`.
 
 - Preprocessing only works around generator limitations (union discriminators, open structs,
   mixed primitive unions, deepObject params, unused API areas). Keep each step minimal and
@@ -53,6 +56,7 @@ openapi-generator 7.22 (`kotlin`, `jvm-retrofit2`, `kotlinx_serialization`) -> `
 - `opencode pair` prints pairing links and a QR for the phone; `--url` sets the address
   the phone should use (`opencode pair --url http://localhost:4096` for the emulator).
 - On the emulator, `adb reverse tcp:4096 tcp:4096` maps the host server to `http://localhost:4096`.
+  The iOS simulator shares the Mac's network: use the address of the OpenCode host.
 - Phones reach the server over the LAN or a VPN. Never publish port 4096 to the internet:
   traffic is plain HTTP with Basic auth.
 - Never print, log, commit or screenshot passwords, tokens or pairing codes. Scripts read
@@ -69,8 +73,9 @@ openapi-generator 7.22 (`kotlin`, `jvm-retrofit2`, `kotlinx_serialization`) -> `
   `type(scope): Description`, see `CONTRIBUTING.md`.
 - Prompts sent during verification go only to a disposable session in a scratch directory,
   with a cheap model; never prompt in real sessions.
-- After Android UI or behavior changes, install the debug build on the emulator and inspect
-  the changed screen before finishing (see `android/AGENTS.md`).
+- After UI or behavior changes, install the debug build on the emulator and inspect the
+  changed screen before finishing (see `android/AGENTS.md`); for iOS-specific code also run
+  the app on the iOS simulator (macOS with Xcode).
 - Before declaring Android work complete, run from `android/`
   `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug`, and `bun run check` in
   `tools/api-gen` when the API or the generator changed. CI runs both.

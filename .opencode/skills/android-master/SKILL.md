@@ -16,8 +16,8 @@ being changed, and one comparable implementation before editing.
   arguments, back handling, or list-detail layouts.
 - Load `android-auth-session` for pairing, server passwords, saved servers,
   credential storage, 401 handling, or active-server switching.
-- Load `android-opencode-api` for the generated client in `core/api`, Retrofit
-  services, SSE events, mapping to domain models, or regenerating the API.
+- Load `android-opencode-api` for the generated client in `core/api`, the Ktor
+  client, SSE events, mapping to domain models, or regenerating the API.
 - Load `android-data-boundaries` for repository contracts, local stores,
   domain mapping, transcript reconciliation, or typed data errors.
 - Load `android-coroutines` for scopes, suspend APIs, Flow, the shared event

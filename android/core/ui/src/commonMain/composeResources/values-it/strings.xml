@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oc_retry">Riprova</string>
+    <string name="oc_cancel">Annulla</string>
+    <string name="oc_clear">Cancella</string>
+    <string name="oc_close">Chiudi</string>
+    <string name="oc_back">Indietro</string>
+    <string name="oc_copy">Copia</string>
+    <string name="oc_copied">Copiato negli appunti</string>
+    <string name="oc_show_password">Mostra password</string>
+    <string name="oc_hide_password">Nascondi password</string>
+    <string name="oc_just_now">adesso</string>
+    <string name="oc_error_unauthorized">Autenticazione non riuscita. Controlla la password o ripeti l'abbinamento.</string>
+    <string name="oc_error_unreachable">Server non raggiungibile. Controlla l'URL e che il server sia avviato.</string>
+    <string name="oc_error_pairing">Il codice di abbinamento non è valido o è scaduto. Generane uno nuovo.</string>
+    <string name="oc_error_not_found">Non trovato sul server.</string>
+    <string name="oc_error_server">Errore del server (%1$d): %2$s</string>
+    <string name="oc_error_generic">Qualcosa è andato storto: %1$s</string>
+    <string name="oc_models_title">Scegli modello</string>
+    <string name="oc_models_search">Cerca modelli</string>
+    <string name="oc_models_recent">Usati di recente</string>
+    <string name="oc_models_variant">Ragionamento</string>
+    <string name="oc_models_variant_default">Predefinito</string>
+    <string name="oc_models_empty">Nessun modello corrisponde alla ricerca</string>
+</resources>

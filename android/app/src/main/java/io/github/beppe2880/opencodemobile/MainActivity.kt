@@ -9,10 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -21,9 +17,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
-import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
@@ -43,34 +36,17 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) readSessionToOpen(intent)
         keepSplashUntilLoaded()
         setContent {
-            val appSettings by settings.settings.collectAsStateWithLifecycle()
-            val loaded by servers.loaded.collectAsStateWithLifecycle()
-            val activeServer by servers.activeServer.collectAsStateWithLifecycle()
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
-            val dark = appSettings.theme.isDark()
-            DisposableEffect(dark) {
-                val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
-                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
-                onDispose { }
-            }
-            OcTheme(darkTheme = dark) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(OcTheme.colors.bgBase)
-                        .semantics { testTagsAsResourceId = true },
-                ) {
-                    // Choosing the start screen needs the saved servers, read off the main thread.
-                    if (loaded) {
-                        AppNavHost(
-                            hasActiveServer = activeServer != null,
-                            openSessionId = openSession,
-                            onSessionOpened = { sessionToOpen.value = null },
-                        )
-                        if (activeServer != null && !appSettings.notificationsIntroShown) NotificationsIntro(settings)
-                    }
-                }
-            }
+            OpenCodeApp(
+                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                openSessionId = openSession,
+                onSessionOpened = { sessionToOpen.value = null },
+                onDarkThemeChange = { dark ->
+                    val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
+                    enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                },
+                overlay = { appSettings -> if (!appSettings.notificationsIntroShown) NotificationsIntro(settings) },
+            )
         }
     }
 

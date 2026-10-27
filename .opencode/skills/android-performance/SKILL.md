@@ -50,7 +50,7 @@ the initialized dependency and how failures/retries behave.
   its output against the release build before acting on it.
 - Remove or narrow keep rules only with release-build and runtime evidence.
 - Validate kotlinx-serialization (generated API models and union serializers),
-  Retrofit interfaces, Koin, CameraX and the markdown renderer after R8 changes.
+  Ktor and kotlinx-serialization, Koin, CameraX and the markdown renderer after R8 changes.
 
 ## Report
 

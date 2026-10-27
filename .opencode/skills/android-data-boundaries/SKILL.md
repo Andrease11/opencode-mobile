@@ -12,7 +12,7 @@ preserving cancellation and actionable failures.
 ## Repository Contracts
 
 - Use `suspend` for one-shot work and cold `Flow` for streams.
-- Return `core:domain` models rather than generated API models, Retrofit
+- Return `core:domain` models rather than generated API models, Ktor
   responses, cursors, Android controllers, or mutable storage objects.
 - Choose one failure contract per cohesive API: typed result, nullable absence,
   or exception. Do not mix meanings for convenience.

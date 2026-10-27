@@ -18,7 +18,14 @@ function resources(xml: string): Map<string, Resource> {
   return map
 }
 
-function placeholders(text: string): string[] {
+// Android resources (app) accept `%s` and `%%`; Compose Multiplatform resources (all other
+// modules) only substitute positional `%1$s`/`%1$d` and keep every other character verbatim.
+function placeholders(text: string, compose: boolean): string[] {
+  if (compose) {
+    expect(text, "Compose resources use positional %N$s/%N$d placeholders").not.toMatch(/%(?:%|[sdf]|\.\d+f)/)
+    expect(text, "Compose resources must not use Android escapes").not.toMatch(/\\['"@?]/)
+    return [...text.matchAll(/%\d+\$[ds]/g)].map(match => match[0]).sort()
+  }
   return [...text.matchAll(/%(?:\d+\$)?[ds%]/g)].map(match => match[0]).sort()
 }
 
@@ -34,7 +41,8 @@ afterAll(() => {
 })
 
 for (const module of modules) {
-  const res = `${root}/android/${module}/src/main/res`
+  const compose = module !== "app"
+  const res = compose ? `${root}/android/${module}/src/commonMain/composeResources` : `${root}/android/${module}/src/main/res`
   const source = resources(await Bun.file(`${res}/values/strings.xml`).text())
   for (const locale of locales) {
     test(`${module}: ${locale} coverage, format arguments and plural forms`, async () => {
@@ -50,7 +58,7 @@ for (const module of modules) {
         expect(value!.type).toBe(original.type)
         if (original.type === "string") {
           expect(value!.body.trim().length, name).toBeGreaterThan(0)
-          expect(placeholders(value!.body), name).toEqual(placeholders(original.body))
+          expect(placeholders(value!.body, compose), name).toEqual(placeholders(original.body, compose))
         } else {
           const items = [...value!.body.matchAll(/<item quantity="([^"]+)">([^<]*)<\/item>/g)]
           const sourceOther = original.body.match(/<item quantity="other">([^<]*)<\/item>/)![1]
@@ -60,7 +68,7 @@ for (const module of modules) {
           for (const quantity of required) expect(items.some(item => item[1] === quantity), `${name}.${quantity}`).toBe(true)
           for (const [, quantity, text] of items) {
             expect(text.trim().length, `${name}.${quantity}`).toBeGreaterThan(0)
-            expect(placeholders(text), `${name}.${quantity}`).toEqual(placeholders(sourceOther))
+            expect(placeholders(text, compose), `${name}.${quantity}`).toEqual(placeholders(sourceOther, compose))
           }
         }
       }

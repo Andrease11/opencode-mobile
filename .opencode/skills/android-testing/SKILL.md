@@ -11,7 +11,7 @@ tests cover logic and UI contracts; Maestro covers a few complete journeys.
 ## Existing Stack
 
 - JUnit 4, `kotlinx-coroutines-test`, `MainDispatcherRule` from `core:testing`.
-- OkHttp `MockWebServer` for transport tests in `core:network`.
+- OkHttp `MockWebServer` for transport tests in `core:network` (the Android Ktor engine is OkHttp).
 - Recorded, sanitized server fixtures (JSON responses and an `.sse` event log)
   under `src/test/resources` of `core:network`/`core:data`.
 - Compose UI test APIs for instrumented tests; Maestro for black-box flows.

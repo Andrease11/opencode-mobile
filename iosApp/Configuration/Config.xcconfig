@@ -1,0 +1,4 @@
+// Shared settings of the iOS app. Set TEAM_ID to sign for a device; the simulator needs none.
+TEAM_ID=
+BUNDLE_ID=io.github.beppe2880.opencodemobile
+APP_NAME=OpenCode Mobile
