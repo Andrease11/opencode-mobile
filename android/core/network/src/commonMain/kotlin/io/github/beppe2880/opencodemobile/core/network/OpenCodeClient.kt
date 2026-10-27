@@ -33,7 +33,7 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
-import io.ktor.utils.io.readRemaining
+import io.ktor.utils.io.readBuffer
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
@@ -156,7 +156,7 @@ class OpenCodeClient internal constructor(
         status.value == RANGE_NOT_SATISFIABLE -> FileBytes(ByteArray(0), null, 0)
         !status.isSuccess() -> throw httpError(status.value, readBounded())
         else -> {
-            val bytes = bodyAsChannel().readRemaining(maxBytes.toLong()).readByteArray()
+            val bytes = bodyAsChannel().readBuffer(maxBytes.toLong()).readByteArray()
             // `Content-Range: bytes 0-1023/52341` carries the whole size of a partial read.
             val size = headers[HttpHeaders.ContentRange]?.substringAfterLast('/')?.toLongOrNull()
                 ?: contentLength()?.takeIf { it >= 0 }
