@@ -123,4 +123,18 @@
     <string name="chat_older_failed">以前のメッセージを読み込めませんでした</string>
     <string name="chat_older_retry">再試行</string>
     <string name="chat_open_file">ファイルを開く</string>
+    <string name="chat_more">その他のオプション</string>
+    <string name="chat_mcps">MCP サーバー</string>
+    <string name="chat_command_mcps">MCP 接続を管理</string>
+    <string name="chat_mcps_refresh">MCP の状態を更新</string>
+    <string name="chat_mcps_runtime">接続はこのチャットだけでなく、プロジェクトに適用されます。変更はサーバーの再起動まで有効で、設定は変わりません。</string>
+    <string name="chat_mcps_error">MCP サーバーを読み込めませんでした</string>
+    <string name="chat_mcps_empty">MCP サーバーがありません</string>
+    <string name="chat_mcps_empty_description">サーバー上の OpenCode 設定に MCP サーバーを追加してください。</string>
+    <string name="chat_mcps_connected">接続済み</string>
+    <string name="chat_mcps_disconnected">未接続</string>
+    <string name="chat_mcps_pending">接続中</string>
+    <string name="chat_mcps_failed">接続に失敗</string>
+    <string name="chat_mcps_needs_auth">認証が必要です</string>
+    <string name="chat_mcps_auth_hint">パソコンの OpenCode でログインしてから、ここで更新してください。</string>
 </resources>

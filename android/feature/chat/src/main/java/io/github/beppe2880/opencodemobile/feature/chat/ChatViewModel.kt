@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
@@ -47,6 +48,7 @@ class ChatViewModel(
     private val drafts: DraftRepository,
     private val images: ImageMemory,
     private val scroll: ScrollMemory,
+    private val mcps: McpRepository,
     private val clock: () -> Long = System::currentTimeMillis,
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
 
@@ -62,6 +64,8 @@ class ChatViewModel(
     private var suggestJob: Job? = null
     private var changesJob: Job? = null
     private var queueJob: Job? = null
+    private var mcpJob: Job? = null
+    private val changingMcps = mutableSetOf<String>()
 
     /** Models of the most recently updated sessions, across every project. */
     private var recentFromSessions: List<ModelRef> = emptyList()
@@ -169,6 +173,16 @@ class ChatViewModel(
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
             ChatEvent.OpenChanges -> loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+            ChatEvent.OpenMcps -> {
+                updateState { it.copy(mcps = it.mcps ?: McpPanel(changing = changingMcps.toSet())) }
+                refreshMcps()
+            }
+            ChatEvent.RefreshMcps -> refreshMcps()
+            ChatEvent.CloseMcps -> {
+                mcpJob?.cancel()
+                updateState { it.copy(mcps = null) }
+            }
+            is ChatEvent.SetMcpConnected -> setMcpConnected(event.name, event.connected)
             ChatEvent.OpenTerminal -> currentState.directory.takeIf { it.isNotEmpty() }?.let { sendEffect(ChatEffect.OpenTerminal(it)) }
             ChatEvent.CloseChanges -> {
                 changesJob?.cancel()
@@ -344,6 +358,11 @@ class ChatViewModel(
     private fun onServerEvent(event: ServerEvent) {
         if (event == ServerEvent.Connected) {
             loadAll()
+            refreshMcps()
+            return
+        }
+        if (event == ServerEvent.McpsChanged) {
+            refreshMcps()
             return
         }
         if (event !is ServerEvent.SessionScoped || event.sessionId != sessionId) return
@@ -745,6 +764,7 @@ class ChatViewModel(
             Completions.Builtin.Redo -> restoreRevert()
             Completions.Builtin.Compact -> compact()
             Completions.Builtin.Fork -> fork(null)
+            Completions.Builtin.Mcps -> onEvent(ChatEvent.OpenMcps)
         }
     }
 
@@ -906,6 +926,39 @@ class ChatViewModel(
         val index = order.indexOf(sessionId).takeIf { it >= 0 } ?: return null
         val id = order.getOrNull(index + step) ?: return null
         return SessionPeek(id, sessions.cached(id)?.title.orEmpty())
+    }
+
+    private fun refreshMcps() {
+        if (currentState.mcps == null || currentState.directory.isEmpty()) return
+        mcpJob?.cancel()
+        updateState { it.copy(mcps = it.mcps?.copy(loading = true, error = null)) }
+        val directory = currentState.directory
+        mcpJob = viewModelScope.launch {
+            mcps.list(directory).fold(
+                onSuccess = { servers -> updateState { it.copy(mcps = it.mcps?.copy(servers = servers, loading = false)) } },
+                onFailure = { error ->
+                    updateState { it.copy(mcps = it.mcps?.copy(loading = false, error = error.toUiText())) }
+                },
+            )
+        }
+    }
+
+    private fun setMcpConnected(name: String, connected: Boolean) {
+        if (currentState.mcps?.servers?.none { it.name == name } != false || !changingMcps.add(name)) return
+        val directory = currentState.directory
+        updateState { it.copy(mcps = it.mcps?.copy(changing = changingMcps.toSet())) }
+        viewModelScope.launch {
+            try {
+                mcps.setConnected(directory, name, connected).onFailure { error ->
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                }
+            } finally {
+                changingMcps.remove(name)
+                updateState { it.copy(mcps = it.mcps?.copy(changing = changingMcps.toSet())) }
+            }
+            // A successful HTTP response need not mean connected (e.g. OAuth is required).
+            refreshMcps()
+        }
     }
 
     private fun compact() {

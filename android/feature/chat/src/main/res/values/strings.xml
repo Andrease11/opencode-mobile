@@ -129,4 +129,18 @@
     <string name="chat_older_failed">Couldn\'t load earlier messages</string>
     <string name="chat_older_retry">Try again</string>
     <string name="chat_open_file">Open file</string>
+    <string name="chat_more">More options</string>
+    <string name="chat_mcps">MCP servers</string>
+    <string name="chat_command_mcps">Manage MCP connections</string>
+    <string name="chat_mcps_refresh">Refresh MCP status</string>
+    <string name="chat_mcps_runtime">Connections apply to this project, not just this chat. Changes last until the server restarts; configuration is unchanged.</string>
+    <string name="chat_mcps_error">Could not load MCP servers</string>
+    <string name="chat_mcps_empty">No MCP servers</string>
+    <string name="chat_mcps_empty_description">Add MCP servers in the OpenCode configuration on your server.</string>
+    <string name="chat_mcps_connected">Connected</string>
+    <string name="chat_mcps_disconnected">Disconnected</string>
+    <string name="chat_mcps_pending">Connecting</string>
+    <string name="chat_mcps_failed">Connection failed</string>
+    <string name="chat_mcps_needs_auth">Authentication required</string>
+    <string name="chat_mcps_auth_hint">Sign in from OpenCode on your computer, then refresh here.</string>
 </resources>

@@ -7,7 +7,7 @@
 const KEEP_TAGS = new Set([
   "server", "location", "agent", "session", "model", "project", "form", "permission",
   "filesystem", "command", "skill", "event", "shell", "worktree", "vcs", "pty", "reference",
-  "provider",
+  "provider", "mcp",
 ])
 
 const refName = (ref: string) => ref.split("/").pop()!

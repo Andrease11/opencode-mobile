@@ -43,7 +43,8 @@ class EventMappingTest {
             ServerEvent.ExecutionEnded(sessionId, SessionOutcome.Succeeded, "msg_13634c29a001sUSC1CxpcTg4ER", 1791910789786),
             events.last(),
         )
-        assertTrue(events.drop(1).all { it is ServerEvent.SessionScoped && it.sessionId == sessionId })
+        assertTrue(events.contains(ServerEvent.McpsChanged))
+        assertTrue(events.drop(1).filterNot { it == ServerEvent.McpsChanged }.all { it is ServerEvent.SessionScoped && it.sessionId == sessionId })
 
         val enqueued = events.filterIsInstance<ServerEvent.InboxEnqueued>().single()
         assertEquals("msg_13634b644001FZJ7cqjGjVVWUe", enqueued.inboxId)

@@ -153,4 +153,18 @@
     <string name="chat_older_failed">تعذّر تحميل الرسائل السابقة</string>
     <string name="chat_older_retry">إعادة المحاولة</string>
     <string name="chat_open_file">فتح الملف</string>
+    <string name="chat_more">خيارات أخرى</string>
+    <string name="chat_mcps">خوادم MCP</string>
+    <string name="chat_command_mcps">إدارة اتصالات MCP</string>
+    <string name="chat_mcps_refresh">تحديث حالة MCP</string>
+    <string name="chat_mcps_runtime">تنطبق الاتصالات على هذا المشروع وليس هذه المحادثة فقط. تستمر التغييرات حتى إعادة تشغيل الخادم؛ ولا يتغير الإعداد.</string>
+    <string name="chat_mcps_error">تعذر تحميل خوادم MCP</string>
+    <string name="chat_mcps_empty">لا توجد خوادم MCP</string>
+    <string name="chat_mcps_empty_description">أضف خوادم MCP في إعدادات OpenCode على الخادم.</string>
+    <string name="chat_mcps_connected">متصل</string>
+    <string name="chat_mcps_disconnected">غير متصل</string>
+    <string name="chat_mcps_pending">جارٍ الاتصال</string>
+    <string name="chat_mcps_failed">فشل الاتصال</string>
+    <string name="chat_mcps_needs_auth">المصادقة مطلوبة</string>
+    <string name="chat_mcps_auth_hint">سجّل الدخول من OpenCode على الكمبيوتر ثم حدّث هنا.</string>
 </resources>

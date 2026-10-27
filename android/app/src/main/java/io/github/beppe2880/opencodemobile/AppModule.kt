@@ -36,7 +36,7 @@ val appModule = module {
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
-    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }

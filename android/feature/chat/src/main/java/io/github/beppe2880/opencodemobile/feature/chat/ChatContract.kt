@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.McpServer
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
@@ -95,6 +96,7 @@ data class ChatState(
     val queued: List<QueuedPrompt> = emptyList(),
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
+    val mcps: McpPanel? = null,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -111,6 +113,13 @@ data class ChatState(
 }
 
 data class SessionPeek(val id: String, val title: String)
+
+data class McpPanel(
+    val servers: List<McpServer>? = null,
+    val loading: Boolean = true,
+    val error: UiText? = null,
+    val changing: Set<String> = emptySet(),
+)
 
 /** Changed files of [scope]; [files] is null until first loaded, and kept while it refreshes. */
 data class ChangesPanel(
@@ -205,6 +214,10 @@ sealed interface ChatEvent {
     data class Fork(val messageId: String) : ChatEvent
 
     data object OpenChanges : ChatEvent
+    data object OpenMcps : ChatEvent
+    data object CloseMcps : ChatEvent
+    data object RefreshMcps : ChatEvent
+    data class SetMcpConnected(val name: String, val connected: Boolean) : ChatEvent
     data object OpenTerminal : ChatEvent
     data object CloseChanges : ChatEvent
 

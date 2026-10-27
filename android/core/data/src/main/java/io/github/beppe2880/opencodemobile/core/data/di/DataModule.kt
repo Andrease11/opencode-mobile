@@ -18,6 +18,7 @@ import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.ProcessLifecycleVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
+import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.EncryptedServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.LanServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
@@ -30,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -86,6 +88,7 @@ val dataModule = module {
     single<CatalogRepository> { RemoteCatalogRepository(get()) }
     single<TerminalRepository> { RemoteTerminalRepository(get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
+    single<McpRepository> { RemoteMcpRepository(get()) }
     single<SettingsRepository> {
         PreferencesSettingsRepository(androidContext().getSharedPreferences("settings", Context.MODE_PRIVATE))
     }
