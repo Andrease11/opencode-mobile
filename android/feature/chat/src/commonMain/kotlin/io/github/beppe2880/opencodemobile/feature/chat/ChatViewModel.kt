@@ -7,9 +7,11 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
+import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
@@ -18,6 +20,7 @@ import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
 import io.github.beppe2880.opencodemobile.core.domain.isComplete
@@ -32,6 +35,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attachment
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_undo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_session_deleted
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -50,6 +54,7 @@ class ChatViewModel(
     private val drafts: DraftRepository,
     private val images: ImageMemory,
     private val scroll: ScrollMemory,
+    private val mcps: McpRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
 
@@ -65,6 +70,8 @@ class ChatViewModel(
     private var suggestJob: Job? = null
     private var changesJob: Job? = null
     private var queueJob: Job? = null
+    private var mcpJob: Job? = null
+    private val changingMcps = mutableSetOf<String>()
 
     /** Models of the most recently updated sessions, across every project. */
     private var recentFromSessions: List<ModelRef> = emptyList()
@@ -74,6 +81,11 @@ class ChatViewModel(
 
     /** Keys of [BackgroundableWork] already sent to the background, so the hint hides at once. */
     private val movedToBackground = mutableSetOf<String>()
+
+    /** What running shell tools have printed so far, by call id, and the jobs reading it. */
+    private val liveOutput = HashMap<String, String>()
+    private val liveJobs = HashMap<String, Job>()
+    private var liveOutputIntervalMs: Long = settings.settings.value.liveOutputIntervalMs
 
     /** First message of a staged revert; it and everything after are hidden. */
     private var revertMessageId: String? = null
@@ -94,10 +106,17 @@ class ChatViewModel(
         viewModelScope.launch {
             settings.settings.collect { s ->
                 showReasoning = s.showReasoning
+                liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
                 updateState {
                     it.copy(
                         expandToolsByDefault = s.expandToolsByDefault,
+                        live = LiveFollow.of(s),
+                        showFullCommands = s.showFullCommands,
+                        showToolDetails = s.showToolDetails,
+                        outputPreviewLines = s.outputPreviewLines,
+                        keepLiveStepsOpen = s.keepLiveStepsOpen,
+                        chatTextScale = s.chatTextScale,
                         showCost = s.showCost,
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,
@@ -125,6 +144,7 @@ class ChatViewModel(
             ChatEvent.MoveToBackground -> moveToBackground()
             ChatEvent.Compact -> compact()
             is ChatEvent.OpenSession -> sendEffect(ChatEffect.OpenSession(event.sessionId))
+            is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
             is ChatEvent.SwitchSession -> sendEffect(ChatEffect.SwitchSession(event.sessionId))
             ChatEvent.LoadOlder -> loadOlder()
             // Not part of the state: only read back when the chat opens again.
@@ -159,6 +179,17 @@ class ChatViewModel(
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
             ChatEvent.OpenChanges -> loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+            ChatEvent.OpenMcps -> {
+                updateState { it.copy(mcps = it.mcps ?: McpPanel(changing = changingMcps.toSet())) }
+                refreshMcps()
+            }
+            ChatEvent.RefreshMcps -> refreshMcps()
+            ChatEvent.CloseMcps -> {
+                mcpJob?.cancel()
+                updateState { it.copy(mcps = null) }
+            }
+            is ChatEvent.SetMcpConnected -> setMcpConnected(event.name, event.connected)
+            ChatEvent.OpenTerminal -> currentState.directory.takeIf { it.isNotEmpty() }?.let { sendEffect(ChatEffect.OpenTerminal(it)) }
             ChatEvent.CloseChanges -> {
                 changesJob?.cancel()
                 updateState { it.copy(changes = null) }
@@ -218,6 +249,8 @@ class ChatViewModel(
                 )
             }
             rebuild()
+            // `/mcps` can open the panel before the project directory is known.
+            if (currentState.mcps?.servers == null && mcpJob?.isActive != true) refreshMcps()
             loadCatalog(s.directory)
             prefetchNeighbors()
         }
@@ -333,6 +366,11 @@ class ChatViewModel(
     private fun onServerEvent(event: ServerEvent) {
         if (event == ServerEvent.Connected) {
             loadAll()
+            refreshMcps()
+            return
+        }
+        if (event == ServerEvent.McpsChanged) {
+            refreshMcps()
             return
         }
         if (event !is ServerEvent.SessionScoped || event.sessionId != sessionId) return
@@ -542,6 +580,61 @@ class ChatViewModel(
         }
     }
 
+    /** Running tools show what their shell has printed so far; finished ones keep their final output. */
+    private fun withLiveOutput(visible: List<Message>): List<Message> {
+        if (liveOutput.isEmpty()) return visible
+        return visible.map { message ->
+            if (message !is Message.Assistant || message.parts.none { it is Part.Tool && it.callId in liveOutput }) return@map message
+            message.copy(
+                parts = message.parts.map { part ->
+                    val live = (part as? Part.Tool)?.takeIf { it.status == ToolStatus.Running }?.let { liveOutput[it.callId] }
+                    if (live != null) (part as Part.Tool).copy(output = live) else part
+                },
+            )
+        }
+    }
+
+    /**
+     * The server streams a `bash` tool's output only to its shell, not to the event stream:
+     * while the tool runs, its shell output is read every [liveOutputIntervalMs] (setting).
+     */
+    private fun followShells(visible: List<Message>) {
+        val running = if (currentState.live?.shell == true) runningShells(visible) else emptyMap()
+        (liveJobs.keys - running.keys).forEach { callId ->
+            liveJobs.remove(callId)?.cancel()
+            liveOutput.remove(callId)
+        }
+        running.forEach { (callId, shellId) ->
+            if (callId in liveJobs) return@forEach
+            // Registered before it starts: the first read can rebuild, and with it call this again.
+            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+                var cursor = 0L
+                while (true) {
+                    val directory = currentState.directory
+                    chat.shellOutput(directory, shellId, cursor).onSuccess { page ->
+                        if (page.text.isNotEmpty()) {
+                            liveOutput[callId] = liveOutput[callId].orEmpty() + page.text
+                            cursor = page.cursor
+                            rebuild()
+                        }
+                    }
+                    delay(liveOutputIntervalMs)
+                }
+            }
+            liveJobs[callId] = job
+            job.start()
+        }
+    }
+
+    /** Shell ids of the running `bash` tools, by call id. */
+    private fun runningShells(visible: List<Message>): Map<String, String> = visible.asSequence()
+        .filterIsInstance<Message.Assistant>()
+        .flatMap { it.parts }
+        .filterIsInstance<Part.Tool>()
+        .filter { it.status == ToolStatus.Running }
+        .mapNotNull { tool -> tool.metadata[SHELL_ID]?.let { tool.callId to it } }
+        .toMap()
+
     private fun rebuild() {
         val state = currentState
         val visible = visibleMessages()
@@ -549,7 +642,8 @@ class ChatViewModel(
         // Queued prompts show above the composer instead of as pending bubbles.
         val queuedIds = state.queued.mapTo(HashSet()) { it.id }
         val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
-        val items = ChatItemsBuilder.build(withImages(shown), state.running, showReasoning, state.models::labelFor, groupActivity)
+        followShells(shown)
+        val items = ChatItemsBuilder.build(withLiveOutput(withImages(shown)), state.running, showReasoning, state.models::labelFor, groupActivity)
         val backgroundable = BackgroundableWork.find(visible)?.takeIf { it.key !in movedToBackground }
         val compactions = visible.filterIsInstance<Message.Notice>()
             .filter { it.kind == NoticeKind.Compacting || it.kind == NoticeKind.Compaction }
@@ -600,7 +694,14 @@ class ChatViewModel(
         val attachments = state.attachments
         val delivery = state.delivery
         val revert = revertMessageId
-        val local = Message.User("$LOCAL_PREFIX${localIds++}", clock(), text, pending = true, attachments = state.uploads.size)
+        val local = Message.User(
+            "$LOCAL_PREFIX${localIds++}",
+            clock(),
+            text,
+            pending = true,
+            attachments = attachments.size,
+            files = attachments.filter { it.mention != null }.map { it.uri.removePrefix("file://") },
+        )
         val reverted = takeReverted()
         messages = messages + local
         updateState { it.copy(draft = "", attachments = emptyList(), suggestions = emptyList(), sending = true) }
@@ -671,6 +772,7 @@ class ChatViewModel(
             Completions.Builtin.Redo -> restoreRevert()
             Completions.Builtin.Compact -> compact()
             Completions.Builtin.Fork -> fork(null)
+            Completions.Builtin.Mcps -> onEvent(ChatEvent.OpenMcps)
         }
     }
 
@@ -834,6 +936,39 @@ class ChatViewModel(
         return SessionPeek(id, sessions.cached(id)?.title.orEmpty())
     }
 
+    private fun refreshMcps() {
+        if (currentState.mcps == null || currentState.directory.isEmpty()) return
+        mcpJob?.cancel()
+        updateState { it.copy(mcps = it.mcps?.copy(loading = true, error = null)) }
+        val directory = currentState.directory
+        mcpJob = viewModelScope.launch {
+            mcps.list(directory).fold(
+                onSuccess = { servers -> updateState { it.copy(mcps = it.mcps?.copy(servers = servers, loading = false)) } },
+                onFailure = { error ->
+                    updateState { it.copy(mcps = it.mcps?.copy(loading = false, error = error.toUiText())) }
+                },
+            )
+        }
+    }
+
+    private fun setMcpConnected(name: String, connected: Boolean) {
+        if (currentState.mcps?.servers?.none { it.name == name } != false || !changingMcps.add(name)) return
+        val directory = currentState.directory
+        updateState { it.copy(mcps = it.mcps?.copy(changing = changingMcps.toSet())) }
+        viewModelScope.launch {
+            try {
+                mcps.setConnected(directory, name, connected).onFailure { error ->
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                }
+            } finally {
+                changingMcps.remove(name)
+                updateState { it.copy(mcps = it.mcps?.copy(changing = changingMcps.toSet())) }
+            }
+            // A successful HTTP response need not mean connected (e.g. OAuth is required).
+            refreshMcps()
+        }
+    }
+
     private fun compact() {
         if (currentState.compacting) return
         compactRequestedWith = messages.count { it is Message.Notice && it.kind == NoticeKind.Compaction }
@@ -951,6 +1086,7 @@ class ChatViewModel(
     private companion object {
         const val LOCAL_PREFIX = "local-"
         const val RELOAD_DEBOUNCE_MS = 400L
+        const val SHELL_ID = "shellID"
         const val LOCAL_MATCH_WINDOW = 10
         const val SUGGEST_DEBOUNCE_MS = 150L
 

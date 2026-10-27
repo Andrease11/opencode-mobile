@@ -52,7 +52,7 @@ target SDK 36, min SDK 26, JVM target 11, Gradle daemon on JDK 21. iOS targets a
 ## Module Graph
 
 ```text
-app -> shared -> feature:{connect,sessions,chat,settings} -> core:{ui,mvi,domain}
+app -> shared -> feature:{connect,sessions,chat,settings,terminal,files} -> core:{ui,mvi,domain}
 app -> core:data -> core:network -> core:api (generated)
 shared (iosMain) -> core:data
 ```

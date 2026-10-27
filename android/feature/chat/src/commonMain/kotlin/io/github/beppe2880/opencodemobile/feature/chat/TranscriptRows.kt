@@ -10,6 +10,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Info
@@ -32,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
+import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
@@ -73,8 +77,8 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_working
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Lines of tool and shell output shown before "Show more". */
-internal const val OUTPUT_PREVIEW_LINES = 12
+/** Lines of tool and shell output shown before "Show more" (setting). */
+internal val LocalOutputLines = staticCompositionLocalOf { 12 }
 
 @Composable
 internal fun UserBubble(
@@ -82,6 +86,8 @@ internal fun UserBubble(
     modifier: Modifier = Modifier,
     onLongPress: (() -> Unit)? = null,
     onOpenImage: (Int) -> Unit = {},
+    directory: String = "",
+    onOpenFile: (String) -> Unit = {},
 ) {
     val c = OcTheme.colors
     Column(
@@ -136,8 +142,25 @@ internal fun UserBubble(
                 )
             }
         }
-        // Images show as thumbnails above; only the other files are counted.
-        val files = item.attachments - item.images.size
+        if (item.files.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(top = OcSpacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs, Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                item.files.forEachIndexed { index, path ->
+                    OcChip(
+                        text = path.removePrefix("${directory.trimEnd('/')}/"),
+                        onClick = { onOpenFile(path) },
+                        leadingIcon = Icons.Outlined.Description,
+                        mono = true,
+                        modifier = Modifier.testTag("chat_user_file_${item.key}_$index"),
+                    )
+                }
+            }
+        }
+        // Images show as thumbnails above and mentioned files as chips; only uploads are counted.
+        val files = item.attachments - item.images.size - item.files.size
         if (item.pending || files > 0) {
             Row(
                 modifier = Modifier.padding(top = OcSpacing.xs),
@@ -175,23 +198,32 @@ internal fun AssistantText(item: ChatItem.Text, cache: MarkdownCache, modifier: 
 }
 
 @Composable
-internal fun ReasoningBlock(item: ChatItem.Reasoning, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ReasoningBlock(
+    item: ChatItem.Reasoning,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    live: LiveFollow? = null,
+) {
     val c = OcTheme.colors
     val label = when {
         item.streaming -> stringResource(Res.string.chat_thinking)
         item.durationMs != null && item.durationMs >= 1_000 -> stringResource(Res.string.chat_thought_for, formatDuration(item.durationMs))
         else -> stringResource(Res.string.chat_thought)
     }
+    // Thinking in progress stays open so it can be followed live.
+    val open = expanded || (live?.thinking == true && item.streaming)
     Column(modifier = modifier.fillMaxWidth()) {
         DisclosureRow(
-            expanded = expanded,
+            expanded = open,
             onToggle = onToggle,
             testTag = "chat_reasoning_${item.key}",
         ) {
             Text(label, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
             if (item.streaming) OcSpinner(size = 10.dp)
         }
-        AnimatedVisibility(visible = expanded) {
+        // Summarized thinking only arrives at the end: no empty box while it streams.
+        AnimatedVisibility(visible = open && item.text.isNotBlank()) {
             Text(
                 text = item.text,
                 style = MaterialTheme.typography.bodySmall,
@@ -235,31 +267,63 @@ internal fun DisclosureRow(
     }
 }
 
+/** An inline divider notice; a completed compaction expands to show its summary. */
 @Composable
-internal fun NoticeRow(item: ChatItem.Notice, modifier: Modifier = Modifier) {
+internal fun NoticeRow(
+    item: ChatItem.Notice,
+    cache: MarkdownCache,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = OcTheme.colors
     val color = if (item.kind == NoticeKind.Error) c.danger.fg else c.textFaint
-    Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = OcSpacing.xxs),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
-    ) {
-        Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
-        Icon(if (item.kind == NoticeKind.Error) Icons.Outlined.ErrorOutline else Icons.Outlined.Info, null, tint = color, modifier = Modifier.size(12.dp))
-        Text(
-            when (item.kind) {
-                // The completed notice carries the whole summary: too long for a divider label.
-                NoticeKind.Compacting -> stringResource(Res.string.chat_compacting)
-                NoticeKind.Compaction -> stringResource(Res.string.chat_compacted)
-                else -> item.text
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 280.dp),
-        )
-        Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+    val summary = item.text.takeIf { item.kind == NoticeKind.Compaction && it.isNotBlank() }
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = OcSpacing.xxs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+        ) {
+            Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+            val icon = if (item.kind == NoticeKind.Error) Icons.Outlined.ErrorOutline else Icons.Outlined.Info
+            val label: @Composable () -> Unit = {
+                Icon(icon, null, tint = color, modifier = Modifier.size(12.dp))
+                Text(
+                    when (item.kind) {
+                        // The completed notice carries the whole summary: too long for a divider label.
+                        NoticeKind.Compacting -> stringResource(Res.string.chat_compacting)
+                        NoticeKind.Compaction -> stringResource(Res.string.chat_compacted)
+                        else -> item.text
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = color,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 280.dp),
+                )
+            }
+            if (summary != null) {
+                DisclosureRow(expanded = expanded, onToggle = onToggle, testTag = "chat_compaction_${item.key}") { label() }
+            } else {
+                label()
+            }
+            Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+        }
+        if (summary != null) {
+            AnimatedVisibility(visible = expanded) {
+                Box(
+                    Modifier
+                        .padding(top = OcSpacing.xs)
+                        .fillMaxWidth()
+                        .background(c.layer01, RoundedCornerShape(OcRadius.md))
+                        .padding(OcSpacing.md)
+                        .testTag("chat_compaction_summary_${item.key}"),
+                ) {
+                    SelectionContainer { OcMarkdown(id = "${item.key}/summary", content = summary, cache = cache) }
+                }
+            }
+        }
     }
 }
 
@@ -296,7 +360,7 @@ internal fun ShellBlock(item: ChatItem.Shell, modifier: Modifier = Modifier) {
         }
         if (item.output.isNotBlank()) {
             Text(
-                item.output.trimEnd().lines().takeLast(OUTPUT_PREVIEW_LINES).joinToString("\n"),
+                item.output.trimEnd().lines().takeLast(LocalOutputLines.current).joinToString("\n"),
                 style = OcTheme.mono.codeSmall,
                 color = c.textMuted,
             )

@@ -13,6 +13,7 @@ kotlin {
         compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
         androidResources { enable = true }
         withHostTest {}
+        withDeviceTest { instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     }
     iosArm64()
     iosSimulatorArm64()
@@ -44,6 +45,13 @@ kotlin {
             implementation(project(":core:testing"))
             implementation(libs.junit)
             implementation(libs.kotlinx.coroutines.test)
+        }
+        getByName("androidDeviceTest").dependencies {
+            implementation(project.dependencies.platform(libs.androidx.compose.bom))
+            implementation(libs.androidx.compose.ui.test.junit4)
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.compose.ui.test.manifest)
+            implementation(libs.androidx.test.espresso.core)
         }
     }
 }

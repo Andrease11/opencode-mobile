@@ -29,9 +29,11 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
+import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
+import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session_message
@@ -53,6 +55,12 @@ data object SettingsDestination
 @Serializable
 data object UsageDestination
 
+@Serializable
+data class TerminalDestination(val directory: String)
+
+@Serializable
+data class FileDestination(val directory: String, val path: String)
+
 /** Width at which Sessions and Chat are shown side by side. */
 private val ListDetailMinWidth = 840.dp
 private val ListPaneWidth = 360.dp
@@ -63,6 +71,9 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     openSessionId: String? = null,
     onSessionOpened: () -> Unit = {},
+    /** Opens the new session sheet over the session list (widget button). */
+    openNewSession: Boolean = false,
+    onNewSessionOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -83,6 +94,15 @@ fun AppNavHost(
             popUpTo<SessionsDestination>()
         }
         onSessionOpened()
+    }
+
+    // Handed to the session list, which opens its sheet and clears it.
+    var pendingNewSession by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(openNewSession, hasActiveServer) {
+        if (!openNewSession || !hasActiveServer) return@LaunchedEffect
+        navController.popBackStack(SessionsDestination, inclusive = false)
+        pendingNewSession = true
+        onNewSessionOpened()
     }
 
     NavHost(navController = navController, startDestination = start, modifier = modifier) {
@@ -106,6 +126,10 @@ fun AppNavHost(
             SessionsListDetail(
                 onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
                 onOpenSettings = { navController.navigate(SettingsDestination) },
+                openNewSession = pendingNewSession,
+                onNewSessionOpened = { pendingNewSession = false },
+                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
             )
         }
         composable<ChatDestination> { entry ->
@@ -114,6 +138,8 @@ fun AppNavHost(
                 sessionId = args.sessionId,
                 onBack = { navController.popBackStack() },
                 onOpenSession = { navController.navigate(ChatDestination(it)) },
+                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
                 onSwitchSession = {
                     // Replaces this chat, so Back still returns to the session list.
                     navController.navigate(ChatDestination(it)) {
@@ -132,6 +158,13 @@ fun AppNavHost(
         composable<UsageDestination> {
             UsageRoute(onBack = { navController.popBackStack() })
         }
+        composable<TerminalDestination> { entry ->
+            TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })
+        }
+        composable<FileDestination> { entry ->
+            val args = entry.toRoute<FileDestination>()
+            FileViewerRoute(directory = args.directory, path = args.path, onBack = { navController.popBackStack() })
+        }
     }
 }
 
@@ -140,17 +173,28 @@ fun AppNavHost(
 private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenTerminal: (String) -> Unit,
+    onOpenFile: (String, String) -> Unit,
+    openNewSession: Boolean,
+    onNewSessionOpened: () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth) {
-            SessionsRoute(onOpenChat = onOpenChatFullScreen, onOpenSettings = onOpenSettings)
+            SessionsRoute(
+                onOpenChat = onOpenChatFullScreen,
+                onOpenSettings = onOpenSettings,
+                openNewSession = openNewSession,
+                onNewSessionOpened = onNewSessionOpened,
+            )
         } else {
             Row(Modifier.fillMaxSize()) {
                 SessionsRoute(
                     onOpenChat = { selected = it },
                     onOpenSettings = onOpenSettings,
                     selectedSessionId = selected,
+                    openNewSession = openNewSession,
+                    onNewSessionOpened = onNewSessionOpened,
                     modifier = Modifier.width(ListPaneWidth).fillMaxHeight(),
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
@@ -161,6 +205,8 @@ private fun SessionsListDetail(
                         onBack = { selected = null },
                         showBack = false,
                         onOpenSession = onOpenChatFullScreen,
+                        onOpenTerminal = onOpenTerminal,
+                        onOpenFile = onOpenFile,
                         onSwitchSession = { selected = it },
                         modifier = Modifier.weight(1f),
                     )

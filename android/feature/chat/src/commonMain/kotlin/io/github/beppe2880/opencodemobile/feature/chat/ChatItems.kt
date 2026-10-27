@@ -40,6 +40,7 @@ sealed interface ChatItem {
         val pending: Boolean,
         val attachments: Int,
         val images: List<ImageAttachment> = emptyList(),
+        val files: List<String> = emptyList(),
     ) : ChatItem
     data class Text(override val key: String, val text: String, val streaming: Boolean) : ChatItem
     data class Reasoning(override val key: String, val text: String, val streaming: Boolean, val durationMs: Long?) : ChatItem
@@ -141,6 +142,8 @@ object ChatItemsBuilder {
     ): List<ChatItem> {
         val out = ArrayList<ChatItem>(messages.size * 2)
         var tools = ArrayList<Part.Tool>()
+        // Call ids are only unique per message (some providers restart at call_0 every step).
+        var toolsKey = ""
         var turn = ArrayList<Message.Assistant>()
         var turnStart: Long? = null
         // Position right after the turn's last assistant item; the footer goes there even when
@@ -155,7 +158,7 @@ object ChatItemsBuilder {
 
         fun flushTools() {
             if (tools.isNotEmpty()) {
-                addTurnItem(ChatItem.Tools("tools-${tools.first().callId}", tools))
+                addTurnItem(ChatItem.Tools(toolsKey, tools))
                 tools = ArrayList()
             }
         }
@@ -199,7 +202,7 @@ object ChatItemsBuilder {
         messages.forEachIndexed { index, message ->
             when (message) {
                 is Message.User -> startTurn(message.createdAt) {
-                    out += ChatItem.User(message.id, message.text, message.pending, message.attachments, message.images)
+                    out += ChatItem.User(message.id, message.text, message.pending, message.attachments, message.images, message.files)
                 }
                 is Message.Synthetic -> startTurn(message.createdAt)
                 is Message.Idle -> {
@@ -211,7 +214,10 @@ object ChatItemsBuilder {
                     turn += message
                     message.parts.forEach { part ->
                         when (part) {
-                            is Part.Tool -> tools += part
+                            is Part.Tool -> {
+                                if (tools.isEmpty()) toolsKey = "tools-${message.id}/${part.callId}"
+                                tools += part
+                            }
                             is Part.Text -> if (part.text.isNotBlank() || part.streaming) {
                                 flushTools()
                                 addTurnItem(ChatItem.Text("${message.id}/${part.key}", part.text, part.streaming))

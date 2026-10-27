@@ -29,12 +29,14 @@ repository boundaries.
 
 | Module | Responsibility |
 |---|---|
-| `:app` | Android only: `OpenCodeApplication` (starts Koin), `MainActivity`, `appModule`, optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver) |
+| `:app` | Android only: `OpenCodeApplication` (starts Koin), `MainActivity`, `appModule`, optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver), home screen widget (`widget/`, Glance) |
 | `:shared` | Shared by both apps: `OpenCodeApp` shell, root navigation (`AppNavHost`), `sharedModule` (ViewModels); iOS entry point `MainViewController()` in the `Shared` framework |
 | `:feature:connect` | QR scan, paste link, manual URL + password/code, saved servers |
 | `:feature:sessions` | Session list, search, project filter, create/rename/delete |
 | `:feature:chat` | Live transcript, composer, agent/model pickers, permissions, interrupt |
 | `:feature:settings` | Servers, theme, display preferences, about |
+| `:feature:terminal` | Server shell over the PTY WebSocket (xterm.js in a WebView), configurable key bar |
+| `:feature:files` | Read-only file viewer (`/api/fs/read`): highlighted text with line numbers, images |
 | `:core:ui` | `OcTheme` tokens, typography (Inter, IBM Plex Mono), `Oc*` components, Markdown |
 | `:core:mvi` | `BaseViewModel`, `CollectEffect`, `OptimisticState` |
 | `:core:domain` | UI-facing models, repository interfaces, `TranscriptReducer` |

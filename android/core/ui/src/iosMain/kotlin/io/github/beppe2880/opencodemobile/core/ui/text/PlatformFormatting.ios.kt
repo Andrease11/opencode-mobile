@@ -1,5 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.ui.text
 
+import androidx.compose.runtime.Composable
+import platform.Foundation.NSByteCountFormatter
+import platform.Foundation.NSByteCountFormatterCountStyleFile
 import platform.Foundation.NSDate
 import platform.Foundation.NSNumber
 import platform.Foundation.NSNumberFormatter
@@ -27,3 +30,6 @@ internal actual fun formatRelativeTime(timestamp: Long, now: Long): String {
         relativeToDate = NSDate.dateWithTimeIntervalSince1970(now / 1000.0),
     )
 }
+
+@Composable
+actual fun formatFileSize(bytes: Long): String = NSByteCountFormatter.stringFromByteCount(bytes, NSByteCountFormatterCountStyleFile)

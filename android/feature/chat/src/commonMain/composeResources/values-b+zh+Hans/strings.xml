@@ -38,6 +38,7 @@
     </plurals>
     <string name="chat_changes">变更</string>
     <string name="chat_changes_open">显示已更改的文件</string>
+    <string name="chat_terminal_open">打开终端</string>
     <string name="chat_changes_session">整个会话</string>
     <string name="chat_changes_last_turn">最近一轮</string>
     <plurals name="chat_changes_files">
@@ -121,4 +122,19 @@
     </plurals>
     <string name="chat_older_failed">无法加载更早的消息</string>
     <string name="chat_older_retry">重试</string>
+    <string name="chat_open_file">打开文件</string>
+    <string name="chat_more">更多选项</string>
+    <string name="chat_mcps">MCP 服务器</string>
+    <string name="chat_command_mcps">管理 MCP 连接</string>
+    <string name="chat_mcps_refresh">刷新 MCP 状态</string>
+    <string name="chat_mcps_runtime">连接适用于当前项目，而不仅是此对话。更改持续到服务器重启，配置保持不变。</string>
+    <string name="chat_mcps_error">无法加载 MCP 服务器</string>
+    <string name="chat_mcps_empty">没有 MCP 服务器</string>
+    <string name="chat_mcps_empty_description">请在服务器上的 OpenCode 配置中添加 MCP 服务器。</string>
+    <string name="chat_mcps_connected">已连接</string>
+    <string name="chat_mcps_disconnected">已断开</string>
+    <string name="chat_mcps_pending">正在连接</string>
+    <string name="chat_mcps_failed">连接失败</string>
+    <string name="chat_mcps_needs_auth">需要身份验证</string>
+    <string name="chat_mcps_auth_hint">请在电脑上的 OpenCode 中登录，然后在此刷新。</string>
 </resources>

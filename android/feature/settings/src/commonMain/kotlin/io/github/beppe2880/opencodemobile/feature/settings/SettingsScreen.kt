@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,9 +39,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
+import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
@@ -72,8 +78,27 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_di
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_activity
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_interval
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_interval_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_other
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_other_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_reads
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_reads_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_shell
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_shell_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_thinking
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_thinking_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_finished
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_finished_sub
@@ -81,14 +106,25 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_no
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_permissions_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_password
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fast
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_slow
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_remove
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_remove_message
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_remove_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_rename
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_rename_label
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_rename_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_confirm
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_message
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_section
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_save
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_actions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_version
@@ -103,10 +139,21 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_switch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_large
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_largest
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_small
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_light
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unknown
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage_sub
@@ -120,6 +167,7 @@ fun SettingsScreen(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
     showNotifications: Boolean = notificationsSupported,
+    showTerminal: Boolean = terminalKeyboardSupported,
 ) {
     val c = OcTheme.colors
     Scaffold(
@@ -153,9 +201,13 @@ fun SettingsScreen(
             ) {
                 item(key = "servers") { ServersSection(state, onEvent) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
-                item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
+                item(key = "appearance") { AppearanceSection(state.settings, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
+                item(key = "live") { LiveActivitySection(state.settings, onEvent) }
                 if (showNotifications) item(key = "notifications") { NotificationsSection(state, onEvent) }
+                // The section holds only the keyboard switch.
+                if (showTerminal) item(key = "terminal") { TerminalSection(state.settings, onEvent) }
+                item(key = "reset") { ResetSection(onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
         }
@@ -169,6 +221,17 @@ fun SettingsScreen(
             onConfirm = { onEvent(SettingsEvent.ConfirmRename(it)) },
             onDismiss = { onEvent(SettingsEvent.DismissDialog) },
             testTagPrefix = "settings_rename",
+        )
+    }
+    if (state.resetting) {
+        OcConfirmDialog(
+            title = stringResource(Res.string.settings_reset_title),
+            text = stringResource(Res.string.settings_reset_message),
+            confirmLabel = stringResource(Res.string.settings_reset_confirm),
+            destructive = true,
+            onConfirm = { onEvent(SettingsEvent.ConfirmReset) },
+            onDismiss = { onEvent(SettingsEvent.DismissDialog) },
+            testTagPrefix = "settings_reset",
         )
     }
     state.removing?.let { server ->
@@ -280,7 +343,7 @@ private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
 }
 
 @Composable
-private fun AppearanceSection(theme: ThemeMode, onEvent: (SettingsEvent) -> Unit) {
+private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(Res.string.settings_appearance)) {
         OcSegmentedControl(
             segments = listOf(
@@ -288,8 +351,62 @@ private fun AppearanceSection(theme: ThemeMode, onEvent: (SettingsEvent) -> Unit
                 OcSegment(ThemeMode.Light, stringResource(Res.string.settings_theme_light), "settings_theme_light"),
                 OcSegment(ThemeMode.Dark, stringResource(Res.string.settings_theme_dark), "settings_theme_dark"),
             ),
-            selected = theme,
+            selected = settings.theme,
             onSelect = { onEvent(SettingsEvent.ThemeChanged(it)) },
+        )
+        OcCard {
+            val sizes =
+                listOf(Res.string.settings_text_small, Res.string.settings_text_default, Res.string.settings_text_large, Res.string.settings_text_largest)
+            ChoiceRow(
+                title = stringResource(Res.string.settings_text_size),
+                subtitle = stringResource(Res.string.settings_text_size_sub),
+                choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(sizes[i]), "settings_text_size_$i") },
+                selected = settings.chatTextScale,
+                onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
+            )
+        }
+    }
+}
+
+/** A title and subtitle with a segmented choice under them, inside a card. */
+@Composable
+private fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegment<T>>, selected: T, onSelect: (T) -> Unit) {
+    val c = OcTheme.colors
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    ) {
+        Column {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+        }
+        OcSegmentedControl(segments = choices, selected = selected, onSelect = onSelect)
+    }
+}
+
+@Composable
+private fun TerminalSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(Res.string.settings_terminal)) {
+        OcCard {
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_terminal_keyboard),
+                subtitle = stringResource(Res.string.settings_terminal_keyboard_sub),
+                checked = settings.terminalOpenKeyboard,
+                onCheckedChange = { onEvent(SettingsEvent.TerminalKeyboardChanged(it)) },
+                modifier = Modifier.testTag("settings_terminal_keyboard_switch"),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(Res.string.settings_reset_section)) {
+        OcButton(
+            text = stringResource(Res.string.settings_reset),
+            onClick = { onEvent(SettingsEvent.RequestReset) },
+            variant = OcButtonVariant.Secondary,
+            modifier = Modifier.fillMaxWidth().testTag("settings_reset_button"),
         )
     }
 }
@@ -353,6 +470,114 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 onCheckedChange = { onEvent(SettingsEvent.DictationChanged(it)) },
                 modifier = Modifier.testTag("settings_dictation_switch"),
             )
+        }
+    }
+}
+
+@Composable
+private fun LiveActivitySection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(Res.string.settings_live_activity)) {
+        OcCard {
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_follow_running),
+                subtitle = stringResource(Res.string.settings_follow_running_sub),
+                checked = settings.followRunningTools,
+                onCheckedChange = { onEvent(SettingsEvent.FollowRunningToolsChanged(it)) },
+                modifier = Modifier.testTag("settings_follow_running_switch"),
+            )
+            // Each kind only matters while following is on.
+            if (settings.followRunningTools) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_live_thinking),
+                    subtitle = stringResource(Res.string.settings_live_thinking_sub),
+                    checked = settings.liveThinking,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveThinkingChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_thinking_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_live_shell),
+                    subtitle = stringResource(Res.string.settings_live_shell_sub),
+                    checked = settings.liveShell,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveShellChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_shell_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_live_edits),
+                    subtitle = stringResource(Res.string.settings_live_edits_sub),
+                    checked = settings.liveEdits,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveEditsChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_edits_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_live_reads),
+                    subtitle = stringResource(Res.string.settings_live_reads_sub),
+                    checked = settings.liveReads,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveReadsChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_reads_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_live_other),
+                    subtitle = stringResource(Res.string.settings_live_other_sub),
+                    checked = settings.liveOther,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveOtherChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_other_switch"),
+                )
+            }
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_full_commands),
+                subtitle = stringResource(Res.string.settings_full_commands_sub),
+                checked = settings.showFullCommands,
+                onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
+                modifier = Modifier.testTag("settings_full_commands_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_tool_details),
+                subtitle = stringResource(Res.string.settings_tool_details_sub),
+                checked = settings.showToolDetails,
+                onCheckedChange = { onEvent(SettingsEvent.ShowToolDetailsChanged(it)) },
+                modifier = Modifier.testTag("settings_tool_details_switch"),
+            )
+            OcDivider()
+            ChoiceRow(
+                title = stringResource(Res.string.settings_output_lines),
+                subtitle = stringResource(Res.string.settings_output_lines_sub),
+                choices = OUTPUT_LINE_CHOICES.map { OcSegment(it, it.toString(), "settings_output_lines_$it") },
+                selected = settings.outputPreviewLines,
+                onSelect = { onEvent(SettingsEvent.OutputPreviewLinesChanged(it)) },
+            )
+            if (settings.followRunningTools) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(Res.string.settings_keep_live_open),
+                    subtitle = stringResource(Res.string.settings_keep_live_open_sub),
+                    checked = settings.keepLiveStepsOpen,
+                    onCheckedChange = { onEvent(SettingsEvent.KeepLiveStepsOpenChanged(it)) },
+                    modifier = Modifier.testTag("settings_keep_live_open_switch"),
+                )
+            }
+            if (settings.followRunningTools && settings.liveShell) {
+                OcDivider()
+                val speeds = listOf(
+                    Res.string.settings_refresh_fastest,
+                    Res.string.settings_refresh_fast,
+                    Res.string.settings_refresh_normal,
+                    Res.string.settings_refresh_slow,
+                )
+                ChoiceRow(
+                    title = stringResource(Res.string.settings_live_interval),
+                    subtitle = stringResource(Res.string.settings_live_interval_sub),
+                    choices = LIVE_INTERVAL_CHOICES.mapIndexed { i, ms -> OcSegment(ms, stringResource(speeds[i]), "settings_live_interval_$ms") },
+                    selected = settings.liveOutputIntervalMs,
+                    onSelect = { onEvent(SettingsEvent.LiveOutputIntervalChanged(it)) },
+                )
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.api.apis.ServerApi
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -11,6 +12,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.client.utils.EmptyContent
 import io.ktor.http.HttpHeaders
@@ -30,7 +32,7 @@ class BasicCredentials(val username: String = ServerProfile.DEFAULT_USERNAME, va
  */
 class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
 
-    private val baseHttp: HttpClient = HttpClient {
+    private val baseHttp: HttpClient = platformHttpClient(PING_INTERVAL_MILLIS) {
         expectSuccess = false
         install(HttpTimeout) {
             connectTimeoutMillis = 10_000
@@ -40,6 +42,8 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
         // to answer with JSON. Responses are decoded by [awaitBody].
         install(ContentNegotiation) { json(OpenCodeJson) }
         install(NoContentTypeWithoutBody)
+        // Pings detect a dead terminal connection; OkHttp sends its own (see platformHttpClient).
+        install(WebSockets) { pingIntervalMillis = PING_INTERVAL_MILLIS }
     }
 
     fun create(baseUrl: String, credentials: BasicCredentials?): OpenCodeClient {
@@ -64,7 +68,14 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
     } catch (e: OpenCodeError) {
         throw pairingError(e)
     }
+
+    private companion object {
+        const val PING_INTERVAL_MILLIS = 20_000L
+    }
 }
+
+/** The client on the platform engine; [pingIntervalMillis] applies to WebSockets. */
+internal expect fun platformHttpClient(pingIntervalMillis: Long, block: HttpClientConfig<*>.() -> Unit): HttpClient
 
 /**
  * The generated client marks every POST/PUT/PATCH as JSON, also without a body (interrupt,

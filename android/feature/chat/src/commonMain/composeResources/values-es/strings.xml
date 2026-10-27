@@ -41,6 +41,7 @@
     </plurals>
     <string name="chat_changes">Cambios</string>
     <string name="chat_changes_open">Mostrar archivos modificados</string>
+    <string name="chat_terminal_open">Abrir terminal</string>
     <string name="chat_changes_session">Sesión completa</string>
     <string name="chat_changes_last_turn">Último turno</string>
     <plurals name="chat_changes_files">
@@ -127,4 +128,19 @@
     </plurals>
     <string name="chat_older_failed">No se pudieron cargar los mensajes anteriores</string>
     <string name="chat_older_retry">Reintentar</string>
+    <string name="chat_open_file">Abrir archivo</string>
+    <string name="chat_more">Más opciones</string>
+    <string name="chat_mcps">Servidores MCP</string>
+    <string name="chat_command_mcps">Gestionar conexiones MCP</string>
+    <string name="chat_mcps_refresh">Actualizar estado MCP</string>
+    <string name="chat_mcps_runtime">Las conexiones se aplican a este proyecto, no solo a este chat. Los cambios duran hasta reiniciar el servidor; la configuración no cambia.</string>
+    <string name="chat_mcps_error">No se pudieron cargar los servidores MCP</string>
+    <string name="chat_mcps_empty">No hay servidores MCP</string>
+    <string name="chat_mcps_empty_description">Añade servidores MCP en la configuración de OpenCode del servidor.</string>
+    <string name="chat_mcps_connected">Conectado</string>
+    <string name="chat_mcps_disconnected">Desconectado</string>
+    <string name="chat_mcps_pending">Conectando</string>
+    <string name="chat_mcps_failed">Error de conexión</string>
+    <string name="chat_mcps_needs_auth">Autenticación necesaria</string>
+    <string name="chat_mcps_auth_hint">Inicia sesión desde OpenCode en tu ordenador y actualiza aquí.</string>
 </resources>

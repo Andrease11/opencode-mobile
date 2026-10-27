@@ -33,6 +33,8 @@ kotlin {
             implementation(project(":feature:sessions"))
             implementation(project(":feature:chat"))
             implementation(project(":feature:settings"))
+            implementation(project(":feature:terminal"))
+            implementation(project(":feature:files"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.ui)

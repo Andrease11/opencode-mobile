@@ -8,6 +8,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +48,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_no_output
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_open_file
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_open_subagent
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_show_less
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_show_more
@@ -68,18 +71,27 @@ internal fun ToolsGroup(
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
+    onOpenFile: (String) -> Unit = {},
+    live: LiveFollow? = null,
+    fullCommands: Boolean = false,
+    /** The agent is still working on this group: the tools [live] covers stay open. */
+    inLiveGroup: Boolean = false,
+    /** Rows open on their output when the group opens; tapping one folds it. */
+    details: Boolean = false,
 ) {
     val c = OcTheme.colors
+    // Work in progress stays open so it can be followed live; it folds back once done.
+    val open = expanded || (live != null && (inLiveGroup || item.running) && item.tools.any(live::covers))
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking = null),
             running = item.running,
             failed = item.failed > 0,
-            expanded = expanded,
+            expanded = open,
             onToggle = { onToggle("g:${item.key}") },
             testTag = "chat_tools_${item.key}",
         )
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(visible = open) {
             Column(
                 modifier = Modifier
                     .padding(top = OcSpacing.xs)
@@ -87,15 +99,21 @@ internal fun ToolsGroup(
                     .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.lg))
                     .padding(vertical = OcSpacing.xs),
             ) {
-                item.tools.forEach { tool ->
+                item.tools.forEachIndexed { index, tool ->
+                    // Call ids repeat across steps; the group key plus position is unique.
+                    val id = "${item.key}#$index"
                     ToolRow(
                         tool = tool,
                         directory = directory,
-                        expanded = isExpanded("o:${tool.callId}"),
-                        full = isExpanded("f:${tool.callId}"),
-                        onToggle = { onToggle("o:${tool.callId}") },
-                        onToggleFull = { onToggle("f:${tool.callId}") },
+                        expanded = isExpanded("o:$id") != details,
+                        full = isExpanded("f:$id"),
+                        onToggle = { onToggle("o:$id") },
+                        onToggleFull = { onToggle("f:$id") },
                         onOpenSession = onOpenSession,
+                        onOpenFile = onOpenFile,
+                        live = live,
+                        inLiveGroup = inLiveGroup,
+                        fullCommand = fullCommands,
                     )
                 }
             }
@@ -114,6 +132,13 @@ internal fun ActivityGroup(
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
+    onOpenFile: (String) -> Unit = {},
+    live: LiveFollow? = null,
+    fullCommands: Boolean = false,
+    /** The agent is still working on this group: its newest tools stay open between calls. */
+    inLiveGroup: Boolean = false,
+    /** Inner tool groups open with every tool's output when this group opens. */
+    details: Boolean = false,
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -121,34 +146,44 @@ internal fun ActivityGroup(
         item.thinkingMs >= 1_000 -> stringResource(Res.string.chat_thought_for, formatDuration(item.thinkingMs))
         else -> stringResource(Res.string.chat_thought)
     }
+    val followed = live != null &&
+        (item.tools.any(live::covers) || (live.thinking && item.thoughts.any { it.streaming }))
+    val open = expanded || (followed && (inLiveGroup || item.running))
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking),
             running = item.running,
             failed = item.failed > 0,
-            expanded = expanded,
+            expanded = open,
             onToggle = { onToggle("a:${item.key}") },
             testTag = "chat_activity_${item.key}",
         )
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(visible = open) {
             Column(
                 modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {
+                val latestTools = item.entries.lastOrNull { it is ChatItem.Tools }
                 item.entries.forEach { entry ->
                     when (entry) {
                         is ChatItem.Reasoning -> ReasoningBlock(
                             item = entry,
                             expanded = isExpanded("r:${entry.key}"),
                             onToggle = { onToggle("r:${entry.key}") },
+                            live = live,
                         )
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
                             directory = directory,
-                            expanded = isExpanded("g:${entry.key}") != defaultToolsExpanded,
+                            expanded = isExpanded("g:${entry.key}") != (defaultToolsExpanded || details),
                             isExpanded = isExpanded,
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,
+                            onOpenFile = onOpenFile,
+                            live = live,
+                            fullCommands = fullCommands,
+                            inLiveGroup = inLiveGroup && entry === latestTools,
+                            details = details,
                         )
                         else -> Unit
                     }
@@ -211,71 +246,110 @@ private fun ToolRow(
     onToggle: () -> Unit,
     onToggleFull: () -> Unit,
     onOpenSession: (String) -> Unit,
+    onOpenFile: (String) -> Unit,
+    live: LiveFollow?,
+    inLiveGroup: Boolean,
+    fullCommand: Boolean,
 ) {
     val c = OcTheme.colors
     val child = SessionInsights.childSession(tool)
+    val file = ToolInfo.filePath(tool)
     val argument = ToolInfo.primaryArgument(tool.input)?.let { arg ->
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
+    val running = tool.status == ToolStatus.Running || tool.status == ToolStatus.Streaming
+    // Followed kinds open while they run and, in the group the agent is still working on, once done.
+    val open = expanded || (live?.covers(tool) == true && (running || inLiveGroup))
     val statusLabel = when (tool.status) {
         ToolStatus.Streaming, ToolStatus.Running -> stringResource(Res.string.chat_tool_running)
         ToolStatus.Completed -> stringResource(Res.string.chat_tool_completed)
         ToolStatus.Error -> stringResource(Res.string.chat_tool_failed)
     }
+    // With full commands on, the argument gets its own full-width lines under the title.
+    val wrapArgument = fullCommand && !argument.isNullOrEmpty()
     Column(Modifier.fillMaxWidth()) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(role = Role.Button, onClick = onToggle)
                 .semantics { stateDescription = statusLabel }
-                .heightIn(min = 44.dp)
-                .padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)
                 .testTag("chat_tool_${tool.callId}"),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
         ) {
-            Icon(ToolInfo.icon(tool.name), contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
-            Text(ToolInfo.title(tool.name), style = OcTheme.mono.label, color = c.textBase)
-            Text(
-                text = argument.orEmpty(),
-                style = OcTheme.mono.codeSmall,
-                color = c.textMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            if (tool.diffs.isNotEmpty()) {
-                DiffStats(tool.diffs.sumOf { it.additions }, tool.diffs.sumOf { it.deletions })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 44.dp)
+                    .padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+            ) {
+                Icon(ToolInfo.icon(tool.name), contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
+                Text(ToolInfo.title(tool.name), style = OcTheme.mono.label, color = c.textBase)
+                if (wrapArgument) {
+                    Spacer(Modifier.weight(1f))
+                } else {
+                    Text(
+                        text = argument.orEmpty(),
+                        style = OcTheme.mono.codeSmall,
+                        color = c.textMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (tool.diffs.isNotEmpty()) {
+                    DiffStats(tool.diffs.sumOf { it.additions }, tool.diffs.sumOf { it.deletions })
+                }
+                if (file != null) {
+                    OcIconButton(
+                        icon = Icons.Outlined.FileOpen,
+                        contentDescription = stringResource(Res.string.chat_open_file),
+                        onClick = { onOpenFile(file) },
+                        modifier = Modifier.size(36.dp).testTag("chat_open_file_${tool.callId}"),
+                    )
+                }
+                if (child != null) {
+                    OcIconButton(
+                        icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                        contentDescription = stringResource(Res.string.chat_open_subagent),
+                        onClick = { onOpenSession(child) },
+                        modifier = Modifier.size(36.dp).testTag("chat_open_subagent_${tool.callId}"),
+                    )
+                }
+                ToolStatusIcon(tool.status)
             }
-            if (child != null) {
-                OcIconButton(
-                    icon = Icons.AutoMirrored.Outlined.OpenInNew,
-                    contentDescription = stringResource(Res.string.chat_open_subagent),
-                    onClick = { onOpenSession(child) },
-                    modifier = Modifier.size(36.dp).testTag("chat_open_subagent_${tool.callId}"),
+            if (wrapArgument) {
+                Text(
+                    text = argument.orEmpty(),
+                    style = OcTheme.mono.codeSmall,
+                    color = c.textMuted,
+                    modifier = Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
                 )
             }
-            ToolStatusIcon(tool.status)
         }
-        AnimatedVisibility(visible = expanded) {
+        // A running tool has nothing to show until its output starts arriving.
+        AnimatedVisibility(visible = open && !(running && tool.output.isNullOrEmpty())) {
             if (tool.diffs.isNotEmpty() && tool.error == null) {
-                ToolDiffs(tool, directory, full, onToggleFull)
+                // Patches change several files and have no button of their own: each diff gets one.
+                ToolDiffs(tool, directory, full, onToggleFull, onOpenFile.takeIf { file == null })
             } else {
-                ToolOutput(tool, full, onToggleFull)
+                ToolOutput(tool, full, onToggleFull, live = running)
             }
         }
     }
 }
 
 @Composable
-private fun ToolDiffs(tool: Part.Tool, directory: String, full: Boolean, onToggleFull: () -> Unit) {
+private fun ToolDiffs(tool: Part.Tool, directory: String, full: Boolean, onToggleFull: () -> Unit, onOpenFile: ((String) -> Unit)?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
-        tool.diffs.forEach { diff -> FileDiffView(diff, directory, full, onToggleFull) }
+        tool.diffs.forEach { diff ->
+            FileDiffView(diff, directory, full, onToggleFull, onOpenFile = onOpenFile?.takeIf { diff.status != "deleted" }?.let { open -> { open(diff.path) } })
+        }
     }
 }
 
@@ -290,12 +364,18 @@ private fun ToolStatusIcon(status: ToolStatus) {
 }
 
 @Composable
-private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit) {
+private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit, live: Boolean = false) {
     val c = OcTheme.colors
     val raw = (tool.error ?: tool.output).orEmpty().trimEnd()
     val lines = raw.lines()
-    val truncated = !full && lines.size > OUTPUT_PREVIEW_LINES
-    val shown = if (truncated) lines.take(OUTPUT_PREVIEW_LINES).joinToString("\n") else raw
+    val previewLines = LocalOutputLines.current
+    val truncated = !full && lines.size > previewLines
+    // While the tool runs, the newest lines are the interesting ones.
+    val shown = when {
+        !truncated -> raw
+        live -> lines.takeLast(previewLines).joinToString("\n")
+        else -> lines.take(previewLines).joinToString("\n")
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -313,7 +393,7 @@ private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit)
                     .padding(OcSpacing.sm),
             )
         }
-        if (lines.size > OUTPUT_PREVIEW_LINES) {
+        if (lines.size > previewLines) {
             Text(
                 text = stringResource(if (full) Res.string.chat_show_less else Res.string.chat_show_more),
                 style = MaterialTheme.typography.labelMedium,

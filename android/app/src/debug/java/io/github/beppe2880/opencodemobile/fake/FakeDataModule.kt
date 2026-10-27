@@ -17,6 +17,9 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.McpServer
+import io.github.beppe2880.opencodemobile.core.domain.McpStatus
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -37,6 +40,10 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.TerminalInfo
+import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
+import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
+import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
@@ -82,6 +89,17 @@ val fakeDataModule = module {
     single<CatalogRepository> { FakeCatalog() }
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
+    single<TerminalRepository> { FakeTerminals() }
+    single<McpRepository> {
+        object : McpRepository {
+            private var servers = listOf(McpServer("demo", McpStatus.Connected))
+            override suspend fun list(directory: String) = Result.success(servers)
+            override suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit> {
+                servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
+                return Result.success(Unit)
+            }
+        }
+    }
 }
 
 private const val LATENCY = 350L
@@ -449,5 +467,20 @@ internal class FakeSettings : SettingsRepository {
     override val settings: StateFlow<AppSettings> = _settings.asStateFlow()
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         _settings.value = transform(_settings.value)
+    }
+}
+
+/** A terminal that echoes what is typed, like a shell without commands. */
+internal class FakeTerminals : TerminalRepository {
+    override suspend fun open(directory: String) = Result.success(TerminalInfo(id = "pty_fake", title = "Terminal 1", running = true))
+
+    override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int) = Result.success(Unit)
+
+    override suspend fun close(directory: String, terminalId: String) = Result.success(Unit)
+
+    override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate> = flow {
+        emit(TerminalUpdate.Link(TerminalLink.Connected))
+        emit(TerminalUpdate.Output("\u001b[32m~/${directory.substringAfterLast('/')}\u001b[0m $ "))
+        input.collect { bytes -> emit(TerminalUpdate.Output(bytes.decodeToString().replace("\r", "\r\n$ "))) }
     }
 }

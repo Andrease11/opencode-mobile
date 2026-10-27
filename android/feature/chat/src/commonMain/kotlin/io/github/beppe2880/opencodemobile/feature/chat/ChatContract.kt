@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.McpServer
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
@@ -42,6 +43,18 @@ data class ChatState(
     /** Keys whose expansion differs from the default (see [isExpanded]). */
     val toggled: Set<String> = emptySet(),
     val expandToolsByDefault: Boolean = false,
+    /** Which running work stays open (settings); null when following is off. */
+    val live: LiveFollow? = LiveFollow(),
+    /** Lines of tool output before "Show more" (setting). */
+    val outputPreviewLines: Int = 12,
+    /** Steps followed live stay open after the answer (setting). */
+    val keepLiveStepsOpen: Boolean = false,
+    /** Transcript text size relative to the system one (setting). */
+    val chatTextScale: Float = 1f,
+    /** An opened tool group shows each tool's output (setting). */
+    val showToolDetails: Boolean = true,
+    /** Tool rows wrap long commands and paths (setting). */
+    val showFullCommands: Boolean = false,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
     /** The microphone button of the composer (setting). */
@@ -83,6 +96,7 @@ data class ChatState(
     val queued: List<QueuedPrompt> = emptyList(),
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
+    val mcps: McpPanel? = null,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -99,6 +113,13 @@ data class ChatState(
 }
 
 data class SessionPeek(val id: String, val title: String)
+
+data class McpPanel(
+    val servers: List<McpServer>? = null,
+    val loading: Boolean = true,
+    val error: UiText? = null,
+    val changing: Set<String> = emptySet(),
+)
 
 /** Changed files of [scope]; [files] is null until first loaded, and kept while it refreshes. */
 data class ChangesPanel(
@@ -145,6 +166,9 @@ sealed interface ChatEvent {
     /** Opens a subagent's child session. */
     data class OpenSession(val sessionId: String) : ChatEvent
 
+    /** Opens a file of the server read-only; [path] is absolute or relative to the session folder. */
+    data class OpenFile(val path: String) : ChatEvent
+
     /** Replaces this chat with a neighbor in the session list (swipe). */
     data class SwitchSession(val sessionId: String) : ChatEvent
 
@@ -190,6 +214,11 @@ sealed interface ChatEvent {
     data class Fork(val messageId: String) : ChatEvent
 
     data object OpenChanges : ChatEvent
+    data object OpenMcps : ChatEvent
+    data object CloseMcps : ChatEvent
+    data object RefreshMcps : ChatEvent
+    data class SetMcpConnected(val name: String, val connected: Boolean) : ChatEvent
+    data object OpenTerminal : ChatEvent
     data object CloseChanges : ChatEvent
 
     /** Shows another range in the open changes sheet, or reloads the current one. */
@@ -209,4 +238,6 @@ sealed interface ChatEffect {
     data object PromptSent : ChatEffect
     data class OpenSession(val sessionId: String) : ChatEffect
     data class SwitchSession(val sessionId: String) : ChatEffect
+    data class OpenTerminal(val directory: String) : ChatEffect
+    data class OpenFile(val directory: String, val path: String) : ChatEffect
 }

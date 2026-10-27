@@ -25,6 +25,9 @@ fun OpenCodeApp(
     modifier: Modifier = Modifier,
     openSessionId: String? = null,
     onSessionOpened: () -> Unit = {},
+    /** Opens the new session sheet over the session list (Android widget button). */
+    openNewSession: Boolean = false,
+    onNewSessionOpened: () -> Unit = {},
     onDarkThemeChange: (Boolean) -> Unit = {},
     overlay: @Composable (AppSettings) -> Unit = {},
 ) {
@@ -43,6 +46,8 @@ fun OpenCodeApp(
                     hasActiveServer = activeServer != null,
                     openSessionId = openSessionId,
                     onSessionOpened = onSessionOpened,
+                    openNewSession = openNewSession,
+                    onNewSessionOpened = onNewSessionOpened,
                 )
                 if (activeServer != null) overlay(appSettings)
             }

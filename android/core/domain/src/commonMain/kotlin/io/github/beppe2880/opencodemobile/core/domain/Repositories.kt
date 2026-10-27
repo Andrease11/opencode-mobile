@@ -125,11 +125,21 @@ interface DraftRepository {
 
 enum class PromptDelivery { Steer, Queue }
 
+/** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
+data class ShellOutput(val text: String, val cursor: Long)
+
 /** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
 data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
 
 /** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
 enum class ChangesScope { LastTurn, Session }
+
+interface McpRepository {
+    suspend fun list(directory: String): Result<List<McpServer>>
+
+    /** Changes the runtime connection in this project, not the persistent configuration. */
+    suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit>
+}
 
 interface ChatRepository {
     /**
@@ -181,6 +191,13 @@ interface ChatRepository {
      * transcript. Long commands keep running on the server after this returns.
      */
     suspend fun shell(sessionId: String, command: String): Result<Unit> = Result.success(Unit)
+
+    /**
+     * Output a shell command (for example a running `bash` tool) has written since byte
+     * [cursor]; the returned cursor is where the next read starts.
+     */
+    suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> =
+        Result.success(ShellOutput("", cursor))
 
     /** Prompts sent but not delivered yet, oldest first. */
     suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
@@ -251,10 +268,41 @@ interface CatalogRepository {
 
 enum class ThemeMode { System, Light, Dark }
 
+val OUTPUT_LINE_CHOICES = listOf(6, 12, 24, 50)
+val LIVE_INTERVAL_CHOICES = listOf(300L, 700L, 1_500L, 3_000L)
+val TEXT_SCALE_CHOICES = listOf(0.85f, 1f, 1.15f, 1.3f)
+
+/** Defaults for everything a user can change, keeping what is not a preference (seen intros, terminal keys). */
+fun AppSettings.reset(): AppSettings = AppSettings(notificationsIntroShown = notificationsIntroShown, terminalKeys = terminalKeys)
+
 data class AppSettings(
     val theme: ThemeMode = ThemeMode.System,
     val showReasoning: Boolean = true,
     val expandToolsByDefault: Boolean = false,
+    /** Running work stays open while the agent works; the kinds below choose which. */
+    val followRunningTools: Boolean = true,
+    /** With [followRunningTools]: thinking in progress. */
+    val liveThinking: Boolean = true,
+    /** With [followRunningTools]: shell commands, with their output as it arrives. */
+    val liveShell: Boolean = true,
+    /** With [followRunningTools]: file edits and writes, with their diff once applied. */
+    val liveEdits: Boolean = true,
+    /** With [followRunningTools]: reads and searches, with their result. */
+    val liveReads: Boolean = false,
+    /** With [followRunningTools]: every other tool (web, subagents, todos, MCP...). */
+    val liveOther: Boolean = false,
+    /** Lines of tool output shown before "Show more"; one of [OUTPUT_LINE_CHOICES]. */
+    val outputPreviewLines: Int = 12,
+    /** How often a running command's output is read, in milliseconds; one of [LIVE_INTERVAL_CHOICES]. */
+    val liveOutputIntervalMs: Long = 700,
+    /** The steps followed live stay open after the answer ends instead of folding back. */
+    val keepLiveStepsOpen: Boolean = false,
+    /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
+    val chatTextScale: Float = 1f,
+    /** Opening a tool group shows each tool's output or diff, not only its name. */
+    val showToolDetails: Boolean = true,
+    /** Long commands and paths in tool rows wrap instead of being cut to one line. */
+    val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
@@ -278,6 +326,13 @@ data class AppSettings(
     val notifyFinished: Boolean = true,
     /** The one-time explanation of notifications, shown once a server is connected, was answered. */
     val notificationsIntroShown: Boolean = false,
+    /**
+     * Rows of the key bar above the keyboard in the terminal, as key specs owned by the terminal
+     * screen; null for its default layout.
+     */
+    val terminalKeys: List<List<String>>? = null,
+    /** Opening the terminal also shows the on-screen keyboard. */
+    val terminalOpenKeyboard: Boolean = true,
 )
 
 interface SettingsRepository {

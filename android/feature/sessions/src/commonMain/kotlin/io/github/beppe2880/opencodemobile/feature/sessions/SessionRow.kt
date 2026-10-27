@@ -16,12 +16,11 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +45,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fa
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -62,13 +62,11 @@ internal fun SessionRow(
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
+    // Only a settled swipe asks for confirmation (onDismiss reacts to the settled value, so a
+    // drag crossing back does not cancel anything), then the row slides back: a cancelled
+    // delete leaves it in place and swipeable again.
     val dismissState = rememberSwipeToDismissBoxState()
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            currentOnDelete()
-            dismissState.reset()
-        }
-    }
+    val scope = rememberCoroutineScope()
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
     val runningLabel = stringResource(Res.string.sessions_running_a11y)
@@ -76,6 +74,10 @@ internal fun SessionRow(
         state = dismissState,
         enableDismissFromStartToEnd = false,
         modifier = modifier,
+        onDismiss = {
+            currentOnDelete()
+            scope.launch { dismissState.reset() }
+        },
         backgroundContent = {
             Box(
                 modifier = Modifier.fillMaxSize().background(c.danger.bg).padding(horizontal = OcSpacing.xl),

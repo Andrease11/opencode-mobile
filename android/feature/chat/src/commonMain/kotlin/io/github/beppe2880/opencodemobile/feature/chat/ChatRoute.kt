@@ -32,6 +32,10 @@ fun ChatRoute(
     onOpenSession: (String) -> Unit = {},
     /** Replaces this chat with another session of the list (swipe). */
     onSwitchSession: (String) -> Unit = {},
+    /** Opens a shell in the folder of the session. */
+    onOpenTerminal: (String) -> Unit = {},
+    /** Opens a file read-only: the session folder and the path, absolute or relative to it. */
+    onOpenFile: (directory: String, path: String) -> Unit = { _, _ -> },
 ) {
     val viewModel: ChatViewModel = koinViewModel(key = "chat-$sessionId") { parametersOf(sessionId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -75,10 +79,12 @@ fun ChatRoute(
             ChatEffect.NavigateBack -> onBack()
             ChatEffect.PromptSent -> {
                 dictation.cancel()
-                listState.scrollToItem(0)
+                listState.scrollToLatest()
             }
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)
             is ChatEffect.SwitchSession -> onSwitchSession(effect.sessionId)
+            is ChatEffect.OpenTerminal -> onOpenTerminal(effect.directory)
+            is ChatEffect.OpenFile -> onOpenFile(effect.directory, effect.path)
         }
     }
 
