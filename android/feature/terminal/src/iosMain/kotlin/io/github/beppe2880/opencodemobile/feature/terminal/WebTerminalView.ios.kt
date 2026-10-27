@@ -10,6 +10,7 @@ import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSURL
+import platform.GameController.GCKeyboard
 import platform.UIKit.UIColor
 import platform.UIKit.UIScrollViewContentInsetAdjustmentBehavior
 import platform.WebKit.WKNavigationAction
@@ -44,8 +45,9 @@ window.OcTerminal = (function () {
 """
 
 /**
- * A WKWebView that only shows the bundled page. iOS opens the keyboard only after a tap on
- * the terminal, so [openKeyboard] has no effect here (the setting is hidden on iOS).
+ * A WKWebView that only shows the bundled page. Focusing xterm.js opens the on-screen
+ * keyboard, so without [openKeyboard] the page is focused only by a tap, or right away when
+ * a hardware keyboard is connected.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -54,6 +56,7 @@ internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage
     UIKitView(
         factory = { terminal.create(page) },
         modifier = modifier,
+        update = { terminal.openKeyboard = openKeyboard },
         onRelease = { terminal.release() },
         properties = UIKitInteropProperties(
             // Touches go straight to xterm.js, which scrolls its history and selects text itself.
@@ -65,6 +68,7 @@ internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage
 
 @OptIn(ExperimentalForeignApi::class)
 private class IosTerminalView(private val surface: WebSurface) {
+    var openKeyboard = true
     private var webView: WKWebView? = null
     private var bridgePage: WebTerminalPage? = null
 
@@ -79,6 +83,7 @@ private class IosTerminalView(private val surface: WebSurface) {
         val view = WKWebView(frame = CGRectMake(0.0, 0.0, 0.0, 0.0), configuration = configuration)
         val calls = object : WebTerminalPage {
             override fun call(function: String, vararg arguments: String) {
+                if (function == "focus" && !openKeyboard && GCKeyboard.coalescedKeyboard == null) return
                 view.evaluateJavaScript("window.oc.$function(${arguments.joinToString(",")})", completionHandler = null)
             }
         }

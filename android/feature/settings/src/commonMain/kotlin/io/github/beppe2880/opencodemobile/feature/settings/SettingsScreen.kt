@@ -167,7 +167,6 @@ fun SettingsScreen(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
     showNotifications: Boolean = notificationsSupported,
-    showTerminal: Boolean = terminalKeyboardSupported,
 ) {
     val c = OcTheme.colors
     Scaffold(
@@ -205,8 +204,7 @@ fun SettingsScreen(
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
                 item(key = "live") { LiveActivitySection(state.settings, onEvent) }
                 if (showNotifications) item(key = "notifications") { NotificationsSection(state, onEvent) }
-                // The section holds only the keyboard switch.
-                if (showTerminal) item(key = "terminal") { TerminalSection(state.settings, onEvent) }
+                item(key = "terminal") { TerminalSection(state.settings, onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
