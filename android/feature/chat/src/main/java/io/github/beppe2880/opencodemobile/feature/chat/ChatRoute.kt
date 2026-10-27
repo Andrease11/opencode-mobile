@@ -92,7 +92,7 @@ fun ChatRoute(
             ChatEffect.NavigateBack -> onBack()
             ChatEffect.PromptSent -> {
                 dictation.cancel()
-                listState.scrollToItem(0)
+                listState.scrollToLatest()
             }
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)
             is ChatEffect.SwitchSession -> onSwitchSession(effect.sessionId)

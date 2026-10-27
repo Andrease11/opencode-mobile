@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Where the user left each chat, for as long as the app runs (one instance per app). The
- * anchor is the key of the first visible row (the newest one on screen, the list is reversed)
+ * anchor is the key of the first visible row (the oldest one on screen)
  * plus its pixel offset, so the place survives new messages arriving below it. No entry means
  * "at the bottom".
  */
