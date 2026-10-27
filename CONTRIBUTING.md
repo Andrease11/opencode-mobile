@@ -27,10 +27,15 @@ On an emulator the host's server is at `http://10.0.2.2:4096` and shows up under
 this network"; alternatively `adb reverse tcp:4096 tcp:4096` makes it reachable at
 `http://localhost:4096`. Pair with `opencode pair`.
 
+The iOS app (`iosApp/`) needs macOS with Xcode: open `iosApp/iosApp.xcodeproj` and run it on
+a simulator, or build it from the command line as described in
+[`android/AGENTS.md`](android/AGENTS.md#ios). Most code is shared in `android/`, so iOS
+compile errors also show up on Linux with `./gradlew compileKotlinIosSimulatorArm64`.
+
 Before opening a pull request, run what CI runs:
 
 ```bash
-(cd android && ./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug)
+(cd android && ./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug compileKotlinIosSimulatorArm64)
 (cd tools/api-gen && bun install && bun run check)   # only if you touched the API or the generator
 ```
 
