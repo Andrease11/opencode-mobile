@@ -130,6 +130,7 @@ zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" 
 
 # ---- Test ----
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 [plugins]

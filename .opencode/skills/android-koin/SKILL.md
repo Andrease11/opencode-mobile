@@ -13,8 +13,12 @@ during unrelated work.
 - `core/data/.../di/DataModule.kt` (`dataModule`) registers repositories, the
   network client cache, the shared event stream and the app-scoped
   `CoroutineScope`.
-- `app/.../di/AppModule.kt` (`appModule`) registers ViewModels.
-- `OpenCodeApplication` starts Koin with `dataModule + appModule`.
+- `shared/.../SharedModule.kt` (`sharedModule(appInfo)`) registers ViewModels for both
+  apps; `app/.../AppModule.kt` (`appModule`) includes it and adds Android-only
+  notifications. `dataModule` includes the platform bindings of `platformDataModule`
+  (`core/data/src/{android,ios}Main/.../di/`).
+- `OpenCodeApplication` starts Koin with `dataModules() + appModule`; on iOS
+  `MainViewController()` starts it once with `dataModule` and `sharedModule`.
 - Use `viewModelOf(::Type)` for ordinary constructor injection and
   `viewModel { params -> Type(params.get(), get()) }` for runtime parameters such
   as a session ID.

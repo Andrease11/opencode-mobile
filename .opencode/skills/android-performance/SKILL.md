@@ -34,6 +34,13 @@ Use `references/compose-diagnostics.md` for Compose-specific diagnosis and
   wrong phase, and cross-phase back-writing.
 - False stability annotations can produce stale UI.
 
+## Compose Multiplatform Resources
+
+`stringResource`/`Font` from Compose resources resolve synchronously on first
+composition; many distinct strings in a lazy list item can cost frame time. Measure
+(trace or macrobenchmark against the previous build) before restructuring; hoist
+repeated lookups out of list items only with evidence.
+
 ## Startup
 
 Inspect synchronous work in `Application`, Activity creation, Koin graph startup,
@@ -44,8 +51,8 @@ the initialized dependency and how failures/retries behave.
 ## R8 And Release
 
 - Inspect AGP version and current release configuration first.
-- This project currently has minification disabled; enabling it is a dedicated
-  release task, not cleanup.
+- Release builds use R8 (`isMinifyEnabled`, `isShrinkResources`); libraries ship
+  their own keep rules and `app/proguard-rules.pro` only fills gaps.
 - AGP 9.4.1 includes the standalone R8 analyzer task (added in AGP 9.3); verify
   its output against the release build before acting on it.
 - Remove or narrow keep rules only with release-build and runtime evidence.

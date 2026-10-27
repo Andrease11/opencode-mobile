@@ -19,8 +19,9 @@ kotlin {
             api(libs.kotlinx.coroutines.core)
             implementation(libs.atomicfu)
         }
-        getByName("androidHostTest").dependencies {
-            implementation(libs.junit)
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

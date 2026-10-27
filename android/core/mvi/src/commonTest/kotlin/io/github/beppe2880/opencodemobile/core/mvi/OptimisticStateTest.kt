@@ -1,7 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.mvi
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class OptimisticStateTest {
     private data class State(val items: List<String> = listOf("a", "b"), val title: String = "Old")

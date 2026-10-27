@@ -83,6 +83,16 @@ transport-specific decision.
 
 ## Local Stores
 
+- Settings and drafts use multiplatform-settings `Settings` (`SettingsStore`,
+  `DraftsStore` qualifiers): `SharedPreferencesSettings` over the existing `settings` and
+  `drafts` files on Android, `NSUserDefaultsSettings` suites on iOS. Saved servers use
+  `ServerStore` (EncryptedSharedPreferences / Keychain). Keep file names, keys and JSON
+  schemas unchanged: they are read by upgrading installs.
+- Room is Room KMP: DAOs are `suspend`, the database has `@ConstructedBy` with the
+  generated `expect object`, Android keeps the framework SQLite database
+  `message-cache.db`, iOS uses `BundledSQLiteDriver` in Caches. Catch
+  `androidx.sqlite.SQLiteException`. Do not adopt Room 3 during unrelated work.
+
 - Treat preference/file keys and serialized payloads as a persisted schema.
 - Define defaults, missing/corrupt-value behavior, version/migration needs, and
   whether each value may be backed up.

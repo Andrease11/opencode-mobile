@@ -24,8 +24,8 @@ kotlin {
             implementation(libs.jb.lifecycle.runtime.compose)
             api(libs.kotlinx.coroutines.core)
         }
-        getByName("androidHostTest").dependencies {
-            implementation(libs.junit)
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
         }
     }

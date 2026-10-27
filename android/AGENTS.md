@@ -50,9 +50,11 @@ Dependency direction: `app -> shared -> feature -> core:{ui,mvi,domain}`; `app -
 ## Multiplatform Layout
 
 - Sources live in `src/commonMain/kotlin`; platform code in `src/androidMain/kotlin` and
-  `src/iosMain/kotlin` (expect/actual or interfaces bound in Koin). Host unit tests live in
-  `src/androidHostTest/kotlin` and run on the JVM (`testAndroidHostTest`, also reachable as
-  `testDebugUnitTest`).
+  `src/iosMain/kotlin` (interfaces bound in Koin, or `expect`/`actual` for small helpers;
+  see the `kmp-platform-boundaries` skill). Pure-logic tests go in `src/commonTest/kotlin`
+  with `kotlin.test` and run on the JVM and the iOS simulator; tests needing JVM tooling
+  (MockWebServer, Robolectric, Room) live in `src/androidHostTest/kotlin`. Both run with
+  `testAndroidHostTest`, also reachable as `testDebugUnitTest`.
 - Keep `java.*`, `android.*`, OkHttp and Activity APIs out of `commonMain`. Use
   kotlinx-datetime, `kotlin.time.Clock`, `kotlin.uuid.Uuid`, atomicfu locks and Compose
   Multiplatform APIs instead.
