@@ -186,6 +186,25 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `MCP panel opened before the session directory is known loads once it is`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply {
+            uncached = true
+            loaded = CompletableDeferred()
+        }
+        val vm = vm(sessions)
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("/mcps"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertTrue(mcps.directories.isEmpty())
+        sessions.loaded!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(listOf("/repo"), mcps.directories)
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+        assertFalse(vm.state.value.mcps!!.loading)
+    }
+
+    @Test
     fun `opening MCPs from the menu keeps the unsent prompt and attachments`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -1045,8 +1064,13 @@ private class FakeSessions(
     override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
     var activeIds: Set<String> = emptySet()
     override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
-    override suspend fun get(sessionId: String) = Result.success(session)
-    override fun cached(sessionId: String) = titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
+    var uncached = false
+    var loaded: CompletableDeferred<Unit>? = null
+    override suspend fun get(sessionId: String): Result<Session> {
+        loaded?.await()
+        return Result.success(session)
+    }
+    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
     override suspend fun create(directory: String, agent: String?, model: ModelRef?) = Result.success(session)
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)

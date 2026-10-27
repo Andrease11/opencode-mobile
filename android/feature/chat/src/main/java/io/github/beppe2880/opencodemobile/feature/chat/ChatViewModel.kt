@@ -243,6 +243,8 @@ class ChatViewModel(
                 )
             }
             rebuild()
+            // `/mcps` can open the panel before the project directory is known.
+            if (currentState.mcps?.servers == null && mcpJob?.isActive != true) refreshMcps()
             loadCatalog(s.directory)
             prefetchNeighbors()
         }
