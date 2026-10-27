@@ -8,7 +8,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitorService
-import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import io.github.beppe2880.opencodemobile.widget.WidgetUpdater
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -29,7 +28,6 @@ val appModule = module {
             .map { it.isAtLeast(Lifecycle.State.STARTED) }
             .stateIn(get(AppScope), SharingStarted.Eagerly, false)
     }
-    single { WidgetLoader(get(), get()) }
     single { WidgetUpdater(androidContext(), get(), get(), get(AppVisible)) }
     single {
         SessionMonitor(

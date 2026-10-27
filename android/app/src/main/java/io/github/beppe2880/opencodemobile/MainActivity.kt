@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         readIntent(intent)
     }
 
-    /** The launcher activity is exported: accept only a well-formed session id. */
+    /** The launcher activity is exported: the session id is checked. */
     private fun readIntent(intent: Intent?) {
         intent ?: return
         if (intent.getBooleanExtra(EXTRA_NEW_SESSION, false)) {
@@ -70,13 +70,12 @@ class MainActivity : ComponentActivity() {
         }
         val id = intent.getStringExtra(EXTRA_SESSION_ID) ?: return
         intent.removeExtra(EXTRA_SESSION_ID)
-        if (SESSION_ID.matches(id)) sessionToOpen.value = id
+        if (isSessionId(id)) sessionToOpen.value = id
     }
 
     companion object {
         const val EXTRA_SESSION_ID = "io.github.beppe2880.opencodemobile.extra.SESSION_ID"
         const val EXTRA_NEW_SESSION = "io.github.beppe2880.opencodemobile.extra.NEW_SESSION"
-        private val SESSION_ID = Regex("ses_[A-Za-z0-9]{1,64}")
     }
 
     /** Holds the first frame (the system splash screen) until the saved servers are read. */

@@ -34,6 +34,21 @@
 		<string>ko</string>
 		<string>ar</string>
 	</array>
+	<!-- Shared with the widget extension, which reads the sessions the app writes there. -->
+	<key>OCAppGroup</key>
+	<string>$(APP_GROUP)</string>
+	<!-- Links from the home screen widget: opencodemobile://session/<id>, opencodemobile://new-session. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(BUNDLE_ID)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>opencodemobile</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageViewModel
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
+import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -27,4 +28,6 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { UsageViewModel(get(), get()) }
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
+    // Home screen widget: Glance on Android, WidgetKit on iOS.
+    single { WidgetLoader(get(), get()) }
 }

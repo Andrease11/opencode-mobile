@@ -40,6 +40,8 @@ Before opening a pull request, run what CI runs:
 ```
 
 For terminal WebView changes, also run `bun test tools/terminal-touch.test.ts` from the root.
+After changing the Android widget strings (`widget_*` in `android/app/src/main/res`), run
+`bun tools/ios-widget-strings.ts` to update the iOS widget's String Catalog.
 
 ## Code conventions
 

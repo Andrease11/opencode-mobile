@@ -39,6 +39,12 @@ agent's questions while you are away from the desk.
   notification. The app explains them and asks for permission after you connect; in Settings
   you choose which kinds you get (permission requests, questions, finished sessions) or turn
   them off.
+- **Terminal**: a shell on the server in the session's folder, with a key bar for Esc, Ctrl,
+  arrows and your own keys; it keeps running when you leave and picks up where it was.
+- **Read files** the agent touched, with syntax highlighting, line numbers and images.
+- **MCP servers**: see their status and connect or disconnect them for the project.
+- **Home screen widget**: running and recent sessions, one tap to open one or start a new
+  one.
 - **Voice input**: dictate prompts with the microphone in the message box, using the
   phone's speech recognition (can be turned off in Settings).
 - **Usage statistics**: cost, tokens and activity per day and per model, for today, the

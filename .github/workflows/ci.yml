@@ -88,6 +88,8 @@ jobs:
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - name: Terminal touch regression tests
         run: bun test tools/terminal-touch.test.ts
+      - name: Check the iOS widget strings match the Android ones
+        run: bun test tools/ios-widget-strings.test.ts
       - name: Check translation coverage and format arguments
         # Every language is required on the release pull request; elsewhere only English and Italian.
         env:

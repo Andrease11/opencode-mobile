@@ -27,6 +27,8 @@ Compose UI returned by `MainViewController()` in
 - Simulator builds are ad-hoc signed (`CODE_SIGN_IDENTITY[sdk=iphonesimulator*] =
   "-"`): an unsigned app cannot use the Keychain (`errSecMissingEntitlement`,
   -34018). Device builds need `TEAM_ID` in `iosApp/Configuration/Config.xcconfig`.
+- `MARKETING_VERSION` lives in `Config.xcconfig` and is bumped by release-please with
+  `version.txt`; do not set it in `project.pbxproj`.
 
 ## Compose On iOS
 
@@ -56,7 +58,24 @@ Compose UI returned by `MainViewController()` in
 | HTTP | Ktor Darwin engine; it ignores `connectTimeoutMillis`, only request and socket timeouts apply |
 | Clipboard | `UIPasteboard` (iOS asks before the app pastes) |
 | QR, dictation, picker | AVFoundation, Speech + AVAudioEngine, PHPicker / document picker |
+| Terminal | xterm.js page from Compose resources in a `WKWebView` (`UIKitView`, non-cooperative touches); bridge over `WKScriptMessageHandler`, font injected as a user script |
+| Links | `opencodemobile://session/<id>`, `opencodemobile://new-session` (`AppLinks.kt`, `.onOpenURL` in `iOSApp.swift`) |
+| Home screen widget | WidgetKit extension `iosApp/SessionsWidget` (SwiftUI); the app writes a JSON snapshot to the App Group (`WidgetSnapshots.kt`) and calls `WidgetCenter.reloadAllTimelines` |
 | Notifications | not supported; settings section hidden |
+
+## Widget Extension
+
+- The extension cannot reach the server or the Keychain: it only reads
+  `widget.snapshot` from the App Group defaults (`OCAppGroup` in both Info.plists, from
+  `APP_GROUP` in `Config.xcconfig`). Change the JSON contract in `WidgetSnapshots.kt` and
+  `SessionsWidget.swift` together.
+- The snapshot is written at launch and on `widgetRefreshes` (sessions start, end or are
+  deleted, the server changes, the app goes to the background).
+- Strings come from the Android widget strings: `bun tools/ios-widget-strings.ts`
+  regenerates `Localizable.xcstrings`; `tools/ios-widget-strings.test.ts` fails when stale.
+- Device builds need the App Group enabled for `TEAM_ID`; the simulator needs nothing.
+- `iosApp.xcodeproj` is edited by hand (no generator): new files need a file reference, a
+  group entry and a build phase entry in `project.pbxproj`.
 
 ## Build And Verify On The Mac
 

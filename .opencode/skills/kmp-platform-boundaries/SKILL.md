@@ -17,7 +17,7 @@ platform-specific, and it stays small, named and replaceable.
 | iOS-only APIs (UIKit, AVFoundation, Speech, Keychain, Network, posix) | `src/iosMain` of the same module |
 | App entry, notifications service, manifest | `:app` (Android only) |
 | Navigation, app shell, ViewModel bindings, iOS entry | `:shared` (`MainViewController()` in `iosMain`) |
-| Xcode project, Info.plist, Swift host | `iosApp/` |
+| Xcode project, Info.plist, Swift host, WidgetKit extension | `iosApp/` |
 
 - `commonMain` never imports `java.*`, `android.*`, `androidx.activity`,
   `androidx.core`, OkHttp, or Okio. CI compiles iOS klibs on Linux and fails on
