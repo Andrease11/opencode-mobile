@@ -67,7 +67,7 @@ from the Ktor-based `multiplatform` library) -> `android/core/api/src/commonMain
 
 ## Workflows
 
-- Use `android-master` as the entry skill for Android work and `product-ux-orchestrator` for
+- Use `kmp-master` as the entry skill for Android and iOS work and `product-ux-orchestrator` for
   user-flow planning or audits.
 - Commits and pull request titles follow Conventional Commits:
   `type(scope): Description`, see `CONTRIBUTING.md`.

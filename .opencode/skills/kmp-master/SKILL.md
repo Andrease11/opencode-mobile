@@ -1,9 +1,9 @@
 ---
-name: android-master
+name: kmp-master
 description: Entry skill for any task under opencode-mobile/android or iosApp (Kotlin Multiplatform app for Android and iOS); classifies the concern, preserves the module architecture, the common/platform split and the generated OpenCode API boundary, and loads only the specialist skills needed.
 ---
 
-# Android Master
+# KMP Master
 
 Use this as the router for work in `android/` (all Kotlin Multiplatform modules) and
 `iosApp/`. Read `android/AGENTS.md`, the files being changed, and one comparable

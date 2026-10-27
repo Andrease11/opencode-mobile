@@ -9,7 +9,7 @@ library (`com.android.kotlin.multiplatform.library`); the UI uses Compose Multip
 Material 3 themed with OpenCode V2 tokens; state uses MVI; Koin provides dependency
 injection; the OpenCode HTTP client is generated (Ktor + kotlinx.serialization).
 
-Use `android-master` as the entry skill. It routes to the smallest relevant specialist
+Use `kmp-master` as the entry skill. It routes to the smallest relevant specialist
 skill set. Read the files you are changing and follow a nearby feature before introducing
 a new pattern.
 
