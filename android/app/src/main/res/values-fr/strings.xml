@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_select_session">Sélectionnez une session</string>
-    <string name="app_select_session_message">Choisissez une session dans la liste ou démarrez-en une nouvelle.</string>
 
     <string name="notif_channel_running">Sessions en cours</string>
     <string name="notif_channel_attention">En attente de votre réponse</string>

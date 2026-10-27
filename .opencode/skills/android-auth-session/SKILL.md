@@ -44,7 +44,7 @@ The app has no user accounts. A "session" with a server is a saved
   codes or full pairing links. Show only scheme/host/port.
 
 Load `android-security` for storage, clipboard and camera rules and
-`android-opencode-api` for interceptor changes.
+`android-opencode-api` for HTTP client changes.
 
 ## Verification
 

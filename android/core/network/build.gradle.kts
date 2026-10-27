@@ -1,29 +1,44 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "io.github.beppe2880.opencodemobile.core.network"
-    compileSdk = 37
-    defaultConfig {
+kotlin {
+    android {
+        namespace = "io.github.beppe2880.opencodemobile.core.network"
+        compileSdk = 37
         minSdk = 26
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
+        withHostTest {}
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
+    iosArm64()
+    iosSimulatorArm64()
 
-dependencies {
-    api(project(":core:domain"))
-    api(project(":core:api"))
-    api(libs.okhttp)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.okhttp.logging)
-    api(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.coroutines.core)
-    testImplementation(project(":core:testing"))
-    testImplementation(libs.okhttp.mockwebserver)
+    compilerOptions {
+        optIn.add("kotlin.io.encoding.ExperimentalEncodingApi")
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            api(project(":core:domain"))
+            api(project(":core:api"))
+            api(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            api(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.coroutines.core)
+        }
+        androidMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(project(":core:testing"))
+            implementation(libs.okhttp.mockwebserver)
+        }
+    }
 }

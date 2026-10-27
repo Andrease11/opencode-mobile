@@ -25,6 +25,6 @@ AI-generated descriptions may be closed. -->
 
 ### Checklist
 
-- [ ] `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug` passes (in `android/`; `spotlessApply` fixes formatting)
+- [ ] `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug compileKotlinIosSimulatorArm64` passes (in `android/`; `spotlessApply` fixes formatting)
 - [ ] New user-visible strings are translated in all supported languages (`bun test tools/locales.test.ts`)
 - [ ] No unrelated changes, no edits to the generated `android/core/api`

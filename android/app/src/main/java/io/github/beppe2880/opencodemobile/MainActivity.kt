@@ -9,10 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -21,9 +17,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
-import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
@@ -46,37 +39,20 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) readIntent(intent)
         keepSplashUntilLoaded()
         setContent {
-            val appSettings by settings.settings.collectAsStateWithLifecycle()
-            val loaded by servers.loaded.collectAsStateWithLifecycle()
-            val activeServer by servers.activeServer.collectAsStateWithLifecycle()
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val newSession by newSessionRequested.collectAsStateWithLifecycle()
-            val dark = appSettings.theme.isDark()
-            DisposableEffect(dark) {
-                val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
-                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
-                onDispose { }
-            }
-            OcTheme(darkTheme = dark) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(OcTheme.colors.bgBase)
-                        .semantics { testTagsAsResourceId = true },
-                ) {
-                    // Choosing the start screen needs the saved servers, read off the main thread.
-                    if (loaded) {
-                        AppNavHost(
-                            hasActiveServer = activeServer != null,
-                            openSessionId = openSession,
-                            onSessionOpened = { sessionToOpen.value = null },
-                            openNewSession = newSession,
-                            onNewSessionOpened = { newSessionRequested.value = false },
-                        )
-                        if (activeServer != null && !appSettings.notificationsIntroShown) NotificationsIntro(settings)
-                    }
-                }
-            }
+            OpenCodeApp(
+                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                openSessionId = openSession,
+                onSessionOpened = { sessionToOpen.value = null },
+                openNewSession = newSession,
+                onNewSessionOpened = { newSessionRequested.value = false },
+                onDarkThemeChange = { dark ->
+                    val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
+                    enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                },
+                overlay = { appSettings -> if (!appSettings.notificationsIntroShown) NotificationsIntro(settings) },
+            )
         }
     }
 
@@ -85,7 +61,7 @@ class MainActivity : ComponentActivity() {
         readIntent(intent)
     }
 
-    /** The launcher activity is exported: accept only a well-formed session id. */
+    /** The launcher activity is exported: the session id is checked. */
     private fun readIntent(intent: Intent?) {
         intent ?: return
         if (intent.getBooleanExtra(EXTRA_NEW_SESSION, false)) {
@@ -94,13 +70,12 @@ class MainActivity : ComponentActivity() {
         }
         val id = intent.getStringExtra(EXTRA_SESSION_ID) ?: return
         intent.removeExtra(EXTRA_SESSION_ID)
-        if (SESSION_ID.matches(id)) sessionToOpen.value = id
+        if (isSessionId(id)) sessionToOpen.value = id
     }
 
     companion object {
         const val EXTRA_SESSION_ID = "io.github.beppe2880.opencodemobile.extra.SESSION_ID"
         const val EXTRA_NEW_SESSION = "io.github.beppe2880.opencodemobile.extra.NEW_SESSION"
-        private val SESSION_ID = Regex("ses_[A-Za-z0-9]{1,64}")
     }
 
     /** Holds the first frame (the system splash screen) until the saved servers are read. */

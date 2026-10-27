@@ -36,7 +36,8 @@ Treat every scanned QR, pasted link, intent and server payload as untrusted.
 ## Credentials And Sensitive Data
 
 - Server passwords and pairing tokens live only in `ServerRepository`'s encrypted
-  storage (`androidx.security:security-crypto`). Do not migrate it during
+  storage (`androidx.security:security-crypto` on Android, the Keychain on iOS via
+  `KeychainServerStore`). Do not migrate it during
   unrelated work; a migration must define behavior for existing ciphertext,
   invalid keys and backup.
 - `allowBackup` is false; keep secrets out of backups.
@@ -44,6 +45,10 @@ Treat every scanned QR, pasted link, intent and server payload as untrusted.
   transcripts, tool output or file contents. HTTP logging is debug-only with
   headers redacted and no bodies.
 - Clipboard: read only on explicit user action ("Paste link"); never copy secrets.
+  iOS asks the user before every programmatic paste.
+- iOS mirrors the Android policy in `iosApp/iosApp/Info.plist`: ATS allows plain
+  HTTP (self-hosted servers), and every permission has a usage description. Add a
+  new iOS permission only with its description string (`kmp-ios`).
 - Never put credentials in repository files, Maestro flows, screenshots,
   process-visible commands or final responses.
 

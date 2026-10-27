@@ -94,7 +94,7 @@ export function prepareSpec(spec: any): string {
     }
   })
 
-  // 4. Retrofit cannot encode deepObject query objects; expose `location[directory]` as a
+  // 4. The generated client cannot encode deepObject query objects; expose `location[directory]` as a
   //    scalar parameter.
   for (const item of Object.values<any>(spec.paths)) {
     for (const operation of Object.values<any>(item)) {

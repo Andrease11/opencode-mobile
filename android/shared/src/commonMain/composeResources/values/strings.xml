@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_select_session">Select a session</string>
+    <string name="app_select_session_message">Pick a session from the list or start a new one.</string>
+</resources>

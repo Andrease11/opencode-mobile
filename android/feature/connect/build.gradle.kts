@@ -1,43 +1,57 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.compose)
 }
 
-android {
-    namespace = "io.github.beppe2880.opencodemobile.feature.connect"
-    compileSdk = 37
-    defaultConfig {
+kotlin {
+    android {
+        namespace = "io.github.beppe2880.opencodemobile.feature.connect"
+        compileSdk = 37
         minSdk = 26
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
+        androidResources { enable = true }
+        withHostTest {}
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:ui"))
+            implementation(project(":core:mvi"))
+            implementation(project(":core:domain"))
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.jb.lifecycle.runtime.compose)
+            implementation(libs.jb.lifecycle.viewmodel.compose)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.zxing.core)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(project(":core:testing"))
+            implementation(libs.junit)
+            implementation(libs.kotlinx.coroutines.test)
+        }
     }
-    buildFeatures { compose = true }
 }
 
-dependencies {
-    implementation(project(":core:ui"))
-    implementation(project(":core:mvi"))
-    implementation(project(":core:domain"))
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.koin.androidx.compose)
-    implementation(libs.androidx.activity.compose)
-
-    testImplementation(project(":core:testing"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
-    implementation(libs.zxing.core)
+compose.resources {
+    packageOfResClass = "io.github.beppe2880.opencodemobile.feature.connect.resources"
+    generateResClass = always
 }

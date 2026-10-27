@@ -55,7 +55,7 @@ the plan so later verification uses the same criterion.
   is in scope.
 - Load `ux-implementation-review` during delivery and before completion.
 
-For implementation, also load the owning project skills: `android-master` and its
+For implementation, also load the owning project skills: `kmp-master` and its
 specialists for `android/`. The OpenCode server is external; flows that need a
 server change are out of scope and must be reported as constraints.
 

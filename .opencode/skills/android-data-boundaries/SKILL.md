@@ -12,7 +12,7 @@ preserving cancellation and actionable failures.
 ## Repository Contracts
 
 - Use `suspend` for one-shot work and cold `Flow` for streams.
-- Return `core:domain` models rather than generated API models, Retrofit
+- Return `core:domain` models rather than generated API models, Ktor
   responses, cursors, Android controllers, or mutable storage objects.
 - Choose one failure contract per cohesive API: typed result, nullable absence,
   or exception. Do not mix meanings for convenience.
@@ -82,6 +82,16 @@ transport-specific decision.
   fields (`Form.reply`), with `when` conditions evaluated in the domain.
 
 ## Local Stores
+
+- Settings and drafts use multiplatform-settings `Settings` (`SettingsStore`,
+  `DraftsStore` qualifiers): `SharedPreferencesSettings` over the existing `settings` and
+  `drafts` files on Android, `NSUserDefaultsSettings` suites on iOS. Saved servers use
+  `ServerStore` (EncryptedSharedPreferences / Keychain). Keep file names, keys and JSON
+  schemas unchanged: they are read by upgrading installs.
+- Room is Room KMP: DAOs are `suspend`, the database has `@ConstructedBy` with the
+  generated `expect object`, Android keeps the framework SQLite database
+  `message-cache.db`, iOS uses `BundledSQLiteDriver` in Caches. Catch
+  `androidx.sqlite.SQLiteException`. Do not adopt Room 3 during unrelated work.
 
 - Treat preference/file keys and serialized payloads as a persisted schema.
 - Define defaults, missing/corrupt-value behavior, version/migration needs, and

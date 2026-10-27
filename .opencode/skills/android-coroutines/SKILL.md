@@ -35,6 +35,11 @@ Never use `GlobalScope`. Never create a new scope per call.
   logging other failures.
 - Do not use `runCatching` around suspend work unless cancellation is explicitly
   preserved.
+- Callbacks from HTTP engines or platform APIs may run in another coroutine or
+  thread: bridge them with `channelFlow { send() }` or `callbackFlow`, never
+  `flow { emit() }` (Ktor's Darwin engine runs `execute {}` in another coroutine).
+- In common code import `kotlinx.coroutines.IO` for `Dispatchers.IO`; Objective-C
+  callbacks hop to the main queue before touching UI state.
 - Catch at the layer that can add meaning: retry, map to a domain result, update
   UI state, or log with useful non-sensitive context.
 - Avoid silently converting unexpected failures to `null` or an empty list.

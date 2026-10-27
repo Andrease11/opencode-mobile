@@ -45,6 +45,11 @@ disposable scratch directory with a cheap model (for example
 If verification is impossible, name the blocker and separate verified facts from
 assumptions.
 
+## iOS
+
+Shared UI or iOS-specific changes are also verified on the iOS simulator on the Mac;
+follow `kmp-ios` (build, install, DeviceKit automation, crash reports).
+
 ## Final Evidence
 
 Report the exact checks, emulator serial, server version, screen, interaction,

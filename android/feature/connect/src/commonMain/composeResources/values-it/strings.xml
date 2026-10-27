@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connect_title">Connettiti a OpenCode</string>
+    <string name="connect_subtitle">Abbina questo telefono a un server OpenCode in esecuzione sul tuo computer per seguire e guidare le tue sessioni di coding.</string>
+    <string name="connect_add_title">Aggiungi server</string>
+    <string name="connect_scan">Scansiona codice QR</string>
+    <string name="connect_paste">Incolla link</string>
+    <string name="connect_manual">Oppure connettiti manualmente</string>
+    <string name="connect_url_label">URL del server</string>
+    <string name="connect_url_placeholder">http://192.168.1.10:4096</string>
+    <string name="connect_method_code">Codice di abbinamento</string>
+    <string name="connect_method_password">Password</string>
+    <string name="connect_code_label">Codice di abbinamento</string>
+    <string name="connect_password_label">Password del server</string>
+    <string name="connect_test">Prova connessione</string>
+    <string name="connect_submit">Connetti</string>
+    <string name="connect_probe_ok">Raggiungibile · OpenCode %1$s</string>
+    <string name="connect_probe_needs_pairing">Server raggiungibile. Il codice di abbinamento autenticherà questo dispositivo.</string>
+    <string name="connect_hint_title">Ottieni un QR di abbinamento</string>
+    <string name="connect_hint_body">Sul computer dove gira OpenCode esegui %1$s e scansiona il QR che stampa. I codici scadono dopo pochi minuti.</string>
+    <string name="connect_saved_servers">Server salvati</string>
+    <string name="connect_discovered_title">Trovati in questa rete</string>
+    <string name="connect_discovering">Cerco server OpenCode in questa rete…</string>
+    <string name="connect_discovered_hint">Tocca e inserisci un codice di pairing o la password</string>
+    <string name="connect_discover_again">Cerca di nuovo nella rete</string>
+    <string name="connect_active">Attivo</string>
+    <string name="connect_error_url_required">Inserisci l'URL del server</string>
+    <string name="connect_error_url_invalid">Questo non è un URL di server valido</string>
+    <string name="connect_error_code_required">Inserisci il codice di abbinamento</string>
+    <string name="connect_error_password_required">Inserisci la password del server</string>
+    <string name="connect_error_no_reachable_url">Nessuno degli indirizzi del server nel QR risponde da questo telefono. Controlla che il telefono sia sulla stessa rete o VPN, oppure esegui opencode pair --url con un indirizzo raggiungibile.</string>
+    <string name="connect_paste_invalid">Gli appunti non contengono un link OpenCode</string>
+    <string name="connect_scan_invalid">Questo QR non è un link di abbinamento OpenCode</string>
+    <string name="connect_scanner_title">Scansiona il QR di abbinamento</string>
+    <string name="connect_scanner_hint">Inquadra il codice QR mostrato da opencode pair</string>
+    <string name="connect_camera_rationale_title">Serve l'accesso alla fotocamera</string>
+    <string name="connect_camera_rationale">OpenCode usa la fotocamera solo per leggere il QR di abbinamento. Nulla viene registrato o salvato.</string>
+    <string name="connect_camera_grant">Consenti fotocamera</string>
+    <string name="connect_camera_denied">Permesso fotocamera negato. Attivalo nelle impostazioni di sistema oppure incolla il link.</string>
+    <string name="connect_open_settings">Apri impostazioni</string>
+    <string name="connect_camera_unavailable">La fotocamera non è disponibile su questo dispositivo.</string>
+    <string name="connect_warning_public_http">Questo indirizzo sembra pubblico e usa HTTP senza cifratura: la password viaggerebbe in chiaro su internet. Meglio la rete locale, una VPN o HTTPS.</string>
+</resources>

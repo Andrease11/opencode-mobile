@@ -1,14 +1,15 @@
-# Android App Guidance
+# Android and iOS App Guidance
 
 ## Scope
 
-`android/` is a multi-module Android application built with Gradle 9.4.1, AGP 9.4.1
-(built-in Kotlin), Kotlin 2.4.21, Java 11, compile SDK 37, target SDK 36 and min SDK 26. The UI
-uses Jetpack Compose and Material 3 themed with OpenCode V2 tokens; state uses MVI; Koin
-provides dependency injection; the OpenCode HTTP client is generated (Retrofit +
-kotlinx.serialization).
+`android/` is the Gradle build of the Android and iOS apps: Gradle 9.8.1, AGP 9.4.1, Kotlin
+2.4.21 Multiplatform, Java 11, compile SDK 37, target SDK 36, min SDK 26, iOS 15+ (`iosArm64`,
+`iosSimulatorArm64`). Every module except `:app` and `:core:testing` is a Kotlin Multiplatform
+library (`com.android.kotlin.multiplatform.library`); the UI uses Compose Multiplatform and
+Material 3 themed with OpenCode V2 tokens; state uses MVI; Koin provides dependency
+injection; the OpenCode HTTP client is generated (Ktor + kotlinx.serialization).
 
-Use `android-master` as the entry skill. It routes to the smallest relevant specialist
+Use `kmp-master` as the entry skill. It routes to the smallest relevant specialist
 skill set. Read the files you are changing and follow a nearby feature before introducing
 a new pattern.
 
@@ -28,24 +29,41 @@ repository boundaries.
 
 | Module | Responsibility |
 |---|---|
-| `:app` | `OpenCodeApplication` (starts Koin), `MainActivity`, root navigation, `appModule` (ViewModels), optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver), home screen widget (`widget/`, Glance) |
+| `:app` | Android only: `OpenCodeApplication` (starts Koin), `MainActivity`, `appModule`, optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver), home screen widget (`widget/`, Glance) |
+| `:shared` | Shared by both apps: `OpenCodeApp` shell, root navigation (`AppNavHost`), `sharedModule` (ViewModels), widget model and loader (`widget/`); iOS entry point `MainViewController()`, `opencodemobile://` links and the widget snapshot for WidgetKit, in the `Shared` framework |
 | `:feature:connect` | QR scan, paste link, manual URL + password/code, saved servers |
 | `:feature:sessions` | Session list, search, project filter, create/rename/delete |
 | `:feature:chat` | Live transcript, composer, agent/model pickers, permissions, interrupt |
 | `:feature:settings` | Servers, theme, display preferences, about |
-| `:feature:terminal` | Server shell over the PTY WebSocket (xterm.js in a WebView), configurable key bar |
+| `:feature:terminal` | Server shell over the PTY WebSocket (xterm.js from `composeResources/files/terminal` in a WebView on Android, a WKWebView on iOS), configurable key bar |
 | `:feature:files` | Read-only file viewer (`/api/fs/read`): highlighted text with line numbers, images |
 | `:core:ui` | `OcTheme` tokens, typography (Inter, IBM Plex Mono), `Oc*` components, Markdown |
 | `:core:mvi` | `BaseViewModel`, `CollectEffect`, `OptimisticState` |
 | `:core:domain` | UI-facing models, repository interfaces, `TranscriptReducer` |
-| `:core:data` | Repository implementations, encrypted server store, shared event stream, `dataModule` |
-| `:core:network` | OkHttp/Retrofit client, Basic auth, SSE reader, error mapping, generated-to-domain mappers |
+| `:core:data` | Repository implementations, server store (EncryptedSharedPreferences / iOS Keychain), Room cache, shared event stream, `dataModule` + `platformDataModule` |
+| `:core:network` | Ktor client (OkHttp engine on Android, Darwin on iOS), Basic auth, SSE reader, error mapping, generated-to-domain mappers |
 | `:core:api` | Generated OpenCode client. Never edit; run `bun run generate` in `../tools/api-gen` |
 | `:core:testing` | `MainDispatcherRule` and shared test support |
 
-Dependency direction: `app -> feature -> core:{ui,mvi,domain}`; `app -> core:data ->
-core:network -> core:api`. Features never depend on `:app`, other features,
-`core:network` or `core:api`.
+Dependency direction: `app -> shared -> feature -> core:{ui,mvi,domain}`; `app -> core:data
+-> core:network -> core:api` (on iOS `shared` links `core:data`). Features never depend on
+`:app`, `:shared`, other features, `core:network` or `core:api`.
+
+## Multiplatform Layout
+
+- Sources live in `src/commonMain/kotlin`; platform code in `src/androidMain/kotlin` and
+  `src/iosMain/kotlin` (interfaces bound in Koin, or `expect`/`actual` for small helpers;
+  see the `kmp-platform-boundaries` skill). Pure-logic tests go in `src/commonTest/kotlin`
+  with `kotlin.test` and run on the JVM and the iOS simulator; tests needing JVM tooling
+  (MockWebServer, Robolectric, Room) live in `src/androidHostTest/kotlin`. Both run with
+  `testAndroidHostTest`, also reachable as `testDebugUnitTest`.
+- Keep `java.*`, `android.*`, OkHttp and Activity APIs out of `commonMain`. Use
+  kotlinx-datetime, `kotlin.time.Clock`, `kotlin.uuid.Uuid`, atomicfu locks and Compose
+  Multiplatform APIs instead.
+- Android-only features stay in `androidMain` or `:app`; on iOS they are hidden
+  (`notificationsSupported`) rather than faked. The home screen widget exists on both: Glance
+  in `:app`, a WidgetKit extension in `iosApp/SessionsWidget` fed by the app (see the
+  `kmp-ios` skill).
 
 ## Compose And MVI
 
@@ -61,10 +79,12 @@ core:network -> core:api`. Features never depend on `:app`, other features,
 - Use stable keys in lazy lists; keep existing content during refresh.
 - A nested `Scaffold` sets `contentWindowInsets = WindowInsets(0)` when a parent already
   handles system insets. Keep IME padding at the lowest container that must move.
-- Strings live in resources with English defaults and translations for Italian, Spanish,
-  French, German, Brazilian Portuguese, Russian, Simplified Chinese, Japanese, Korean and
-  Arabic. Keep format arguments and locale-specific plurals intact; from the repository
-  root, `bun test tools/locales.test.ts` checks translation coverage.
+- Strings live in Compose Multiplatform resources (`src/commonMain/composeResources/values*`,
+  accessed through each module's generated `Res`) with English defaults and translations for
+  Italian, Spanish, French, German, Brazilian Portuguese, Russian, Simplified Chinese,
+  Japanese, Korean and Arabic. Placeholders are positional only (`%1$s`, `%2$d`); write `'`,
+  `"` and `%` unescaped. `:app` keeps Android resources for notifications. From the
+  repository root, `bun test tools/locales.test.ts` checks translation coverage.
 
 ## Data And API
 
@@ -89,8 +109,24 @@ ANDROID_SERIAL=<serial> ./gradlew :app:installDebug
 ./gradlew spotlessApply   # ktlint formatting, rules in .editorconfig; core/api is excluded
 ```
 
-Before finishing: `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug` (what CI
-runs), plus `bun run check` in `../tools/api-gen` when the API changed.
+Before finishing: `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug`
+and `./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64` (what CI runs; iOS klibs
+compile on Linux too), plus `bun run check` in `../tools/api-gen` when the API changed.
+
+### iOS
+
+Linking the `Shared` framework and building `../iosApp` need macOS with Xcode. From
+`../iosApp`:
+
+```bash
+xcodebuild -project iosApp.xcodeproj -target iosApp -configuration Debug -sdk iphonesimulator \
+  -arch arm64 CODE_SIGNING_ALLOWED=NO build
+xcrun simctl install booted build/Debug-iphonesimulator/OpenCodeMobile.app
+xcrun simctl launch booted io.github.beppe2880.opencodemobile
+```
+
+The Xcode build phase runs `./gradlew :shared:embedAndSignAppleFrameworkForXcode` (needs
+`JAVA_HOME`). Set `TEAM_ID` in `../iosApp/Configuration/Config.xcconfig` to sign for a device.
 
 After every UI or behavior change, install the debug build (`io.github.beppe2880.opencodemobile.debug`)
 on a running emulator and inspect the changed screen and Logcat. `adb reverse tcp:4096

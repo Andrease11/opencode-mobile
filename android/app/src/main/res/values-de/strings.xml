@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_select_session">Wähle eine Sitzung</string>
-    <string name="app_select_session_message">Wähle eine Sitzung aus der Liste oder starte eine neue.</string>
 
     <string name="notif_channel_running">Laufende Sitzungen</string>
     <string name="notif_channel_attention">Wartet auf dich</string>

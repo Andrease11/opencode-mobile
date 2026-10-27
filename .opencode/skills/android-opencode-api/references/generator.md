@@ -25,8 +25,15 @@
    - Flattens deepObject query objects to `location[directory]` scalars.
    - Keeps only `KEEP_TAGS` operations and reachable schemas.
 3. openapi-generator flags that matter:
-   - `library=jvm-retrofit2` + `generateOneOfAnyOfWrappers=true`: only this
-     combination generates kotlinx union serializers.
+   - Two runs with the same spec and flags. Models come from `library=jvm-retrofit2` +
+     `generateOneOfAnyOfWrappers=true`: only this combination generates sealed kotlinx
+     union serializers (the `multiplatform` library flattens unions into
+     `actualInstance: Any?` and duplicates `@Serializable`). APIs, `auth/` and
+     `infrastructure/` come from `library=multiplatform` (Ktor). Model names match, so the
+     two halves compile together in `commonMain`.
+   - `@JvmInline` gets an explicit `kotlin.jvm.JvmInline` import: jvm-retrofit2 relies on
+     the implicit JVM import, which common code lacks.
+   - `dateLibrary=string`: the multiplatform library rejects java.time.
    - `enumPropertyNaming=UPPERCASE`: an enum constant named `context` breaks
      Kotlin 2.2 parsing (context parameters).
    - Type mappings: `integer=Long` (millisecond timestamps), `number=Double`,

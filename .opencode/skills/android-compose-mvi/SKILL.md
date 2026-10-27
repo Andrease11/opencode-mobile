@@ -33,6 +33,13 @@ SessionsScreen(state = state, onEvent = viewModel::onEvent)
 Do not pass ViewModels, repositories, network clients, NavController, or Koin
 through the rendering tree.
 
+Screens are Compose Multiplatform code in `commonMain`: `koinViewModel()` comes from
+`org.koin.compose.viewmodel`, `collectAsStateWithLifecycle`/`LocalLifecycleOwner` from
+`androidx.lifecycle.compose`, back handling from `OcBackHandler`, clipboard from
+`rememberTextClipboard()`. `LocalContext`, Activity result launchers and other
+platform APIs stay behind `expect` composables or interfaces
+(`kmp-platform-boundaries`).
+
 ## MVI Contract
 
 - Define `Event`, immutable `State`, and one-shot `Effect` types.

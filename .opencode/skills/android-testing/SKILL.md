@@ -1,6 +1,6 @@
 ---
 name: android-testing
-description: Use when adding or reviewing opencode-mobile unit tests, MVI ViewModel tests, repository fakes, recorded API fixtures, SSE/transcript tests, coroutine/Flow tests, Compose behavior tests, or test infrastructure.
+description: Use when adding or reviewing opencode-mobile unit tests (commonTest with kotlin.test or JVM androidHostTest), MVI ViewModel tests, repository fakes, recorded API fixtures, SSE/transcript tests, coroutine/Flow tests, Compose behavior tests, or test infrastructure.
 ---
 
 # Android Testing
@@ -8,13 +8,23 @@ description: Use when adding or reviewing opencode-mobile unit tests, MVI ViewMo
 Use the narrowest deterministic test that proves the behavior. Unit and Compose
 tests cover logic and UI contracts; Maestro covers a few complete journeys.
 
-## Existing Stack
+## Where Tests Live
 
-- JUnit 4, `kotlinx-coroutines-test`, `MainDispatcherRule` from `core:testing`.
-- OkHttp `MockWebServer` for transport tests in `core:network`.
-- Recorded, sanitized server fixtures (JSON responses and an `.sse` event log)
-  under `src/test/resources` of `core:network`/`core:data`.
-- Compose UI test APIs for instrumented tests; Maestro for black-box flows.
+- **`src/commonTest`** with `kotlin.test` and `kotlinx-coroutines-test` is the default
+  for pure logic (reducers, mappers, parsers, formatting, ViewModels with fakes). It
+  runs on the JVM with the host tests and on iOS with
+  `./gradlew :<module>:iosSimulatorArm64Test` (Mac only). `core:domain` and `core:mvi`
+  already test there; add `commonTest.dependencies { implementation(libs.kotlin.test) }`
+  to a module the first time.
+- **`src/androidHostTest`** (JVM, JUnit 4) for tests that need JVM tooling: OkHttp
+  `MockWebServer` transport tests in `core:network`/`core:data` (the Android Ktor engine
+  is OkHttp), Robolectric/Room, `MainDispatcherRule` from `core:testing`, classpath
+  fixtures. Move such a test to `commonTest` only when it no longer needs them (e.g.
+  with Ktor `MockEngine` and inline fixtures); migrate incrementally, never in bulk.
+- Recorded, sanitized server fixtures (JSON responses and an `.sse` event log) live in
+  `core/testing/src/main/resources` and are read from the JVM classpath.
+- Compose UI test APIs for instrumented tests; Maestro for black-box Android flows;
+  iOS runtime behavior is verified on the simulator (`kmp-ios`).
 
 Do not add a new framework automatically (Turbine, Robolectric, screenshot
 testing, mocking libraries) without a concrete requirement.
@@ -55,6 +65,8 @@ initial State -> onEvent -> fake response or failure -> State transition -> Effe
 
 ## Verification
 
-Run the focused module test first, then `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug
-:app:assembleDebug` from `android/`. See
+Run the focused module test first (`./gradlew :<module>:testDebugUnitTest`, an alias of
+`testAndroidHostTest`, which also runs `commonTest` on the JVM), then `./gradlew
+spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug compileKotlinIosArm64
+compileKotlinIosSimulatorArm64` from `android/`. See
 `references/test-matrix.md` for risk-based evidence.

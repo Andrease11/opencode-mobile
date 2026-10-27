@@ -1,6 +1,6 @@
 ---
 name: android-opencode-api
-description: Use for the generated OpenCode V2 Kotlin client in opencode-mobile/android/core/api, Retrofit services, Basic auth transport, the /api/event SSE stream, mapping generated models to domain models, or regenerating the client with tools/api-gen (bun run generate).
+description: Use for the generated OpenCode V2 Kotlin client in opencode-mobile/android/core/api, the Ktor HTTP client, Basic auth transport, the /api/event SSE stream, mapping generated models to domain models, or regenerating the client with tools/api-gen (bun run generate).
 ---
 
 # Android OpenCode API
@@ -15,15 +15,18 @@ feature ViewModel
   -> repository interface (core:domain)
   -> repository implementation (core:data)
   -> OpenCode client + mappers (core:network)
-  -> generated Retrofit APIs and models (core:api)
+  -> generated Ktor APIs and models (core:api, Kotlin Multiplatform)
 ```
 
-- `core:api` is produced by openapi-generator 7.22 (`kotlin`, `jvm-retrofit2`,
-  `kotlinx_serialization`) from `api/openapi.json` plus event schemas from npm
-  `@opencode/schema`. It is committed and never edited by hand.
-- `core:network` owns OkHttp/Retrofit construction, authentication headers, SSE
-  reading, error mapping and generated-to-domain mappers.
-- Features never see generated types, Retrofit, OkHttp or HTTP status codes.
+- `core:api` is produced by openapi-generator 7.22 (`kotlin`, `kotlinx_serialization`)
+  from `api/openapi.json` plus event schemas from npm `@opencode/schema`, in two passes:
+  models from `jvm-retrofit2` (sealed union serializers, plain kotlinx-serialization code)
+  and API classes plus their Ktor infrastructure from `multiplatform`. Everything lives in
+  `commonMain`, is committed and never edited by hand.
+- `core:network` (Kotlin Multiplatform) owns Ktor client construction (OkHttp engine on
+  Android, Darwin on iOS), authentication headers, SSE reading, error mapping and
+  generated-to-domain mappers.
+- Features never see generated types, Ktor or HTTP status codes.
 
 ## Regenerating
 
@@ -58,11 +61,15 @@ Read `references/generator.md` before changing preprocessing or generator flags.
 
 ## Transport Rules
 
-- One OkHttp client per active server; authentication is HTTP Basic
-  `opencode:<secret>` added by an interceptor. Bearer is not accepted.
+- One Ktor client per active server, derived from a shared base client (one engine and
+  connection pool); authentication is HTTP Basic `opencode:<secret>` sent as a default
+  header. Bearer is not accepted.
+- Generated calls return `HttpResponse<T>` and never throw on HTTP status; wrap them in
+  `awaitBody` / `awaitSuccess`. Message and session pages are decoded by
+  `TolerantPagesConverter`, which skips items this client cannot decode.
 - `/api/event` is a never-ending SSE stream. The server sends a `:` heartbeat comment
   every 15 s, so the stream client uses a 45 s read timeout to detect dead connections;
-  cancel the call on collector cancellation and ignore the comments. A 401 sets
+  the call ends with the collector and comments are ignored. A 401 sets
   `ConnectionState.Unauthorized` and stops retrying until the server or credentials change.
 - Debug logging must redact `Authorization` and never log request bodies (they
   contain prompts) or pairing responses.

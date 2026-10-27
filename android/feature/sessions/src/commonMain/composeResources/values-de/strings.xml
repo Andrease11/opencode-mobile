@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sessions_title_fallback">Sitzungen</string>
+    <string name="sessions_search">Sitzungen suchen</string>
+    <string name="sessions_all_projects">Alle Projekte</string>
+    <string name="sessions_settings">Einstellungen</string>
+    <string name="sessions_new">Neue Sitzung</string>
+    <string name="sessions_today">Heute</string>
+    <string name="sessions_yesterday">Gestern</string>
+    <string name="sessions_this_week">Diese Woche</string>
+    <string name="sessions_older">Älter</string>
+    <string name="sessions_running">Wird ausgeführt</string>
+    <string name="sessions_failed">Fehlgeschlagen</string>
+    <string name="sessions_interrupted">Unterbrochen</string>
+    <string name="sessions_empty_title">Noch keine Sitzungen</string>
+    <string name="sessions_empty_message">Starte eine Sitzung, um dem Agenten eine Aufgabe in einem deiner Projekte zu geben.</string>
+    <string name="sessions_empty_search_title">Keine passenden Sitzungen</string>
+    <string name="sessions_empty_search_message">Versuche eine andere Suche oder einen anderen Projektfilter.</string>
+    <string name="sessions_error_title">Sitzungen konnten nicht geladen werden</string>
+    <string name="sessions_connection_connected">Verbunden</string>
+    <string name="sessions_connection_connecting">Verbindung wird hergestellt…</string>
+    <string name="sessions_connection_reconnecting">Verbindung wird wiederhergestellt…</string>
+    <string name="sessions_connection_disconnected">Offline</string>
+    <string name="sessions_connection_unauthorized">Anmeldung abgelaufen · neu koppeln</string>
+    <string name="sessions_rename">Umbenennen</string>
+    <string name="sessions_delete">Löschen</string>
+    <string name="sessions_rename_title">Sitzung umbenennen</string>
+    <string name="sessions_rename_label">Titel</string>
+    <string name="sessions_save">Speichern</string>
+    <string name="sessions_delete_title">Sitzung löschen?</string>
+    <string name="sessions_delete_message">„%1$s“ und der Verlauf werden dauerhaft vom Server gelöscht.</string>
+    <string name="sessions_new_title">Neue Sitzung</string>
+    <string name="sessions_new_directory">Projektverzeichnis</string>
+    <string name="sessions_new_other_directory">Anderes Verzeichnis</string>
+    <string name="sessions_new_path_label">Absoluter Pfad</string>
+    <string name="sessions_new_path_placeholder">/home/me/project</string>
+    <string name="sessions_new_agent">Agent</string>
+    <string name="sessions_new_model">Modell</string>
+    <string name="sessions_new_model_default">Serverstandard</string>
+    <string name="sessions_new_create">Sitzung erstellen</string>
+    <string name="sessions_actions_title">Sitzungsaktionen</string>
+    <string name="sessions_running_a11y">Der Agent arbeitet</string>
+    <string name="sessions_new_show_all">Alle %1$d Projekte anzeigen</string>
+    <string name="sessions_untitled">Unbenannte Sitzung</string>
+</resources>

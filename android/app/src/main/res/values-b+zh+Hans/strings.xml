@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_select_session">选择会话</string>
-    <string name="app_select_session_message">从列表中选择会话或新建会话。</string>
 
     <string name="notif_channel_running">运行中的会话</string>
     <string name="notif_channel_attention">等待你的回复</string>

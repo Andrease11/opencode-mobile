@@ -10,7 +10,7 @@ does not redesign the flow or claim user preferences.
 
 ## Platform Routing
 
-- Android: read `android/AGENTS.md`, load `android-master` and
+- Android: read `android/AGENTS.md`, load `kmp-master` and
   `android-runtime-verification`, use an emulator connected to the local OpenCode
   server, and use
   Mobile MCP or Maestro.
