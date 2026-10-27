@@ -12,6 +12,7 @@ internal object Completions {
         Redo("redo", R.string.chat_command_redo),
         Compact("compact", R.string.chat_command_compact),
         Fork("fork", R.string.chat_command_fork),
+        Mcps("mcps", R.string.chat_command_mcps),
         ;
 
         companion object {

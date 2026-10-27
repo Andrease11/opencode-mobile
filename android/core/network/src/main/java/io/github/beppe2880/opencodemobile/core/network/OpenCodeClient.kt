@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.core.network
 import io.github.beppe2880.opencodemobile.api.apis.AgentApi
 import io.github.beppe2880.opencodemobile.api.apis.CommandApi
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
+import io.github.beppe2880.opencodemobile.api.apis.McpApi
 import io.github.beppe2880.opencodemobile.api.apis.ModelApi
 import io.github.beppe2880.opencodemobile.api.apis.PermissionApi
 import io.github.beppe2880.opencodemobile.api.apis.ProjectApi
@@ -57,6 +58,7 @@ class OpenCodeClient internal constructor(
     val providers: ProviderApi = retrofit.create(ProviderApi::class.java)
     val projects: ProjectApi = retrofit.create(ProjectApi::class.java)
     val commands: CommandApi = retrofit.create(CommandApi::class.java)
+    val mcps: McpApi = retrofit.create(McpApi::class.java)
     val files: FilesystemApi = retrofit.create(FilesystemApi::class.java)
     val pty: PtyApi = retrofit.create(PtyApi::class.java)
     val shells: ShellApi = retrofit.create(ShellApi::class.java)

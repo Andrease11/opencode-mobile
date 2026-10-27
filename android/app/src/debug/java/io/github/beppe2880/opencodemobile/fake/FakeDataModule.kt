@@ -17,6 +17,9 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.McpServer
+import io.github.beppe2880.opencodemobile.core.domain.McpStatus
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -87,6 +90,16 @@ val fakeDataModule = module {
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
     single<TerminalRepository> { FakeTerminals() }
+    single<McpRepository> {
+        object : McpRepository {
+            private var servers = listOf(McpServer("demo", McpStatus.Connected))
+            override suspend fun list(directory: String) = Result.success(servers)
+            override suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit> {
+                servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
+                return Result.success(Unit)
+            }
+        }
+    }
 }
 
 private const val LATENCY = 350L

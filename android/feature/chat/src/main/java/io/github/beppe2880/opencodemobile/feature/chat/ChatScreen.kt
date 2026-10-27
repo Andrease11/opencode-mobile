@@ -1,6 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Difference
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Terminal
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
@@ -43,11 +44,10 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
-import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
@@ -80,6 +80,7 @@ fun ChatScreen(
                 onContext = { contextOpen = true },
                 onChanges = { onEvent(ChatEvent.OpenChanges) },
                 onTerminal = { onEvent(ChatEvent.OpenTerminal) },
+                onMcps = { onEvent(ChatEvent.OpenMcps) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -139,6 +140,7 @@ fun ChatScreen(
         ImagePreviewDialog(preview, onDismiss = { onEvent(ChatEvent.ClosePreview) })
     }
     state.changes?.let { ChangesSheet(state, it, onEvent) }
+    state.mcps?.let { McpSheet(state.directory, it, onEvent) }
     if (contextOpen) {
         ContextSheet(
             context = state.context,
@@ -157,8 +159,10 @@ private fun ChatTopBar(
     onContext: () -> Unit,
     onChanges: () -> Unit,
     onTerminal: () -> Unit,
+    onMcps: () -> Unit,
 ) {
     val c = OcTheme.colors
+    var menuOpen by remember { mutableStateOf(false) }
     OcTopBar(
         title = state.title.ifEmpty { " " },
         subtitle = state.directory.takeIf { it.isNotEmpty() },
@@ -192,20 +196,29 @@ private fun ChatTopBar(
                 enabled = state.directory.isNotEmpty(),
                 modifier = Modifier.testTag("chat_terminal_button"),
             )
-            state.agent?.let { agent ->
-                val color = c.agents.forAgent(agent)
-                Text(
-                    text = agent.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = color,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .padding(end = OcSpacing.md)
-                        .background(color.copy(alpha = 0.12f), RoundedCornerShape(OcRadius.sm))
-                        .padding(horizontal = OcSpacing.sm, vertical = OcSpacing.xxs)
-                        .testTag("chat_agent_chip"),
+            Box {
+                OcIconButton(
+                    icon = Icons.Outlined.MoreVert,
+                    contentDescription = stringResource(R.string.chat_more),
+                    onClick = { menuOpen = true },
+                    modifier = Modifier.testTag("chat_more_button"),
                 )
+                DropdownMenu(
+                    expanded = menuOpen,
+                    onDismissRequest = { menuOpen = false },
+                    containerColor = c.bgBase,
+                    modifier = Modifier.exposeTestTags(),
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.chat_mcps)) },
+                        onClick = {
+                            menuOpen = false
+                            onMcps()
+                        },
+                        enabled = state.directory.isNotEmpty(),
+                        modifier = Modifier.testTag("chat_mcps_menu_item"),
+                    )
+                }
             }
         },
     )

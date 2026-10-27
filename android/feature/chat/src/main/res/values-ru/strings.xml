@@ -141,4 +141,18 @@
     <string name="chat_older_failed">Не удалось загрузить предыдущие сообщения</string>
     <string name="chat_older_retry">Повторить</string>
     <string name="chat_open_file">Открыть файл</string>
+    <string name="chat_more">Другие действия</string>
+    <string name="chat_mcps">Серверы MCP</string>
+    <string name="chat_command_mcps">Управление подключениями MCP</string>
+    <string name="chat_mcps_refresh">Обновить статус MCP</string>
+    <string name="chat_mcps_runtime">Подключения действуют для проекта, а не только для этого чата. Изменения действуют до перезапуска сервера; конфигурация не меняется.</string>
+    <string name="chat_mcps_error">Не удалось загрузить серверы MCP</string>
+    <string name="chat_mcps_empty">Нет серверов MCP</string>
+    <string name="chat_mcps_empty_description">Добавьте серверы MCP в конфигурацию OpenCode на сервере.</string>
+    <string name="chat_mcps_connected">Подключён</string>
+    <string name="chat_mcps_disconnected">Отключён</string>
+    <string name="chat_mcps_pending">Подключение</string>
+    <string name="chat_mcps_failed">Ошибка подключения</string>
+    <string name="chat_mcps_needs_auth">Требуется авторизация</string>
+    <string name="chat_mcps_auth_hint">Войдите через OpenCode на компьютере, затем обновите здесь.</string>
 </resources>

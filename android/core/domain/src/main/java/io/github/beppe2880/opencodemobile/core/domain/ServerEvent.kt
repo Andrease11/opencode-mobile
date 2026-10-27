@@ -7,6 +7,8 @@ package io.github.beppe2880.opencodemobile.core.domain
 sealed interface ServerEvent {
     data object Connected : ServerEvent
 
+    data object McpsChanged : ServerEvent
+
     sealed interface SessionScoped : ServerEvent {
         val sessionId: String
     }

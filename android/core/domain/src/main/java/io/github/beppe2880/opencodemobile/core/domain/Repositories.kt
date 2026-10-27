@@ -134,6 +134,13 @@ data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDe
 /** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
 enum class ChangesScope { LastTurn, Session }
 
+interface McpRepository {
+    suspend fun list(directory: String): Result<List<McpServer>>
+
+    /** Changes the runtime connection in this project, not the persistent configuration. */
+    suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit>
+}
+
 interface ChatRepository {
     /**
      * Transcript, oldest first. System instructions are omitted; [Message.Idle] and

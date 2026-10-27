@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 /** Maps a stream event to the subset the app reacts to; returns null for everything else. */
 fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     is OpenCodeEvent.ServerconnectedWrapper -> ServerEvent.Connected
+    is OpenCodeEvent.McpstatuschangedWrapper -> ServerEvent.McpsChanged
 
     is OpenCodeEvent.SessioncreatedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessionrenamedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)

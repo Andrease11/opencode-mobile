@@ -17,6 +17,9 @@ import io.github.beppe2880.opencodemobile.core.domain.FormCondition
 import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
+import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.McpServer
+import io.github.beppe2880.opencodemobile.core.domain.McpStatus
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -63,6 +66,159 @@ class ChatViewModelTest {
     private val settings = FakeSettings()
     private val drafts = FakeDrafts()
     private val scroll = ScrollMemory()
+    private val mcps = FakeMcps()
+
+    @Test
+    fun `MCP menu and slash open the same project panel without prompting`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(mcps.directories.isEmpty())
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        assertEquals(listOf("/repo"), mcps.directories)
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+        vm.onEvent(ChatEvent.CloseMcps)
+        assertNull(vm.state.value.mcps)
+        vm.onEvent(ChatEvent.DraftChanged("/mcps"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+        assertEquals("", vm.state.value.draft)
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
+        vm.onEvent(ChatEvent.CloseMcps)
+        vm.onEvent(ChatEvent.DraftChanged("/mc"))
+        vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.single()))
+        advanceUntilIdle()
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+    }
+
+    @Test
+    fun `MCP connection is reloaded and duplicate requests are ignored while pending`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        val gate = CompletableDeferred<Unit>()
+        mcps.gate = gate
+        vm.onEvent(ChatEvent.SetMcpConnected("test", false))
+        vm.onEvent(ChatEvent.SetMcpConnected("test", false))
+        runCurrent()
+        assertEquals(setOf("test"), vm.state.value.mcps?.changing)
+        assertEquals(listOf(Triple("/repo", "test", false)), mcps.changes)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(McpStatus.Disabled, vm.state.value.mcps?.servers?.single()?.status)
+        assertEquals(emptySet<String>(), vm.state.value.mcps?.changing)
+        vm.onEvent(ChatEvent.SetMcpConnected("test", true))
+        advanceUntilIdle()
+        assertEquals(McpStatus.Connected, vm.state.value.mcps?.servers?.single()?.status)
+    }
+
+    @Test
+    fun `MCP refresh failure retains content and can be retried`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        mcps.listFailure = OpenCodeError.Unreachable("offline")
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.mcps?.error != null)
+        assertFalse(vm.state.value.mcps!!.loading)
+        mcps.listFailure = null
+        vm.onEvent(ChatEvent.RefreshMcps)
+        advanceUntilIdle()
+        assertNull(vm.state.value.mcps?.error)
+        mcps.listFailure = OpenCodeError.Unreachable("offline")
+        vm.onEvent(ChatEvent.RefreshMcps)
+        advanceUntilIdle()
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+        assertTrue(vm.state.value.mcps?.error != null)
+    }
+
+    @Test
+    fun `MCP connection failure does not fake success and reports the error`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        mcps.changeFailure = OpenCodeError.Unreachable("offline")
+        vm.onEvent(ChatEvent.SetMcpConnected("test", false))
+        advanceUntilIdle()
+        assertTrue(vm.effect.first() is ChatEffect.ShowMessage)
+        assertEquals(McpStatus.Connected, vm.state.value.mcps?.servers?.single()?.status)
+        assertTrue(vm.state.value.mcps!!.changing.isEmpty())
+    }
+
+    @Test
+    fun `MCP status events update an open panel but do not fetch when closed`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        mcps.servers = listOf(McpServer("test", McpStatus.NeedsAuth))
+        events.flow.emit(ServerEvent.McpsChanged)
+        advanceUntilIdle()
+        assertEquals(McpStatus.NeedsAuth, vm.state.value.mcps?.servers?.single()?.status)
+        vm.onEvent(ChatEvent.CloseMcps)
+        val requests = mcps.directories.size
+        events.flow.emit(ServerEvent.McpsChanged)
+        advanceUntilIdle()
+        assertEquals(requests, mcps.directories.size)
+    }
+
+    @Test
+    fun `closing the MCP panel during a change does not reopen it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        val gate = CompletableDeferred<Unit>()
+        mcps.gate = gate
+        vm.onEvent(ChatEvent.SetMcpConnected("test", false))
+        runCurrent()
+        vm.onEvent(ChatEvent.CloseMcps)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertNull(vm.state.value.mcps)
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        assertEquals(McpStatus.Disabled, vm.state.value.mcps?.servers?.single()?.status)
+    }
+
+    @Test
+    fun `MCP panel opened before the session directory is known loads once it is`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply {
+            uncached = true
+            loaded = CompletableDeferred()
+        }
+        val vm = vm(sessions)
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("/mcps"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertTrue(mcps.directories.isEmpty())
+        sessions.loaded!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(listOf("/repo"), mcps.directories)
+        assertEquals(mcps.servers, vm.state.value.mcps?.servers)
+        assertFalse(vm.state.value.mcps!!.loading)
+    }
+
+    @Test
+    fun `opening MCPs from the menu keeps the unsent prompt and attachments`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val attachment = PromptAttachment("data:text/plain;base64,QQ==", "note.txt", "text/plain")
+        vm.onEvent(ChatEvent.DraftChanged("unfinished prompt"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(attachment)))
+        mcps.servers = emptyList()
+        vm.onEvent(ChatEvent.OpenMcps)
+        advanceUntilIdle()
+        assertEquals(emptyList<McpServer>(), vm.state.value.mcps?.servers)
+        assertEquals("unfinished prompt", vm.state.value.draft)
+        assertEquals(listOf(attachment), vm.state.value.attachments)
+        assertFalse(vm.state.value.mcps!!.loading)
+    }
 
     @Test
     fun `the reading position is kept for the next opening of the chat`() = runTest(main.testDispatcher) {
@@ -74,7 +230,7 @@ class ChatViewModelTest {
     }
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, clock = { 42 })
 
     @Test
     fun `the microphone follows the voice input setting`() = runTest(main.testDispatcher) {
@@ -246,7 +402,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.DraftChanged("/"))
-        assertEquals(listOf("undo", "redo", "compact", "fork", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
+        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
         vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.last()))
         assertEquals("/review ", vm.state.value.draft)
 
@@ -908,8 +1064,13 @@ private class FakeSessions(
     override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
     var activeIds: Set<String> = emptySet()
     override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
-    override suspend fun get(sessionId: String) = Result.success(session)
-    override fun cached(sessionId: String) = titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
+    var uncached = false
+    var loaded: CompletableDeferred<Unit>? = null
+    override suspend fun get(sessionId: String): Result<Session> {
+        loaded?.await()
+        return Result.success(session)
+    }
+    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
     override suspend fun create(directory: String, agent: String?, model: ModelRef?) = Result.success(session)
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
@@ -1080,6 +1241,26 @@ private class FakeEvents : EventRepository {
     override val connection: StateFlow<ConnectionState> = MutableStateFlow(ConnectionState.Connected)
     val flow = MutableSharedFlow<ServerEvent>(extraBufferCapacity = 64)
     override val events = flow
+}
+
+private class FakeMcps : McpRepository {
+    var servers = listOf(McpServer("test", McpStatus.Connected))
+    val directories = mutableListOf<String>()
+    val changes = mutableListOf<Triple<String, String, Boolean>>()
+    var listFailure: OpenCodeError? = null
+    var changeFailure: OpenCodeError? = null
+    var gate: CompletableDeferred<Unit>? = null
+    override suspend fun list(directory: String): Result<List<McpServer>> {
+        directories += directory
+        return listFailure?.let { Result.failure(it) } ?: Result.success(servers)
+    }
+    override suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit> {
+        changes += Triple(directory, name, connected)
+        gate?.await()
+        changeFailure?.let { return Result.failure(it) }
+        servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
+        return Result.success(Unit)
+    }
 }
 
 private class FakeDrafts : DraftRepository {
