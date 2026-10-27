@@ -33,6 +33,13 @@ class EventMappingTest {
     }
 
     @Test
+    fun `a fork announces the new session`() {
+        val payload = """{"id":"evt_2","created":1,"type":"session.forked","durable":{"aggregateID":"ses_new","seq":0,"version":2},""" +
+            """"data":{"sessionID":"ses_new","parentID":"ses_old","boundary":{"type":"through","messageID":"msg_1"}}}"""
+        assertEquals(ServerEvent.SessionChanged("ses_new"), decodeEvent(payload)?.toDomain())
+    }
+
+    @Test
     fun `maps the session subset and drops the rest`() {
         val events = Fixtures.events().mapNotNull { it.toDomain() }
 

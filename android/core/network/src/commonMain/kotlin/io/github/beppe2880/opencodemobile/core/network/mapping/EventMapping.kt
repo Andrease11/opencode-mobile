@@ -11,6 +11,8 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     is OpenCodeEvent.McpstatuschangedWrapper -> ServerEvent.McpsChanged
 
     is OpenCodeEvent.SessioncreatedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
+    // A fork is a new session, announced with this event instead of session.created.
+    is OpenCodeEvent.SessionforkedWrapper -> value.data.sessionID?.let { ServerEvent.SessionChanged(it) }
     is OpenCodeEvent.SessionrenamedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessionmovedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessionmetadataupdatedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
