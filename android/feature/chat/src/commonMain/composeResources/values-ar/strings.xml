@@ -262,7 +262,15 @@
     <string name="chat_untitled">جلسة بلا عنوان</string>
     <string name="chat_running_empty">لا توجد وكلاء فرعيون أو أوامر قيد التشغيل</string>
     <string name="chat_running_error">تعذر تحديث الأعمال قيد التشغيل</string>
-    <string name="chat_running_unassigned">أوامر أخرى في هذا المشروع</string>
+    <string name="chat_running_unassigned">أوامر غير مرتبطة بجلسة</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="zero">%1$d أوامر غير مرتبطة بجلسة</item>
+        <item quantity="one">%1$d أمر غير مرتبط بجلسة</item>
+        <item quantity="two">%1$d أمران غير مرتبطين بجلسة</item>
+        <item quantity="few">%1$d أوامر غير مرتبطة بجلسة</item>
+        <item quantity="many">%1$d أمرًا غير مرتبط بجلسة</item>
+        <item quantity="other">%1$d أمر غير مرتبط بجلسة</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">هذه الأوامر ليس لها مالك جلسة معروف.</string>
     <string name="chat_running_no_output">لا يوجد خرج بعد</string>
     <string name="chat_running_elapsed">المدة المنقضية: %1$s</string>

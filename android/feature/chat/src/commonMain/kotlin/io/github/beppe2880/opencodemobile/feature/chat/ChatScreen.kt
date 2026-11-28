@@ -54,10 +54,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -105,6 +107,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_muted
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pinned
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_rename
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_rename_label
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned_count
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_save
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
@@ -144,6 +147,7 @@ fun ChatScreen(
     externalOverlayOpen: Boolean = false,
 ) {
     val c = OcTheme.colors
+    val focus = LocalFocusManager.current
     var contextOpen by rememberSaveable { mutableStateOf(false) }
     var bottomBarHeight by remember { mutableStateOf(0) }
     var bottomAreaTop by remember { mutableFloatStateOf(Float.NaN) }
@@ -165,11 +169,15 @@ fun ChatScreen(
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
                     onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onPin = { onEvent(ChatEvent.SetPinned(it)) },
-                    onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                     onMenuEvent = onEvent,
                     bottomAreaTop = { bottomAreaTop },
                 )
-                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
+                if (state.showsRunningLine) {
+                    RunningLine(state.work, state.headerStyle, state.unassignedCommands.size) {
+                        focus.clearFocus()
+                        onEvent(ChatEvent.RunningSheet(true))
+                    }
+                }
             }
         },
         snackbarHost = {
@@ -254,7 +262,7 @@ fun ChatScreen(
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
     if (state.btwOpen) state.btw?.let { BtwPanel(it, onEvent, onCopy) }
-    if (state.workOpen) RunningSheet(state, onEvent)
+    if (state.workOpen) RunningListSheet(state, onEvent)
     state.runningPanel?.let { panel ->
         panel.item?.let { item -> RunningItemSheet(state, panel, item, onEvent, onCopy, onShare) }
     }
@@ -306,7 +314,6 @@ internal fun ChatTopBar(
     onHeaderChanges: () -> Unit,
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
-    onRunning: () -> Unit,
     onProviders: () -> Unit = {},
     /** Pins the session to the top of the session list (true) or unpins it. */
     onPin: (Boolean) -> Unit = {},
@@ -398,7 +405,6 @@ internal fun ChatTopBar(
                     when (event) {
                         is ChatEvent.SetMuted -> if (event.muted) choosingMute = true else onMenuEvent(event)
                         is ChatEvent.SetPinned -> onPin(event.pinned)
-                        is ChatEvent.RunningSheet -> onRunning()
                         ChatEvent.OpenProviders -> onProviders()
                         ChatEvent.OpenMcps -> onMcps()
                         else -> onMenuEvent(event)
@@ -474,24 +480,23 @@ private fun VcsSubtitle(line: VcsLine, style: ChatHeaderStyle, onClick: () -> Un
 private const val SEPARATOR = " · "
 
 /**
- * "2 subagents · 1 command" under the header, written like the header line ([style]: counts after
- * icons, or words); opens the Running sheet. Like the header line it is a compact target: the
- * "Running" menu item is the full-size alternative.
+ * The running summary under the header is the entry point when the composer chips are off.
  */
 @Composable
-internal fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
+internal fun RunningLine(work: RunningWork, style: ChatHeaderStyle, unassignedCount: Int = 0, onClick: () -> Unit) {
     val c = OcTheme.colors
     val textStyle = MaterialTheme.typography.bodySmall
     val iconSize = with(LocalDensity.current) { textStyle.fontSize.toDp() }
-    val summary = runningSummary(work)
+    val unassigned = if (unassignedCount > 0) pluralStringResource(Res.plurals.chat_running_unassigned_count, unassignedCount, unassignedCount) else ""
+    val summary = listOf(runningSummary(work), unassigned).filter { it.isNotEmpty() }.joinToString(" · ")
     Column(Modifier.editable(SettingsPart.RunningLine, LocalEditMode.current)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("chat_running_button")
                 .clickable(onClickLabel = stringResource(UiRes.string.oc_running), role = Role.Button, onClick = onClick)
-                .clearAndSetSemantics { contentDescription = summary }
-                .heightIn(min = 32.dp)
+                .semantics { contentDescription = summary }
+                .heightIn(min = 48.dp)
                 .padding(horizontal = OcSpacing.gutter, vertical = OcSpacing.xs),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
@@ -502,15 +507,28 @@ internal fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () 
                     if (count == 0) continue
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xxs)) {
                         Icon(icon, contentDescription = null, tint = c.textMuted, modifier = Modifier.size(iconSize))
-                        Text(formatInteger(count.toLong()), style = textStyle, color = c.textMuted, maxLines = 1)
+                        Text(formatInteger(count.toLong()), style = textStyle, color = c.textMuted, maxLines = 1, modifier = Modifier.clearAndSetSemantics { })
                     }
                 }
+                if (unassigned.isNotEmpty()) RunningLineText(unassigned, textStyle)
             } else {
-                Text(summary, style = textStyle, color = c.textMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                RunningLineText(summary, textStyle)
             }
         }
         OcDivider()
     }
+}
+
+@Composable
+private fun RunningLineText(text: String, style: TextStyle) {
+    Text(
+        text,
+        style = style,
+        color = OcTheme.colors.textMuted,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.clearAndSetSemantics { },
+    )
 }
 
 @Composable

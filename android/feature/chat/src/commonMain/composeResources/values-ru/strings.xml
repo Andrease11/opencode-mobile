@@ -240,7 +240,13 @@
     <string name="chat_untitled">Сессия без названия</string>
     <string name="chat_running_empty">Субагенты и команды не выполняются</string>
     <string name="chat_running_error">Не удалось обновить выполняемые задачи</string>
-    <string name="chat_running_unassigned">Другие команды в этом проекте</string>
+    <string name="chat_running_unassigned">Непривязанные команды</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="one">%1$d непривязанная команда</item>
+        <item quantity="few">%1$d непривязанные команды</item>
+        <item quantity="many">%1$d непривязанных команд</item>
+        <item quantity="other">%1$d непривязанных команд</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">Для этих команд не известен владелец сеанса.</string>
     <string name="chat_running_no_output">Вывода пока нет</string>
     <string name="chat_running_elapsed">Прошло: %1$s</string>

@@ -19,10 +19,11 @@ import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
+import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.VpnKey
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -147,7 +148,8 @@ internal fun ChatActionsDemo(active: Boolean) {
                 HMenuGroup("Context & history")
                 HMenuItem("Compact", Icons.Outlined.Compress)
                 HMenuGroup("Tools")
-                HMenuItem("Running", Icons.Outlined.PlayCircleOutline)
+                HMenuItem("Providers", Icons.Outlined.VpnKey)
+                HMenuItem("MCP", Icons.Outlined.Hub)
                 OcDivider(Modifier.padding(vertical = OcSpacing.xs))
                 HMenuItem("Delete chat", Icons.Outlined.Delete, Modifier.then(targets.target("delete")), tint = c.danger.fg)
             }

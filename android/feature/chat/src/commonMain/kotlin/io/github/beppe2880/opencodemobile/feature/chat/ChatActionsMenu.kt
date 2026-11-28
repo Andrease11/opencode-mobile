@@ -17,7 +17,6 @@ import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Unarchive
@@ -44,7 +43,6 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
-import io.github.beppe2880.opencodemobile.core.ui.resources.oc_running
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
@@ -68,7 +66,6 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_undo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unmute
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unpin
 import org.jetbrains.compose.resources.stringResource
-import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 internal val ChatState.menuReady: Boolean
     get() = directory.isNotBlank() && !loading && error == null && connection == ConnectionState.Connected && !creatingSession && !forking && !exporting
@@ -145,9 +142,6 @@ internal fun ChatActionsMenu(
             act(ChatEvent.ExportSheet(true))
         }
         MenuGroup(stringResource(Res.string.chat_menu_tools))
-        MenuAction(stringResource(UiRes.string.oc_running), Icons.Outlined.PlayCircleOutline, "chat_running_menu_item", ready) {
-            act(ChatEvent.RunningSheet(true))
-        }
         MenuAction(stringResource(Res.string.chat_providers), Icons.Outlined.VpnKey, "chat_providers_menu_item", ready) { act(ChatEvent.OpenProviders) }
         MenuAction(stringResource(Res.string.chat_mcps), Icons.Outlined.Hub, "chat_mcps_menu_item", ready) { act(ChatEvent.OpenMcps) }
         OcDivider()

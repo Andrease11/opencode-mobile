@@ -351,7 +351,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `running polling stops off screen and output is read only with sheet open`() = runTest(main.testDispatcher) {
+    fun `running polling stops off screen and the list does not fetch output`() = runTest(main.testDispatcher) {
         chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
         val vm = vm()
         advanceUntilIdle()
@@ -361,13 +361,48 @@ class ChatViewModelTest {
         assertTrue(chat.tailReads.isEmpty())
         vm.onEvent(ChatEvent.RunningSheet(true))
         runCurrent()
-        assertEquals(listOf("shell"), chat.tailReads)
-        assertEquals("last line", vm.state.value.workOutput["shell"])
+        assertTrue(chat.tailReads.isEmpty())
         vm.onEvent(ChatEvent.Visible(false))
         val reads = chat.runningReads
         advanceTimeBy(20_000)
         runCurrent()
         assertEquals(reads, chat.runningReads)
+    }
+
+    @Test
+    fun `unassigned shell opens from the header list and can be stopped independently`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(runningChips = false, confirmStopCommand = true)
+        chat.runningCommands = listOf(
+            RunningCommand("watch", "npm run watch", "/repo", 1),
+            RunningCommand("other", "npm test", "/repo", 2, "s2"),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertTrue(vm.state.value.work.isEmpty)
+        assertTrue(vm.state.value.showsRunningLine)
+
+        vm.onEvent(ChatEvent.RunningSheet(true))
+        runCurrent()
+        assertTrue(chat.tailReads.isEmpty())
+        vm.onEvent(ChatEvent.ShowRunningItem(RunningGroup.Commands, "other"))
+        assertTrue(vm.state.value.workOpen)
+        vm.onEvent(ChatEvent.ShowRunningItem(RunningGroup.Commands, "watch"))
+        runCurrent()
+        assertFalse(vm.state.value.workOpen)
+        assertEquals("watch", vm.state.value.runningPanel?.item?.id)
+        assertEquals(listOf("watch"), chat.tailReads)
+        assertEquals("last line", vm.state.value.workOutput["watch"])
+
+        vm.onEvent(ChatEvent.StopCommand("watch"))
+        assertEquals("watch", vm.state.value.confirmingStop)
+        vm.onEvent(ChatEvent.ConfirmStopCommand)
+        runCurrent()
+        assertNotNull(vm.state.value.runningPanel?.endedAt)
+        assertFalse(vm.state.value.showsRunningLine)
+        assertEquals(listOf("other"), chat.runningCommands.map { it.id })
+        vm.onEvent(ChatEvent.Visible(false))
     }
 
     @Test

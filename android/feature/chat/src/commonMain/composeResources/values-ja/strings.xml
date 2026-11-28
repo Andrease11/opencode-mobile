@@ -207,7 +207,10 @@
     <string name="chat_untitled">無題のセッション</string>
     <string name="chat_running_empty">実行中のサブエージェントやコマンドはありません</string>
     <string name="chat_running_error">実行中の作業を更新できませんでした</string>
-    <string name="chat_running_unassigned">このプロジェクトの他のコマンド</string>
+    <string name="chat_running_unassigned">未割り当てのコマンド</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="other">未割り当てのコマンド %1$d 件</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">これらのコマンドには既知のセッション所有者がありません。</string>
     <string name="chat_running_no_output">まだ出力がありません</string>
     <string name="chat_running_elapsed">経過時間: %1$s</string>

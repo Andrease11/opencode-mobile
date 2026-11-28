@@ -336,8 +336,8 @@ class ChatViewModel(
                 restartRunningPoll()
             }
             is ChatEvent.ShowRunningItem -> {
-                val entry = currentState.work.entries(event.group).firstOrNull { it.id == event.id } ?: return
-                updateState { it.copy(runningPanel = RunningPanel(event.group, entry)) }
+                val entry = currentState.runningEntry(event.group, event.id) ?: return
+                updateState { it.copy(workOpen = false, runningPanel = RunningPanel(event.group, entry)) }
                 restartRunningPoll()
             }
             ChatEvent.CloseRunningItem -> {
@@ -484,19 +484,15 @@ class ChatViewModel(
                             workError = snapshot.errors[sessionId]?.toUiText(),
                             workOutput = it.workOutput.filterKeys { id -> id in ids },
                             workOutputErrors = it.workOutputErrors.filterKeys { id -> id in ids },
-                            runningPanel = it.runningPanel?.follow(work, clock() + offset),
+                            runningPanel = it.runningPanel?.follow(work, clock() + offset, snapshot.unassigned),
                         )
                     }
                     // Running tools whose shell id the transcript lost can follow these shells.
                     if (newShells) rebuild()
-                    // The sheet shows every output; a chip's sheet only its own shell's.
-                    val tails = if (currentState.workOpen) {
-                        work.commands + snapshot.unassigned
-                    } else {
-                        val open = currentState.runningPanel?.takeIf { it.endedAt == null }?.item?.takeIf { it.group == RunningGroup.Commands }
-                        work.commands.filter { it.id == open?.id }
-                    }
-                    for (command in tails) {
+                    // Fetch output only for the open shell, whether session-owned or unassigned.
+                    val open = currentState.runningPanel?.takeIf { it.endedAt == null }?.item?.takeIf { it.group == RunningGroup.Commands }
+                    val command = open?.let { item -> (work.commands + snapshot.unassigned).firstOrNull { it.id == item.id } }
+                    if (command != null) {
                         chat.shellTail(command.directory, command.id).fold(
                             onSuccess = { output ->
                                 updateState {

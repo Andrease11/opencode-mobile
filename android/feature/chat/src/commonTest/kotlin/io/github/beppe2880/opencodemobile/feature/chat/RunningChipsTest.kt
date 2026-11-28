@@ -43,6 +43,29 @@ class RunningChipsTest {
     }
 
     @Test
+    fun `unassigned commands get a chip only when there is no session work`() {
+        assertEquals(
+            listOf(RunningChip(RunningGroup.Commands, 3, unassigned = true)),
+            runningChips(RunningWork(), enabled = true, unassignedCount = 3),
+        )
+        assertEquals(runningChips(work, enabled = true), runningChips(work, enabled = true, unassignedCount = 3))
+        assertTrue(runningChips(RunningWork(), enabled = false, unassignedCount = 3).isEmpty())
+        val state = ChatState(unassignedCommands = listOf(command("external", 0).copy(sessionId = null)))
+        assertFalse(state.showsRunningLine)
+        assertTrue(state.withSettings(AppSettings(runningChips = false)).showsRunningLine)
+    }
+
+    @Test
+    fun `the list stays open for an unassigned command even after owned work ends`() {
+        val list = RunningPanel(RunningGroup.Commands)
+        val unassigned = listOf(command("external", 1_000).copy(sessionId = null))
+        assertEquals(list, list.follow(RunningWork(), serverNow = 2_000, unassigned = unassigned))
+        val detail = list.copy(item = unassigned.shellEntries().single())
+        assertNull(detail.follow(RunningWork(), serverNow = 2_000, unassigned = unassigned)?.endedAt)
+        assertEquals(3_000L, detail.follow(RunningWork(), serverNow = 3_000)?.endedAt)
+    }
+
+    @Test
     fun `turning the setting off closes what the chips opened`() {
         val open = ChatState(runningPanel = RunningPanel(RunningGroup.Commands))
         assertNull(open.withSettings(AppSettings(runningChips = false)).runningPanel)

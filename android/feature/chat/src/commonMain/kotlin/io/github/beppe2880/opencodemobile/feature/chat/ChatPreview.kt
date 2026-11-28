@@ -242,7 +242,6 @@ private fun PreviewTopBar(state: ChatState) {
         onHeaderChanges = {},
         onTerminal = {},
         onMcps = {},
-        onRunning = {},
         applyStatusBarInset = false,
     )
 }

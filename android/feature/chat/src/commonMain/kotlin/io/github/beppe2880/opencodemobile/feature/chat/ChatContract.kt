@@ -233,7 +233,8 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     questionsCollapsedByDefault = s.questionsCollapsed,
     headerStyle = s.chatHeaderStyle,
     runningChips = s.runningChips,
-    runningPanel = runningPanel.takeIf { s.runningChips },
+    workOpen = workOpen && !s.runningChips,
+    runningPanel = runningPanel?.takeIf { s.runningChips || it.item != null },
 )
 
 /** The folder name of the header line, when [line] includes it. */

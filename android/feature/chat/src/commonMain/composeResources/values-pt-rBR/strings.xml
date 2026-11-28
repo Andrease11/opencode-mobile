@@ -218,7 +218,11 @@
     <string name="chat_untitled">Sessão sem título</string>
     <string name="chat_running_empty">Nenhum subagente ou comando em execução</string>
     <string name="chat_running_error">Não foi possível atualizar o trabalho em execução</string>
-    <string name="chat_running_unassigned">Outros comandos neste projeto</string>
+    <string name="chat_running_unassigned">Comandos não atribuídos</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="one">%1$d comando não atribuído</item>
+        <item quantity="other">%1$d comandos não atribuídos</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">Esses comandos não têm um proprietário de sessão conhecido.</string>
     <string name="chat_running_no_output">Ainda sem saída</string>
     <string name="chat_running_elapsed">Decorrido: %1$s</string>

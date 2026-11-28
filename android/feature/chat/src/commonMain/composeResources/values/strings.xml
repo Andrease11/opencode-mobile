@@ -218,7 +218,11 @@
     <string name="chat_untitled">Untitled session</string>
     <string name="chat_running_empty">No subagents or commands running</string>
     <string name="chat_running_error">Could not refresh running work</string>
-    <string name="chat_running_unassigned">Other commands in this project</string>
+    <string name="chat_running_unassigned">Unassigned commands</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="one">%1$d unassigned command</item>
+        <item quantity="other">%1$d unassigned commands</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">These commands have no known session owner.</string>
     <string name="chat_running_no_output">No output yet</string>
     <string name="chat_running_elapsed">Elapsed: %1$s</string>

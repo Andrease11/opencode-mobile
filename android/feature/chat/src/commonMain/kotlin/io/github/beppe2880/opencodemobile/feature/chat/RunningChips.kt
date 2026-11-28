@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 
 /**
@@ -16,7 +17,7 @@ data class RunningEntry(
 )
 
 /** A chip above the composer: how many items of [group] run. */
-data class RunningChip(val group: RunningGroup, val count: Int)
+data class RunningChip(val group: RunningGroup, val count: Int, val unassigned: Boolean = false)
 
 /**
  * What the running chips opened: the list of everything that runs (a popover above the
@@ -31,9 +32,16 @@ data class RunningPanel(
 
 /** The items of [group], oldest first; subagents keep the server's order. */
 internal fun RunningWork.entries(group: RunningGroup): List<RunningEntry> = when (group) {
-    RunningGroup.Commands -> commands.sortedBy { it.startedAt }.map { RunningEntry(it.id, group, it.command, startedAt = it.startedAt) }
+    RunningGroup.Commands -> commands.shellEntries()
     RunningGroup.Agents -> agents.map { RunningEntry(it.session.id, group, it.session.title, it.session.agent, it.startedAt) }
 }
+
+internal fun List<RunningCommand>.shellEntries(): List<RunningEntry> =
+    sortedBy { it.startedAt }.map { RunningEntry(it.id, RunningGroup.Commands, it.command, startedAt = it.startedAt) }
+
+internal fun ChatState.runningEntry(group: RunningGroup, id: String): RunningEntry? =
+    work.entries(group).firstOrNull { it.id == id }
+        ?: if (group == RunningGroup.Commands) unassignedCommands.shellEntries().firstOrNull { it.id == id } else null
 
 internal fun RunningWork.count(group: RunningGroup): Int = when (group) {
     RunningGroup.Commands -> commands.size
@@ -41,18 +49,20 @@ internal fun RunningWork.count(group: RunningGroup): Int = when (group) {
 }
 
 /** One chip per kind that runs, shells first; none when the setting is off. */
-internal fun runningChips(work: RunningWork, enabled: Boolean): List<RunningChip> =
+internal fun runningChips(work: RunningWork, enabled: Boolean, unassignedCount: Int = 0): List<RunningChip> =
     if (!enabled) {
         emptyList()
     } else {
         listOf(RunningGroup.Commands, RunningGroup.Agents).mapNotNull { group ->
             work.count(group).takeIf { it > 0 }?.let { RunningChip(group, it) }
+        }.ifEmpty {
+            if (unassignedCount > 0) listOf(RunningChip(RunningGroup.Commands, unassignedCount, unassigned = true)) else emptyList()
         }
     }
 
 /** The running line under the header, unless the chips above the composer already show what runs. */
 internal val ChatState.showsRunningLine: Boolean
-    get() = !work.isEmpty && runningChips(work, runningChips).isEmpty()
+    get() = !runningChips && (!work.isEmpty || unassignedCommands.isNotEmpty())
 
 /** The kinds the list shows, [first] (the chip tapped) first; only those that run. */
 internal fun RunningWork.listGroups(first: RunningGroup): List<RunningGroup> =
@@ -122,9 +132,9 @@ internal fun RunningStop.stopping(state: ChatState): Boolean {
  * The panel after a refresh to [work] at [serverNow]: the open item takes its latest data or,
  * once gone, is marked ended (once); an open list closes when nothing runs anymore.
  */
-internal fun RunningPanel.follow(work: RunningWork, serverNow: Long): RunningPanel? {
-    val open = item ?: return takeIf { !work.isEmpty }
-    val current = work.entries(group)
+internal fun RunningPanel.follow(work: RunningWork, serverNow: Long, unassigned: List<RunningCommand> = emptyList()): RunningPanel? {
+    val open = item ?: return takeIf { !work.isEmpty || unassigned.isNotEmpty() }
+    val current = work.entries(group) + if (group == RunningGroup.Commands) unassigned.shellEntries() else emptyList()
     val found = current.firstOrNull { it.id == open.id }
     return when {
         found != null -> copy(item = found, endedAt = null)
@@ -132,6 +142,9 @@ internal fun RunningPanel.follow(work: RunningWork, serverNow: Long): RunningPan
         else -> this
     }
 }
+
+/** [startedAt] is on the server clock: [offsetMs] moves the device's [now] onto it. */
+internal fun elapsedMs(startedAt: Long, deviceNow: Long, offsetMs: Long): Long = (deviceNow + offsetMs - startedAt).coerceAtLeast(0)
 
 /** A stopwatch: `0:07`, `5:55`, `1:02:03`. */
 internal fun formatElapsedClock(millis: Long): String {

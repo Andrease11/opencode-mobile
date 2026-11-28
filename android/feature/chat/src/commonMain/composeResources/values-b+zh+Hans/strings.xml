@@ -207,7 +207,10 @@
     <string name="chat_untitled">未命名会话</string>
     <string name="chat_running_empty">没有正在运行的子代理或命令</string>
     <string name="chat_running_error">无法刷新运行中的任务</string>
-    <string name="chat_running_unassigned">此项目中的其他命令</string>
+    <string name="chat_running_unassigned">未归属的命令</string>
+    <plurals name="chat_running_unassigned_count">
+        <item quantity="other">%1$d 条未归属的命令</item>
+    </plurals>
     <string name="chat_running_unassigned_hint">这些命令没有已知的会话所有者。</string>
     <string name="chat_running_no_output">暂无输出</string>
     <string name="chat_running_elapsed">已用时：%1$s</string>

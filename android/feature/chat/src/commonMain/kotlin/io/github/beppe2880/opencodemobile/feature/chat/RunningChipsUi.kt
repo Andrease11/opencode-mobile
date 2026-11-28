@@ -36,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -84,6 +85,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
+import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
@@ -100,6 +102,8 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_ch
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_chip_shells
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_chip_shells_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_copy_command
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_empty
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_list_agents
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_list_shells
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_no_output
@@ -107,6 +111,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_op
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_agent_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_session
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_shell_description
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_refresh
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_share
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_status_ended
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_status_exited
@@ -128,6 +133,9 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_st
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_shells_label
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_subagent
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned_count
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_stop
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
@@ -138,14 +146,14 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 /*
  * Running work above the composer (setting): one chip per kind that runs, its list in a popover
- * anchored above the composer, and one item in a sheet with its live output and Stop. The data,
- * polling and stopping are the Running sheet's (ChatViewModel); only what is shown differs.
+ * anchored above the composer, and one item in a sheet with its live output and Stop.
+ * With chips disabled, the header opens the same list in a sheet.
  */
 
 /** The chips, left aligned; the popover of the open list is anchored above them. */
 @Composable
 internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, modifier: Modifier = Modifier) {
-    val chips = runningChips(state.work, state.runningChips)
+    val chips = runningChips(state.work, state.runningChips, state.unassignedCommands.size)
     if (chips.isEmpty()) return
     val focus = LocalFocusManager.current
     var anchorWidth by remember { mutableIntStateOf(0) }
@@ -193,13 +201,17 @@ internal fun RunningChipRow(chips: List<RunningChip>, onClick: (RunningGroup) ->
 private fun RunningChipView(chip: RunningChip, onClick: () -> Unit) {
     val c = OcTheme.colors
     val shape = RoundedCornerShape(percent = 50)
-    val (label, description, tag) = when (chip.group) {
-        RunningGroup.Commands -> Triple(
+    val (label, description, tag) = when {
+        chip.unassigned -> {
+            val unassigned = pluralStringResource(Res.plurals.chat_running_unassigned_count, chip.count, chip.count)
+            Triple(unassigned, unassigned, "running_chip_unassigned")
+        }
+        chip.group == RunningGroup.Commands -> Triple(
             pluralStringResource(Res.plurals.chat_running_chip_shells, chip.count, chip.count),
             pluralStringResource(Res.plurals.chat_running_chip_shells_description, chip.count, chip.count),
             "running_chip_shells",
         )
-        RunningGroup.Agents -> Triple(
+        else -> Triple(
             pluralStringResource(Res.plurals.chat_running_chip_agents, chip.count, chip.count),
             pluralStringResource(Res.plurals.chat_running_chip_agents_description, chip.count, chip.count),
             "running_chip_agents",
@@ -213,7 +225,11 @@ private fun RunningChipView(chip: RunningChip, onClick: () -> Unit) {
             .border(BorderStroke(1.dp, c.borderBase), shape)
             .testTag(tag)
             .semantics { contentDescription = description }
-            .clickable(onClickLabel = stringResource(chip.group.listTitle), role = Role.Button, onClick = onClick)
+            .clickable(
+                onClickLabel = stringResource(if (chip.unassigned) Res.string.chat_running_unassigned else chip.group.listTitle),
+                role = Role.Button,
+                onClick = onClick,
+            )
             .padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
@@ -256,7 +272,6 @@ private class AboveAnchor(private val gap: Int) : PopupPositionProvider {
 @Composable
 private fun RunningListPopover(state: ChatState, group: RunningGroup, width: Dp, onEvent: (ChatEvent) -> Unit) {
     val c = OcTheme.colors
-    val now = rememberNow()
     val shape = RoundedCornerShape(OcRadius.xl)
     Column(
         Modifier
@@ -268,34 +283,113 @@ private fun RunningListPopover(state: ChatState, group: RunningGroup, width: Dp,
             .testTag("running_popover_${group.tagName}")
             .padding(vertical = OcSpacing.sm),
     ) {
-        LazyColumn(Modifier.heightIn(max = 320.dp)) {
-            // Agents and shells stay apart: each its own heading and rows, a divider between them.
-            state.work.listGroups(group).forEachIndexed { index, section ->
-                item(key = "section:${section.name}") {
-                    Column(Modifier.testTag("running_section_${section.tagName}")) {
-                        if (index > 0) OcDivider(Modifier.padding(vertical = OcSpacing.xs))
-                        Text(
-                            stringResource(section.listTitle),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = c.textBase,
-                            modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs).semantics { heading() },
-                        )
-                    }
-                }
-                items(state.work.entries(section), key = { "${section.name}:${it.id}" }) { entry ->
-                    val showItem = { onEvent(ChatEvent.ShowRunningItem(entry.group, entry.id)) }
-                    RunningRow(
-                        entry,
-                        state,
-                        now,
-                        onClick = showItem,
-                        onOpen = if (entry.group == RunningGroup.Agents) ({ onEvent(ChatEvent.OpenSession(entry.id)) }) else showItem,
+        RunningList(state, group, onEvent, Modifier.heightIn(max = 320.dp))
+    }
+}
+
+@Composable
+internal fun RunningListSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
+    OcBottomSheet(onDismiss = { onEvent(ChatEvent.RunningSheet(false)) }, testTag = "chat_running_sheet") {
+        RunningList(
+            state,
+            RunningGroup.Agents,
+            onEvent,
+            Modifier.padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).heightIn(max = 400.dp),
+            showHeader = true,
+        )
+    }
+}
+
+@Composable
+private fun RunningList(
+    state: ChatState,
+    group: RunningGroup,
+    onEvent: (ChatEvent) -> Unit,
+    modifier: Modifier,
+    showHeader: Boolean = false,
+) {
+    val c = OcTheme.colors
+    val now = rememberNow()
+    val groups = state.work.listGroups(group)
+    LazyColumn(modifier.fillMaxWidth()) {
+        if (showHeader) item(key = "header") {
+            Row(Modifier.padding(horizontal = OcSpacing.lg), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(UiRes.string.oc_running), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                if (state.workLoading) OcSpinner()
+                OcIconButton(
+                    Icons.Outlined.Refresh,
+                    contentDescription = stringResource(Res.string.chat_running_refresh),
+                    onClick = { onEvent(ChatEvent.RefreshRunning) },
+                    modifier = Modifier.testTag("chat_running_refresh"),
+                )
+            }
+        }
+        state.workError?.let { error ->
+            item(key = "error") {
+                Box(Modifier.padding(OcSpacing.lg)) {
+                    OcErrorState(
+                        title = stringResource(Res.string.chat_running_error),
+                        message = error.resolve(),
+                        onRetry = { onEvent(ChatEvent.RefreshRunning) },
+                        retryTestTag = "chat_running_retry",
                     )
                 }
             }
         }
-        RunningStops(state, onEvent)
+        if (!state.workLoading && state.workError == null && groups.isEmpty() && state.unassignedCommands.isEmpty()) {
+            item(key = "empty") {
+                Text(stringResource(Res.string.chat_running_empty), color = c.textMuted, modifier = Modifier.padding(OcSpacing.lg))
+            }
+        }
+        groups.forEachIndexed { index, section ->
+            item(key = "section:${section.name}") {
+                RunningSectionTitle(section.listTitle, section.tagName, divider = index > 0)
+            }
+            items(state.work.entries(section), key = { "${section.name}:${it.id}" }) { entry ->
+                RunningListRow(entry, state, now, onEvent)
+            }
+        }
+        if (groups.isNotEmpty()) item(key = "session_stops") { RunningStops(state, onEvent) }
+        if (state.unassignedCommands.isNotEmpty()) {
+            item(key = "section:unassigned") {
+                RunningSectionTitle(Res.string.chat_running_unassigned, "unassigned", divider = groups.isNotEmpty())
+                Text(
+                    stringResource(Res.string.chat_running_unassigned_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = c.textMuted,
+                    modifier = Modifier.padding(horizontal = OcSpacing.lg),
+                )
+            }
+            items(state.unassignedCommands.shellEntries(), key = { "unassigned:${it.id}" }) { entry ->
+                RunningListRow(entry, state, now, onEvent)
+            }
+        }
     }
+}
+
+@Composable
+private fun RunningSectionTitle(title: StringResource, tag: String, divider: Boolean) {
+    Column(Modifier.testTag("running_section_$tag")) {
+        if (divider) OcDivider(Modifier.padding(vertical = OcSpacing.xs))
+        Text(
+            stringResource(title),
+            style = MaterialTheme.typography.titleSmall,
+            color = OcTheme.colors.textBase,
+            modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs).semantics { heading() },
+        )
+    }
+}
+
+@Composable
+private fun RunningListRow(entry: RunningEntry, state: ChatState, now: Long, onEvent: (ChatEvent) -> Unit) {
+    val showItem = { onEvent(ChatEvent.ShowRunningItem(entry.group, entry.id)) }
+    RunningRow(
+        entry,
+        state,
+        now,
+        onClick = showItem,
+        onOpen = if (entry.group == RunningGroup.Agents) ({ onEvent(ChatEvent.OpenSession(entry.id)) }) else showItem,
+    )
 }
 
 @Composable
@@ -645,7 +739,7 @@ internal fun rememberNow(): Long {
     return now
 }
 
-/** The confirmations of every Stop of running work: the Running sheet's and the chips' sheet's. */
+/** The confirmations of every Stop of running work. */
 @Composable
 internal fun RunningStopDialogs(state: ChatState, onEvent: (ChatEvent) -> Unit) {
     state.confirmingStop?.let { id ->
